@@ -1,0 +1,121 @@
+DICCIONARIO DE OBJETOS COCO (Common Objects in Context)
+========================================================
+Este archivo contiene los 80 objetos que puede detectar YOLOv5s entrenado con el dataset COCO.
+
+Formato: ID | Nombre del objeto | Descripción
+================================================
+
+1 | person | Persona
+2 | bicycle | Bicicleta
+3 | car | Coche
+4 | motorbike | Motocicleta
+5 | aeroplane | Avión
+6 | bus | Autobús
+7 | train | Tren
+8 | truck | Camión
+9 | boat | Barco
+10 | traffic light | Semáforo
+11 | fire hydrant | Hidrante contra incendios
+12 | stop sign | Señal de stop
+13 | parking meter | Parquímetro
+14 | bench | Banco
+15 | cat | Gato
+16 | dog | Perro
+17 | horse | Caballo
+18 | sheep | Oveja
+19 | cow | Vaca
+20 | elephant | Elefante
+21 | bear | Oso
+22 | zebra | Cebra
+23 | giraffe | Jirafa
+24 | backpack | Mochila
+25 | umbrella | Paraguas
+26 | handbag | Bolso
+27 | tie | Corbata
+28 | suitcase | Maleta
+29 | frisbee | Frisbee
+30 | skis | Esquís
+31 | snowboard | Tabla de nieve
+32 | sports ball | Pelota deportiva
+33 | kite | Cometa
+34 | baseball bat | Bate de béisbol
+35 | baseball glove | Guante de béisbol
+36 | skateboard | Monopatín
+37 | surfboard | Tabla de surf
+38 | tennis racket | Raqueta de tenis
+39 | bottle | Botella
+40 | wine glass | Vaso de vino
+41 | cup | Taza
+42 | fork | Tenedor
+43 | knife | Cuchillo
+44 | spoon | Cuchara
+45 | bowl | Cuenco
+46 | banana | Plátano
+47 | apple | Manzana
+48 | sandwich | Sándwich
+49 | orange | Naranja
+50 | broccoli | Brócoli
+51 | carrot | Zanahoria
+52 | hot dog | Hot dog
+53 | pizza | Pizza
+54 | donut | Rosquilla
+55 | cake | Pastel
+56 | chair | Silla
+57 | sofa | Sofá
+58 | pottedplant | Planta en maceta
+59 | bed | Cama
+60 | diningtable | Mesa de comedor
+61 | toilet | Inodoro
+62 | tvmonitor | Monitor de TV
+63 | laptop | Portátil
+64 | mouse | Ratón
+65 | remote | Control remoto
+66 | keyboard | Teclado
+67 | microwave | Microondas
+68 | oven | Horno
+69 | toaster | Tostadora
+70 | sink | Fregadero
+71 | refrigerator | Refrigerador
+72 | book | Libro
+73 | clock | Reloj
+74 | vase | Jarrón
+75 | scissors | Tijeras
+76 | teddy bear | Oso de peluche
+77 | hair drier | Secador de pelo
+78 | toothbrush | Cepillo de dientes
+79 | (unused) | Vacío
+80 | (unused) | Vacío
+
+========================================================
+NOTAS IMPORTANTES:
+========================================================
+
+1. En el archivo DashboardLocalConDeteccion.py se utilizan estos IDs:
+   - ID 47: Manzana (apple) - en la función platano()
+   - ID 73: Reloj (clock) - en la función clock()
+   - ID 53: Pizza (pizza) - en la función pizza()
+
+   Nota: Parece que hay un error en el mapeo, puedes ajustar estos IDs
+   según el objeto que realmente quieras detectar.
+
+2. Los IDs van de 1 a 80 (80 objetos totales).
+
+3. Para usar este diccionario, utiliza el ID correspondiente en la función:
+   video_receiver.setObject(ID)
+
+4. Los últimos dos IDs (79 y 80) están sin usar en la mayoría de versiones
+   del dataset COCO.
+
+5. Los objetos están organizados en categorías:
+   - Personas y vehículos (1-9)
+   - Señales de tráfico (10-13)
+   - Mobiliario urbano (14)
+   - Animales (15-23)
+   - Accesorios de personas (24-38)
+   - Alimentos y bebidas (39-55)
+   - Muebles (56-60)
+   - Electrodomésticos (61-71)
+   - Accesorios diversos (72-78)
+
+========================================================
+
