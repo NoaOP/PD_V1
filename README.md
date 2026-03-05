@@ -85,7 +85,7 @@ Este ejercicio básicamente consiste en revisar el fichero `AutopilotService.py`
 Para resolverlo, identificamos la línea exacta que generaba el conflicto, solucionamos forzando la conversión del dato a entero mediante la función `int()` donde saltaba el error y, finalmente, tras una breve comprobación, verificamos que el botón de recepción de datos de telemetría ya se puede utilizar correctamente.
 Ademas en esta funcion la funcion publish_telemetry_info esta inacabada y la acabamos de rellenar, hacemos que hasta que no pase mas de medio segundo no se vuelve a enviar, asi ayudamos a la no saturacion. 
 
-<img width="388" height="701" alt="Captura de pantalla 2026-03-05 202457" src="https://github.com/user-attachments/assets/e9da6c3a-5a14-4b01-a28d-197562509028" />
+<img width="188" height="501" alt="Captura de pantalla 2026-03-05 202457" src="https://github.com/user-attachments/assets/e9da6c3a-5a14-4b01-a28d-197562509028" />
 
 
 **2. Los cambios de velocidad y de heading no están operativos en el dashboard. Introducir el código necesario para implementar estas funcionalidades.**
@@ -106,7 +106,7 @@ Para que el botón se ponga en amarillo y luego en verde, debemos en `indexHTTP.
 
 Para añadir el botón de RTL, empezamos copiando el botón de aterrizaje, ya que se parecen mucho, y luego cambiaremos la función a RTL, esto lo debemos hacer en todos los scripts, ya que siempre que hay alguna referencia al botón de aterrizaje debemos copiarlo y cambiarle el nombre.
 
-<img width="950" height="866" alt="Captura de pantalla 2026-03-05 201949" src="https://github.com/user-attachments/assets/fe0a8fb6-922d-433d-a533-dc80de008079" />
+<img width="550" height="466" alt="Captura de pantalla 2026-03-05 201949" src="https://github.com/user-attachments/assets/fe0a8fb6-922d-433d-a533-dc80de008079" />
 
 
 ### 4.2.3 Escenario Global. WebApp MQTT
@@ -128,7 +128,7 @@ Similar a antes, para crear el botón de RTL, copiamos las funciones y los sitio
 
 Primero añadimos como tal la slide bar para poder cambiar el heading, pero para que funcione debemos añadir una función que coja el valor donde está la slide bar y lo publique, todo esto en `indexMQTT.html`. Como en `AutopilotService.py` ya habíamos añadido las funciones y código necesario para hacer el change heading en el `DashboardGlobalPython.py` no tenemos que añadir nada mas.
 
-<img width="955" height="867" alt="Captura de pantalla 2026-03-05 200445" src="https://github.com/user-attachments/assets/e7a3dc39-db72-453b-a856-c643de99f3a1" />
+<img width="555" height="467" alt="Captura de pantalla 2026-03-05 200445" src="https://github.com/user-attachments/assets/e7a3dc39-db72-453b-a856-c643de99f3a1" />
 
 
 ## 4.3 Video Streaming
