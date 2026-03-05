@@ -1,0 +1,37 @@
+D:\Julio2018\Docencia\PDD\Proyecto2025\repo\DashboardLocalCsharp\Dashboard\Formulario\bin\Debug\Formulario.exe.config
+D:\Julio2018\Docencia\PDD\Proyecto2025\repo\DashboardLocalCsharp\Dashboard\Formulario\bin\Debug\Formulario.exe
+D:\Julio2018\Docencia\PDD\Proyecto2025\repo\DashboardLocalCsharp\Dashboard\Formulario\bin\Debug\Formulario.pdb
+D:\Julio2018\Docencia\PDD\Proyecto2025\repo\DashboardLocalCsharp\Dashboard\Formulario\bin\Debug\csDronLink.dll
+D:\Julio2018\Docencia\PDD\Proyecto2025\repo\DashboardLocalCsharp\Dashboard\Formulario\obj\Debug\Formulario.csproj.AssemblyReference.cache
+D:\Julio2018\Docencia\PDD\Proyecto2025\repo\DashboardLocalCsharp\Dashboard\Formulario\obj\Debug\Formulario.Form1.resources
+D:\Julio2018\Docencia\PDD\Proyecto2025\repo\DashboardLocalCsharp\Dashboard\Formulario\obj\Debug\Formulario.Properties.Resources.resources
+D:\Julio2018\Docencia\PDD\Proyecto2025\repo\DashboardLocalCsharp\Dashboard\Formulario\obj\Debug\Formulario.csproj.GenerateResource.cache
+D:\Julio2018\Docencia\PDD\Proyecto2025\repo\DashboardLocalCsharp\Dashboard\Formulario\obj\Debug\Formulario.csproj.CoreCompileInputs.cache
+D:\Julio2018\Docencia\PDD\Proyecto2025\repo\DashboardLocalCsharp\Dashboard\Formulario\obj\Debug\Formulario.csproj.Up2Date
+D:\Julio2018\Docencia\PDD\Proyecto2025\repo\DashboardLocalCsharp\Dashboard\Formulario\obj\Debug\Formulario.exe
+D:\Julio2018\Docencia\PDD\Proyecto2025\repo\DashboardLocalCsharp\Dashboard\Formulario\obj\Debug\Formulario.pdb
+D:\Julio2018\Docencia\PDD\Proyecto2025\repo\DashboardLocalCsharp\Dashboard\Formulario\obj\Debug\Formulario.exe.config
+C:\Users\elsam\OneDrive\Desktop\PD\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\bin\Debug\Formulario.exe.config
+C:\Users\elsam\OneDrive\Desktop\PD\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\bin\Debug\Formulario.exe
+C:\Users\elsam\OneDrive\Desktop\PD\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\bin\Debug\Formulario.pdb
+C:\Users\elsam\OneDrive\Desktop\PD\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\bin\Debug\csDronLink.dll
+C:\Users\elsam\OneDrive\Desktop\PD\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\obj\Debug\Formulario.csproj.AssemblyReference.cache
+C:\Users\elsam\OneDrive\Desktop\PD\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\obj\Debug\Formulario.Form1.resources
+C:\Users\elsam\OneDrive\Desktop\PD\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\obj\Debug\Formulario.Properties.Resources.resources
+C:\Users\elsam\OneDrive\Desktop\PD\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\obj\Debug\Formulario.csproj.GenerateResource.cache
+C:\Users\elsam\OneDrive\Desktop\PD\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\obj\Debug\Formulario.csproj.CoreCompileInputs.cache
+C:\Users\elsam\OneDrive\Desktop\PD\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\obj\Debug\Formulario.csproj.Up2Date
+C:\Users\elsam\OneDrive\Desktop\PD\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\obj\Debug\Formulario.exe
+C:\Users\elsam\OneDrive\Desktop\PD\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\obj\Debug\Formulario.pdb
+C:\Users\Usuari\OneDrive\Documentos\UPC\4\PD\Projecte C# V1\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\bin\Debug\Formulario.exe.config
+C:\Users\Usuari\OneDrive\Documentos\UPC\4\PD\Projecte C# V1\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\bin\Debug\Formulario.exe
+C:\Users\Usuari\OneDrive\Documentos\UPC\4\PD\Projecte C# V1\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\bin\Debug\Formulario.pdb
+C:\Users\Usuari\OneDrive\Documentos\UPC\4\PD\Projecte C# V1\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\bin\Debug\csDronLink.dll
+C:\Users\Usuari\OneDrive\Documentos\UPC\4\PD\Projecte C# V1\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\obj\Debug\Formulario.csproj.AssemblyReference.cache
+C:\Users\Usuari\OneDrive\Documentos\UPC\4\PD\Projecte C# V1\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\obj\Debug\Formulario.Form1.resources
+C:\Users\Usuari\OneDrive\Documentos\UPC\4\PD\Projecte C# V1\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\obj\Debug\Formulario.Properties.Resources.resources
+C:\Users\Usuari\OneDrive\Documentos\UPC\4\PD\Projecte C# V1\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\obj\Debug\Formulario.csproj.GenerateResource.cache
+C:\Users\Usuari\OneDrive\Documentos\UPC\4\PD\Projecte C# V1\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\obj\Debug\Formulario.csproj.CoreCompileInputs.cache
+C:\Users\Usuari\OneDrive\Documentos\UPC\4\PD\Projecte C# V1\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\obj\Debug\Formulario.csproj.Up2Date
+C:\Users\Usuari\OneDrive\Documentos\UPC\4\PD\Projecte C# V1\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\obj\Debug\Formulario.exe
+C:\Users\Usuari\OneDrive\Documentos\UPC\4\PD\Projecte C# V1\C1\ProyectoDeDrones\DashboardLocalCsharp\Formulario\obj\Debug\Formulario.pdb
