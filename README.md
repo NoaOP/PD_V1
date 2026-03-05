@@ -7,7 +7,67 @@ En la **Versión 1** del proyecto se resuelven los ejercicios propuestos con el 
 * **`P1`**: Contiene los códigos y problemas resueltos en Python.
 
 ## 4.1 Escenario Local
+En el escenario local, la estación de tierra está conectada directamente al dron y es el propio programa quien envía las órdenes utilizando las librerías proporcionadas. En esta parte del proyecto hemos trabajado con dos versiones distintas de la estación de tierra: una desarrollada en Python y otra en C#. En ambos casos, el objetivo ha sido comprender el funcionamiento básico de la interfaz, revisar el código proporcionado y completar los ejercicios propuestos para añadir o corregir funcionalidades.
 
+
+### 4.1.1 Escenario Global. Dashboard Global Python
+En primer lugar, trabajamos con el fichero **DashboardLocalPython.py**, que implementa una interfaz gráfica en Tkinter para controlar el dron en un entorno local. Esta interfaz incluye botones para conectar con el dron, despegar, aterrizar, ejecutar un RTL, consultar datos de telemetría y controlar la navegación en distintas direcciones como se muestra en la imagen.
+
+
+<img width="270" height="414" alt="image" src="https://github.com/user-attachments/assets/180ac4d0-9f79-40e1-8804-8120ce5282e4" />
+
+
+A partir de este código base, se resolvieron los ejercicios planteados:
+
+
+**1. Modificar el código para que las operaciones de aterrizaje y RTL tengan un comportamiento similar a la operación de despegue (llamada no bloqueante).**
+
+
+Inicialmente, las funciones de aterrizaje y RTL estaban programadas de forma bloqueante, lo que provocaba que la interfaz gráfica quedase congelada mientras el dron completaba la maniobra. Para corregirlo, se modificó el código para que ambas operaciones funcionaran con llamadas no bloqueantes, del mismo modo que el despegue. De esta forma, la interfaz sigue activa durante la maniobra y el usuario puede seguir viendo la telemetría o interactuando con la aplicación mientras el dron aterriza o regresa al punto de origen.
+
+
+(VIEDO DE COM FUNCIONA EL RTL I ENCARA HI HA TELEMETRIA?)
+
+
+**2. Incorporar al bloque de datos de telemetría algún dato más.**
+Además de los datos que ya mostraba el dashboard, se añadieron nuevos valores de telemetría para ampliar la información disponible en pantalla. Se incorporaron datos adicionales como el estado del dron y su velocidad, haciendo la interfaz más útil a la hora de supervisar el comportamiento del vehículo durante el vuelo.
+
+
+(FOTITO DE LA TELEMETRIA)
+
+
+**3. Añadir un botón más para realizar una nueva función.**
+
+También se añadió una nueva funcionalidad mediante un botón extra en la interfaz: la función Go To. Esta función pide al usuario una latitud, una longitud y una altitud y, al pulsar el botón, el dron se dirige automáticamente hacia esa posición indicada. Para implementarlo, se creó el nuevo botón en la interfaz, se añadieron los campos necesarios para introducir las coordenadas y la altura, y se vinculó todo con la función correspondiente de la librería `DronLink`. De este modo, la aplicación incorpora una orden de navegación más avanzada que permite enviar el dron directamente a un punto concreto.
+
+(VIDEO)
+
+### 4.1.2 Escenario Global. Dashboard Global Python
+
+La segunda parte del escenario local se desarrolló en C#, utilizando la aplicación de la carpeta DashboardLocalCsharp, creada con Windows Forms. Esta versión ofrece una interfaz muy similar a la de Python, aunque incorpora algunas diferencias, como la posibilidad de indicar la altura de despegue y mostrar también la posición del dron en latitud y longitud como se muestra en la imagen.
+
+<img width="459" height="403" alt="image" src="https://github.com/user-attachments/assets/e560f507-28b5-4b79-897b-e33b41a9384d" />
+
+
+Sobre esta base, se realizaron los ejercicios propuestos:
+
+**1. Hacer que el usuario pueda establecer la altura de despegue con una barra de desplazamiento, igual que el heading o la velocidad.**
+
+Se modificó la interfaz para que la altura de despegue no tuviera que introducirse manualmente, sino que pudiera ajustarse mediante una barra deslizante, igual que otros parámetros como el heading o la velocidad. Su funcionamiento puede observarse en el siguiente vídeo:
+
+https://drive.google.com/file/d/1N8Hu4X_CTP35p9wE4oufnds0ANmOSBUR/view?usp=sharing
+
+**2. Añadir algún dato más a los datos de telemetría.**
+
+Se amplió también la información mostrada en pantalla incorporando un nuevo dato de telemetría: la velocidad ground aproximada del dron. De este modo, además de los valores básicos, el usuario puede visualizar información extra relevante para seguir el estado del dron durante la operación. Esta nueva información se muestra también en el siguiente vídeo:
+
+https://drive.google.com/file/d/1q-8HAw81WQCiybMOLZxCH2JSykyGLKtZ/view?usp=sharing
+
+**3. Incorporar un botón para realizar alguna nueva función.**
+
+Finalmente, se añadió un nuevo botón con una funcionalidad adicional pensada para situaciones de emergencia. Esta nueva función hace que, independientemente del punto en el que se encuentre el dron, ascienda automáticamente 5 metros de altitud al pulsar el botón. El objetivo de esta acción es aumentar rápidamente la separación vertical en caso de que el dron pueda chocar con un obstáculo cercano. De este modo, se amplían las capacidades del dashboard en C# incorporando una orden útil de seguridad. El funcionamiento de esta nueva función puede observarse en el siguiente vídeo:
+
+https://drive.google.com/file/d/1TdIIdKZL2Lew9zLa5RKhy9QaKaxGhT5I/view?usp=sharing
 
 
 ## 4.2 Escenario Global
