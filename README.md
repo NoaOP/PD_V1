@@ -85,7 +85,7 @@ Este ejercicio básicamente consiste en revisar el fichero `AutopilotService.py`
 Para resolverlo, identificamos la línea exacta que generaba el conflicto, solucionamos forzando la conversión del dato a entero mediante la función `int()` donde saltaba el error y, finalmente, tras una breve comprobación, verificamos que el botón de recepción de datos de telemetría ya se puede utilizar correctamente.
 Ademas en esta funcion la funcion publish_telemetry_info esta inacabada y la acabamos de rellenar, hacemos que hasta que no pase mas de medio segundo no se vuelve a enviar, asi ayudamos a la no saturacion. 
 
-<img width="188" height="501" alt="Captura de pantalla 2026-03-05 202457" src="https://github.com/user-attachments/assets/e9da6c3a-5a14-4b01-a28d-197562509028" />
+<img width="208" height="521" alt="Captura de pantalla 2026-03-05 202457" src="https://github.com/user-attachments/assets/e9da6c3a-5a14-4b01-a28d-197562509028" />
 
 
 **2. Los cambios de velocidad y de heading no están operativos en el dashboard. Introducir el código necesario para implementar estas funcionalidades.**
@@ -128,7 +128,7 @@ Similar a antes, para crear el botón de RTL, copiamos las funciones y los sitio
 
 Primero añadimos como tal la slide bar para poder cambiar el heading, pero para que funcione debemos añadir una función que coja el valor donde está la slide bar y lo publique, todo esto en `indexMQTT.html`. Como en `AutopilotService.py` ya habíamos añadido las funciones y código necesario para hacer el change heading en el `DashboardGlobalPython.py` no tenemos que añadir nada mas.
 
-<img width="555" height="467" alt="Captura de pantalla 2026-03-05 200445" src="https://github.com/user-attachments/assets/e7a3dc39-db72-453b-a856-c643de99f3a1" />
+<img width="455" height="367" alt="Captura de pantalla 2026-03-05 200445" src="https://github.com/user-attachments/assets/e7a3dc39-db72-453b-a856-c643de99f3a1" />
 
 
 ## 4.3 Video Streaming
