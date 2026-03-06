@@ -137,6 +137,14 @@ Para recibir video en tiempo real, el cameraService.py captura los frames median
 
 ## 4.4 Reconocimiento de Objetos
 
-**1. Procesar 1 de cada 100 frames hace que el impacto en la fluidez sea despreciable, pero introduce un retardo en la detección del objeto. Experimentar con valores más bajos de ese periodo hasta encontrar un mejor compromiso entre fluidez y retardo en la detección.
+**1. Procesar 1 de cada 100 frames hace que el impacto en la fluidez sea despreciable, pero introduce un retardo en la detección del objeto. Experimentar con valores más bajos de ese periodo hasta encontrar un mejor compromiso entre fluidez y retardo en la detección.**
 
+Para optimizar el rendimiento del sistema, hemos modificado el código de DashboardLocalConDeteccion.py ajustando la frecuencia de análisis de la red neuronal para que procese 10 de cada 100 frames recibidos. Esta configuración específica se seleccionó tras experimentar con diversos intervalos, determinando que es la que ofrece la mejor relación de compromiso entre una visualización fluida del stream de video y una detección de objetos precisa y con bajo retardo. Al no saturar el procesador con cada frame individual, pero aumentar la frecuencia de muestreo respecto al valor inicial, logramos que el rectángulo de detección siga el movimiento del objeto (como la pizza o el reloj) de forma mucho más natural sin sacrificar la estabilidad de la transmisión WebRTC.
 
+**2. Añadir botones para reconocer otros objetos del data set de COCO.**
+
+Hemos ampliado la interfaz del DashboardLocalConDeteccion añadiendo nuevos botones que permiten detectar perros, naranjas y pasteles, aprovechando que la red neuronal ya está entrenada para estos objetos. Para facilitar esta tarea, hemos creado un sencillo archivo .txt que sirve como guía de referencia rápida, donde se puede consultar qué número corresponde a cada uno de los 80 objetos del dataset COCO.
+
+<img width="410" height="878" alt="image" src="https://github.com/user-attachments/assets/6594ac90-dfbc-4f1c-bb1a-4870e5bd090e" />
+
+<img width="1610" height="898" alt="image" src="https://github.com/user-attachments/assets/28cf003d-1e71-46a7-8f41-e3564b2f5bbe" />
