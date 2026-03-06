@@ -133,10 +133,10 @@ Primero añadimos como tal la slide bar para poder cambiar el heading, pero para
 
 ## 4.3 Video Streaming
 
-
+Para recibir video en tiempo real, el cameraService.py captura los frames mediante OpenCV y actúa como servidor emisor, mientras que el DashboardLocalConVideoStream.py actúa como cliente receptor al pulsar un botón de conexión. Ambos establecen un enlace inicial mediante un Websocket para coordinarse y luego utilizan el protocolo WebRTC sobre UDP, lo que garantiza una transmisión fluida y con baja latencia al evitar los retardos de control de flujo típicos de TCP o MQTT. Si bien el sistema está configurado por defecto para funcionar en localhost, basta con sustituir esta dirección por la IP local del servicio si el dashboard y la cámara se ejecutan en equipos distintos dentro de la misma red.
 
 ## 4.4 Reconocimiento de Objetos
 
-
+**1. Procesar 1 de cada 100 frames hace que el impacto en la fluidez sea despreciable, pero introduce un retardo en la detección del objeto. Experimentar con valores más bajos de ese periodo hasta encontrar un mejor compromiso entre fluidez y retardo en la detección.
 
 
