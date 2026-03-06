@@ -47,7 +47,7 @@ def takeoff ():
     global dron
     # despegamos a una altura de 5 metros
     # llamada no bloqueante. Cuando alcance la altura indicada ejecutará la función inTheAir
-    dron.takeOff (50, blocking = False,  callback = inTheAir)
+    dron.takeOff (5, blocking = False,  callback = inTheAir)
     takeOffBtn['text'] = 'Despegando...'
     takeOffBtn['fg'] = 'black'
     takeOffBtn['bg'] = 'yellow'
