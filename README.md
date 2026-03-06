@@ -146,7 +146,4 @@ Para optimizar el rendimiento del sistema, hemos modificado el código de Dashbo
 Hemos ampliado la interfaz del DashboardLocalConDeteccion añadiendo nuevos botones que permiten detectar perros, naranjas y pasteles, aprovechando que la red neuronal ya está entrenada para estos objetos. Para facilitar esta tarea, hemos creado un sencillo archivo .txt que sirve como guía de referencia rápida, donde se puede consultar qué número corresponde a cada uno de los 80 objetos del dataset COCO.
 
 
-<img width="205" height="439" alt="image" src="https://github.com/user-attachments/assets/6594ac90-dfbc-4f1c-bb1a-4870e5bd090e" />
-
-
 <img width="805" height="449" alt="image" src="https://github.com/user-attachments/assets/28cf003d-1e71-46a7-8f41-e3564b2f5bbe" />
