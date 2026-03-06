@@ -7,10 +7,12 @@ En la **Versión 1** del proyecto se resuelven los ejercicios propuestos con el 
 * **`P1`**: Contiene los códigos y problemas resueltos en Python.
 
 ## 4.1 Escenario Local
+
 En el escenario local, la estación de tierra está conectada directamente al dron y es el propio programa quien envía las órdenes utilizando las librerías proporcionadas. En esta parte del proyecto hemos trabajado con dos versiones distintas de la estación de tierra: una desarrollada en Python y otra en C#. En ambos casos, el objetivo ha sido comprender el funcionamiento básico de la interfaz, revisar el código proporcionado y completar los ejercicios propuestos para añadir o corregir funcionalidades.
 
 
 ### 4.1.1 Escenario Global. Dashboard Global Python
+
 En primer lugar, trabajamos con el fichero **DashboardLocalPython.py**, que implementa una interfaz gráfica en Tkinter para controlar el dron en un entorno local. Esta interfaz incluye botones para conectar con el dron, despegar, aterrizar, ejecutar un RTL, consultar datos de telemetría y controlar la navegación en distintas direcciones como se muestra en la imagen.
 
 
@@ -23,17 +25,15 @@ A partir de este código base, se resolvieron los ejercicios planteados:
 **1. Modificar el código para que las operaciones de aterrizaje y RTL tengan un comportamiento similar a la operación de despegue (llamada no bloqueante).**
 
 
-Inicialmente, las funciones de aterrizaje y RTL estaban programadas de forma bloqueante, lo que provocaba que la interfaz gráfica quedase congelada mientras el dron completaba la maniobra. Para corregirlo, se modificó el código para que ambas operaciones funcionaran con llamadas no bloqueantes, del mismo modo que el despegue. De esta forma, la interfaz sigue activa durante la maniobra y el usuario puede seguir viendo la telemetría o interactuando con la aplicación mientras el dron aterriza o regresa al punto de origen.
+Inicialmente, las funciones de aterrizaje y RTL estaban programadas de forma bloqueante, lo que provocaba que la interfaz gráfica quedase congelada mientras el dron completaba la maniobra. Para corregirlo, se modificó el código para que ambas operaciones funcionaran con llamadas no bloqueantes, del mismo modo que el despegue. De esta forma, la interfaz sigue activa durante la maniobra y el usuario puede seguir viendo la telemetría o interactuando con la aplicación mientras el dron aterriza o regresa al punto de origen como se muestra en la imagen.
 
+<img width="1600" height="848" alt="image" src="https://github.com/user-attachments/assets/294423d5-5911-4fa0-a46a-5dfc7e96e885" />
 
-(VIEDO DE COM FUNCIONA EL RTL I ENCARA HI HA TELEMETRIA?)
 
 
 **2. Incorporar al bloque de datos de telemetría algún dato más.**
+
 Además de los datos que ya mostraba el dashboard, se añadieron nuevos valores de telemetría para ampliar la información disponible en pantalla. Se incorporaron datos adicionales como el estado del dron y su velocidad, haciendo la interfaz más útil a la hora de supervisar el comportamiento del vehículo durante el vuelo.
-
-
-(FOTITO DE LA TELEMETRIA)
 
 
 **3. Añadir un botón más para realizar una nueva función.**
