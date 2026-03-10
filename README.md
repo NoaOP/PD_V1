@@ -154,3 +154,7 @@ Hemos ampliado la interfaz del DashboardLocalConDeteccion añadiendo nuevos boto
 
 
 <img width="805" height="449" alt="image" src="https://github.com/user-attachments/assets/28cf003d-1e71-46a7-8f41-e3564b2f5bbe" />
+
+
+En el siguiente vídeo se puede ver el funcionamiento del reconocimiento de objetos y los nuevos objetos añadidos:
+https://drive.google.com/file/d/11wwcbdP_aU5vquPLCbWBiLmkdVE2YVSY/view?usp=sharing
