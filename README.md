@@ -33,14 +33,19 @@ Inicialmente, las funciones de aterrizaje y RTL estaban programadas de forma blo
 
 **2. Incorporar al bloque de datos de telemetría algún dato más.**
 
-Además de los datos que ya mostraba el dashboard, se añadieron nuevos valores de telemetría para ampliar la información disponible en pantalla. Se incorporaron datos adicionales como el estado del dron y su velocidad, haciendo la interfaz más útil a la hora de supervisar el comportamiento del vehículo durante el vuelo.
+Además de los datos que ya mostraba el dashboard, se añadieron nuevos valores de telemetría para ampliar la información disponible en pantalla. Se incorporaron datos adicionales como el estado del dron y su velocidad, haciendo la interfaz más útil a la hora de supervisar el comportamiento del vehículo durante el vuelo. Su funcionamiento puede observarse en el vídeo de la pregunta 3.
+
+En el vídeo se muestra su funcionamiento.
+
+https://drive.google.com/file/d/1-OQDlLpLbsjsY9XwhkFXSymk14IDDuS9/view?usp=sharing
 
 
 **3. Añadir un botón más para realizar una nueva función.**
 
-También se añadió una nueva funcionalidad mediante un botón extra en la interfaz: la función Go To. Esta función pide al usuario una latitud, una longitud y una altitud y, al pulsar el botón, el dron se dirige automáticamente hacia esa posición indicada. Para implementarlo, se creó el nuevo botón en la interfaz, se añadieron los campos necesarios para introducir las coordenadas y la altura, y se vinculó todo con la función correspondiente de la librería `DronLink`. De este modo, la aplicación incorpora una orden de navegación más avanzada que permite enviar el dron directamente a un punto concreto.
+También se añadió una nueva funcionalidad mediante un botón extra en la interfaz: la función Go To. Esta función pide al usuario una latitud, una longitud y una altitud y, al pulsar el botón, el dron se dirige automáticamente hacia esa posición indicada. Para implementarlo, se creó el nuevo botón en la interfaz, se añadieron los campos necesarios para introducir las coordenadas y la altura, y se vinculó todo con la función correspondiente de la librería `DronLink`. De este modo, la aplicación incorpora una orden de navegación más avanzada que permite enviar el dron directamente a un punto concreto. Su funcionamiento puede observarse en el siguiente vídeo:
 
-(VIDEO)
+https://drive.google.com/file/d/118BpxD1hecbot_Gt-S2ncHfJLbqnawwE/view?usp=sharing
+
 
 ### 4.1.2 Escenario Global. Dashboard Global Python
 
@@ -96,7 +101,7 @@ Por otro lado, en `AutopilotService.py` debemos añadir que cuando el comando se
 
 
 ### 4.2.2 Escenario Global. WebApp HTTP
-Ahora empezamos con las web app, estas nos dan la posibilidad de conectarnos para controlar el dron sin tener que instalarnos nada. Primero usaremos el protocolo HTTP.
+Ahora empezamos con las web app, estas nos dan la posibilidad de conectarnos para controlar el dron sin tener que instalarnos nada. Primero usaremos el protocolo HTTP. En el vídeo del final del apartado se muestra su funcionamiento final después de los ejercicios.
 
 **1. El botón de aterrizar tiene un comportamiento diferente al de despegar. Hacer los cambios necesarios para que el botón también se ponga en color amarillo cuando empiece el aterrizaje y se ponga en verde cuando el dron esté en tierra.**
 
@@ -108,10 +113,11 @@ Para añadir el botón de RTL, empezamos copiando el botón de aterrizaje, ya qu
 
 <img width="550" height="466" alt="Captura de pantalla 2026-03-05 201949" src="https://github.com/user-attachments/assets/fe0a8fb6-922d-433d-a533-dc80de008079" />
 
+https://drive.google.com/file/d/1BoyupCY5jyQn9U7NIclUMUVpIm-hF4_l/view?usp=sharing
+
 
 ### 4.2.3 Escenario Global. WebApp MQTT
-En el protocolo HTTP, la información no fluye de la forma más dinámica, por eso ahora utilizaremos MQTT para hacer la WebApp. 
-Hemos resuelto los siguientes ejercicios:
+En el protocolo HTTP, la información no fluye de la forma más dinámica, por eso ahora utilizaremos MQTT para hacer la WebApp. En el vídeo del final del apartado se muestra su funcionamiento final después de los ejercicios. Hemos resuelto los siguientes ejercicios:
 
 
 **1. El botón de aterrizar tiene un comportamiento diferente al de despegar. Hacer los cambios necesarios para que el botón también se ponga en color amarillo cuando empiece el aterrizaje y se ponga en verde cuando el dron esté en tierra.**
@@ -130,6 +136,7 @@ Primero añadimos como tal la slide bar para poder cambiar el heading, pero para
 
 <img width="455" height="367" alt="Captura de pantalla 2026-03-05 200445" src="https://github.com/user-attachments/assets/e7a3dc39-db72-453b-a856-c643de99f3a1" />
 
+https://drive.google.com/file/d/1QRABY5zr6B_IUCsOBJQLRD2gch4cewtW/view?usp=sharing
 
 ## 4.3 Video Streaming
 
@@ -147,3 +154,7 @@ Hemos ampliado la interfaz del DashboardLocalConDeteccion añadiendo nuevos boto
 
 
 <img width="805" height="449" alt="image" src="https://github.com/user-attachments/assets/28cf003d-1e71-46a7-8f41-e3564b2f5bbe" />
+
+
+En el siguiente vídeo se puede ver el funcionamiento del reconocimiento de objetos y los nuevos objetos añadidos:
+https://drive.google.com/file/d/11wwcbdP_aU5vquPLCbWBiLmkdVE2YVSY/view?usp=sharing
