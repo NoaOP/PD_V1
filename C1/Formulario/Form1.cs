@@ -92,6 +92,7 @@ namespace Formulario
 
         private void but_connect_Click(object sender, EventArgs e)
         {
+            //dron.Conectar("produccion", "COM11");
             dron.Conectar("simulacion");
             but_connect.BackColor = Color.Green;
             but_connect.ForeColor = Color.White;
