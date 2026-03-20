@@ -152,8 +152,10 @@ def crear_ventana():
     client = mqtt.Client("InterfazGlobal", transport="websockets")
 
     # me conecto al broker publico y gratuito
-    broker_address = "broker.hivemq.com"
+    #broker_address = "broker.hivemq.com"
+    broker_address = "dronseetac.upc.edu"
     broker_port = 8000
+    client.username_pw_set("dronsEETAC", "mimara1456.")
 
     client.on_message = on_message
     client.on_connect = on_connect

@@ -113,11 +113,31 @@ def on_message(cli, userdata, message):
 
     sending_topic = "Grup2/autopilotServiceDemo/" + origin # lo necesitaré para enviar las respuestas
 
-    if command == 'connect':
-        connection_string = 'tcp:127.0.0.1:5763'
-        baud = 115200
-        dron.connect(connection_string, baud, freq=10)
-        publish_event('connected')
+    if command == 'Simulacion':
+        payload_raw = message.payload.decode("utf-8")
+        try:
+            partes = payload_raw.split(',')
+            opcion = int(partes[0])
+            num_puerto = partes[1]
+
+            if opcion == 1:
+                # Opció 1: COM
+                connection_string = f'COM{num_puerto}'
+                baud = 115200
+                dron.connect(connection_string, baud, freq=10)
+                publish_event('connected')
+                print(f"Conectando a Dron Real en {connection_string}...")
+
+            elif opcion == 2:
+                # Opció: Simulacio
+                connection_string = 'tcp:127.0.0.1:5763'
+                baud = 115200
+                dron.connect(connection_string, baud, freq=10)
+                publish_event('connected')
+                print("Conectando a Simulador...")
+
+        except Exception as e:
+            print(f"Error al procesar el comando de simulación: {e}")
 
     if command == 'arm_takeOff':
         if dron.state == 'connected':
@@ -197,9 +217,20 @@ dron = Dron()
 n = str(random.randint(0,10000))
 client = mqtt.Client("autopilotServiceDemo"+ n, transport="websockets")
 
+
+
+
+
+# Brokers para conectarnos, el publico de hives y el de dronseetac
+
 # me conecto al broker publico y gratuito
-broker_address = "broker.hivemq.com"
+#broker_address = "broker.hivemq.com"
+#broker_port = 8000
+
+broker_address="dronseetac.upc.edu"
 broker_port = 8000
+client.username_pw_set("dronsEETAC","mimara1456.")
+
 
 client.on_message = on_message
 client.on_connect = on_connect

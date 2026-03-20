@@ -25,8 +25,8 @@
         transition: background-color 0.3s;
     }
 
-    .boton-verde { background-color: #4CAF50; }
-    .boton-amarillo { background-color: #FFD700; }
+    .boton-verde { background-color: #4CAF50 !important; color: white !important; }
+    .boton-amarillo { background-color: #FFD700 !important; color: black !important; }
     .boton-blau { background-color: cadetblue ; }
     .boton-rojo { background-color: #f44336; }
 
@@ -75,8 +75,21 @@
     </nav>
 
     <div id="tab-control" class="tab-content container mt-3">
-        <!-- 🔵 Botón de conectar (arriba del todo, ancho completo) -->
-        <button id="botonConectar" class="boton" onclick="conectarDron()">Conectar con Dron</button>
+        <div class="d-flex gap-2 align-items-center mb-2 w-100">
+            <div class="dropdown w-50">
+                <button class="btn btn-primary dropdown-toggle w-100" type="button" id="botonConectar" data-bs-toggle="dropdown" aria-expanded="false" style="border: 2px solid #555; height: 50px; margin-bottom: 10px; box-sizing: border-box; background-color: cadetblue; font-size: 18px">Conectar</button>
+
+                <ul class="dropdown-menu w-100" aria-labelledby="botonConectar">
+                     <li><a class="dropdown-item" href="#" onclick="ejecutarOpcion(1)">Proceso</a></li>
+                     <li><a class="dropdown-item" href="#" onclick="ejecutarOpcion(2)">Simulación </a></li>
+                </ul>
+            </div>
+
+            <div class="w-50">
+                <input type="number" id="port" class="form-control" style="border: 2px solid #555; height: 50px; margin-bottom: 10px; box-sizing: border-box;" placeholder="Puerto de connexón(ej: 11)">
+            </div>
+
+        </div>
 
         <!-- 🔵 Altura + despegar (segunda fila, orden vertical, ancho completo)-->
         <div class="d-flex gap-2 align-items-center mb-2">
@@ -191,15 +204,16 @@
             map = L.map('map').setView([latInicial, lonInicial], 15); // Donde iniciar y a que altura
 
             // Añadir el diseño del mapa
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
             // Icono del drone
             const droneIcon = L.icon({
-                iconUrl: 'https://png.pngtree.com/png-clipart/20250119/original/pngtree-drone-icon-design-gold-color-quadrocopter-logo-vector-png-image_20263091.png',                iconSize: [60, 60],       // Al ser dorado y tener detalles, un poco más de tamaño ayuda
-                iconAnchor: [30, 30],
-                popupAnchor: [0, -30]
+                iconUrl:'https://images.vexels.com/media/users/3/215129/isolated/preview/f98ff00414055616a9675d5d4aed6a9d-icono-de-trazo-de-vista-superior-de-drone-quadcopter.png',
+                iconSize: [30,30],
+                iconAnchor: [15,15],
+                popupAnchor: [0, -15]
             });
 
             // Crear el marcador como tal
@@ -217,12 +231,25 @@
         window.onload = inicializarMapa;
 
 
-        const client = mqtt.connect('ws://broker.hivemq.com:8000/mqtt', {
+        // Nos conectamos a un broker o a dronseetac o a hivemq
+        const client = mqtt.connect('ws://dronseetac.upc.edu:8000', {
             clean: false,
             keepalive: 60,
             clientId: 'webapp_' + Math.random().toString(16).substr(2, 8),
             reconnectPeriod: 1000,
+            username: 'dronsEETAC',
+            password: 'mimara1456.'
         });
+
+        //const client = mqtt.connect('ws://broker.hivemq.com:8000/mqtt', {
+            //clean: false,
+            //keepalive: 60,
+            //clientId: 'webapp_' + Math.random().toString(16).substr(2, 8),
+            //reconnectPeriod: 1000,
+        //});
+
+
+
 
         client.on('connect', function () {
             console.log('Conectado al broker MQTT');
@@ -329,12 +356,6 @@
             }
         });
 
-
-        function conectarDron() {
-            // Solo mandamos conectar. Lo ponemos amarillo indicando "cargando"
-            client.publish('mobileFlask/autopilotServiceDemo/connect');
-            document.getElementById('botonConectar').classList.add('boton-amarillo');
-        }
         function despegarDron() {
             const altura = document.getElementById('altura').value;
             if (altura) {
@@ -535,6 +556,22 @@
                 console.log("Streaming detenido");
             }
         }
+
+
+        function ejecutarOpcion(num) {
+            console.log("Seleccionada opción:", num);
+            const COM = document.getElementById('port').value || '11';
+            const mensaje = num+"," + COM;
+            client.publish('mobileFlask/autopilotServiceDemo/Simulacion', mensaje);
+
+            const btn = document.getElementById('botonConectar');
+            btn.classList.remove('btn-primary', 'boton-verde');
+            btn.classList.add('boton-amarillo');
+
+            //if (num === 1) {alert("Cambiando a Proceso");}
+            //else if (num === 2) {alert("Cambiando Simulacion");}
+        }
+
     </script>
 </body>
 </html>
