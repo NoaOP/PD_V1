@@ -24,6 +24,7 @@ import torch
 from aiortc import MediaStreamTrack, RTCPeerConnection
 from aiortc.contrib.signaling import TcpSocketSignaling
 from av import VideoFrame
+from PIL import Image, ImageTk
 
 
 try:
@@ -107,6 +108,7 @@ class LocalDetector:
    def __init__(self):
        self.model = torch.hub.load("ultralytics/yolov5", "yolov5s", pretrained=True)
        self.model.eval()
+
 
    def detect(self, frame, object_ids):
        if not object_ids:
@@ -220,6 +222,23 @@ class DashboardAllApp:
        self._build_shell()
        self.switch_mode(start_mode)
        self._schedule_service_monitor()
+       #self.icon_image = ImageTk.PhotoImage(Image.open(os.path.join(self.base_dir, "DronPng.png")).resize((30, 30)))
+
+       icon_path = os.path.join(self.base_dir, "DronPng.png")
+       try:
+           self.base_dron_image = Image.open(icon_path).resize((30, 30))
+       except FileNotFoundError:
+           print(f"Error: No se encontró el icono en {icon_path}")
+           self.base_dron_image = None  # Manejo de error si no hay imagen
+
+
+
+
+
+       self.current_rotated_icon = None
+       self.drone_path_positions = []
+       self.map_path_line = None
+
 
 
    def _build_shell(self):
@@ -381,24 +400,32 @@ class DashboardAllApp:
        return "Stop", False
 
 
+
+
    def _update_map_from_telemetry(self, telemetry_info):
        if self.map_widget is None:
            return
 
-
        lat, lon = self._extract_lat_lon(telemetry_info)
+       heading = telemetry_info.get("heading", 0)
+
        if lat is None or lon is None:
            return
 
+       self.map_widget.delete_all_marker()
 
-       # Update drone marker position
-       if self.map_marker is None:
-           self.map_marker = self.map_widget.set_marker(lat, lon, text="Dron")
-       else:
-           self.map_marker.set_position(lat, lon)
+       self.drone_path_positions.append((lat, lon))
+       if len(self.drone_path_positions) > 1:
+           if self.map_path_line is not None:
+               self.map_path_line.delete()
+           self.map_path_line = self.map_widget.set_path(self.drone_path_positions,color="blue")
 
+       if self.base_dron_image:
+           pil_rotated = self.base_dron_image.rotate(-heading, expand=True)
+           self.current_rotated_icon = ImageTk.PhotoImage(pil_rotated)
 
-       # Center map on drone
+       self.map_marker = self.map_widget.set_marker(lat,lon,icon=self.current_rotated_icon)
+
        self.map_widget.set_position(lat, lon)
 
 
@@ -682,7 +709,7 @@ class DashboardAllApp:
 
        try:
            process.terminate()
-           process.wait(timeout=2)
+           process.wait(timeout=1)
        except Exception:
            try:
                process.kill()
@@ -1277,37 +1304,44 @@ class DashboardAllApp:
                pass
 
    async def _video_receiver(self, mode):
-       signaling = TcpSocketSignaling("localhost", 9999)
-       pc = RTCPeerConnection()
-       stop_event = self.local_video_stop_event if mode == "local" else self.global_video_stop_event
-       window_title = "Local Camera" if mode == "local" else "Global Camera"
-       receiver = LocalVideoReceiver(lambda: self._get_selected_object_ids(mode), stop_event, window_title)
-
-       @pc.on("track")
-       def on_track(track):
-           if isinstance(track, MediaStreamTrack):
-               asyncio.ensure_future(receiver.handle_track(track))
 
        try:
-           await signaling.connect()
-           offer = await signaling.receive()
-           await pc.setRemoteDescription(offer)
-           answer = await pc.createAnswer()
-           await pc.setLocalDescription(answer)
-           await signaling.send(pc.localDescription)
+            signaling = TcpSocketSignaling("localhost", 9999)
+            pc = RTCPeerConnection()
+            stop_event = self.local_video_stop_event if mode == "local" else self.global_video_stop_event
+            window_title = "Local Camera" if mode == "local" else "Global Camera"
+            receiver = LocalVideoReceiver(lambda: self._get_selected_object_ids(mode), stop_event, window_title)
 
-           while not stop_event.is_set() and pc.connectionState != "connected":
-               await asyncio.sleep(0.1)
+            @pc.on("track")
+            def on_track(track):
+                if isinstance(track, MediaStreamTrack):
+                    asyncio.ensure_future(receiver.handle_track(track))
 
-           while not stop_event.is_set():
-               await asyncio.sleep(0.2)
-       except Exception:
-           pass
-       finally:
-           try:
-               await pc.close()
-           except Exception:
-               pass
+            try:
+                await signaling.connect()
+                offer = await signaling.receive()
+                await pc.setRemoteDescription(offer)
+                answer = await pc.createAnswer()
+                await pc.setLocalDescription(answer)
+                await signaling.send(pc.localDescription)
+
+                while not stop_event.is_set() and pc.connectionState != "connected":
+                    await asyncio.sleep(0.1)
+
+                while not stop_event.is_set():
+                    await asyncio.sleep(0.2)
+            except Exception:
+                pass
+            finally:
+                try:
+                    await pc.close()
+                except Exception:
+                    pass
+
+       except Exception as e:
+         print(f"DEBUG VIDEO: Error conectando al signal: {e}")
+
+
 
    def _stop_local_video(self):
        self.local_video_stop_event.set()

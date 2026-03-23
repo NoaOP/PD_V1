@@ -232,21 +232,21 @@
 
 
         // Nos conectamos a un broker o a dronseetac o a hivemq
-        const client = mqtt.connect('ws://dronseetac.upc.edu:8000', {
-            clean: false,
-            keepalive: 60,
-            clientId: 'webapp_' + Math.random().toString(16).substr(2, 8),
-            reconnectPeriod: 1000,
-            username: 'dronsEETAC',
-            password: 'mimara1456.'
-        });
-
-        //const client = mqtt.connect('ws://broker.hivemq.com:8000/mqtt', {
+        //const client = mqtt.connect('ws://dronseetac.upc.edu:8000', {
             //clean: false,
             //keepalive: 60,
             //clientId: 'webapp_' + Math.random().toString(16).substr(2, 8),
             //reconnectPeriod: 1000,
+            //username: 'dronsEETAC',
+            //password: 'mimara1456.'
         //});
+
+        const client = mqtt.connect('ws://broker.hivemq.com:8000/mqtt', {
+            clean: false,
+            keepalive: 60,
+            clientId: 'webapp_' + Math.random().toString(16).substr(2, 8),
+            reconnectPeriod: 1000,
+        });
 
 
 

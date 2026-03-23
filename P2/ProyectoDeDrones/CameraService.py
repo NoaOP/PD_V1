@@ -108,7 +108,7 @@ class MultiClientCameraService:
             print(f"Cliente desconectado: {addr}")
 
     async def start(self):
-        self.server = await asyncio.start_server(self._handle_client, self.host, self.port)
+        self.server = await asyncio.start_server(self._handle_client, self.host, self.port,reuse_address=True)
         print(f"CameraService multi-cliente en {self.host}:{self.port}")
 
         async with self.server:

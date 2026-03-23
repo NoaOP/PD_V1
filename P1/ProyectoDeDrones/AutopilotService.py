@@ -224,12 +224,12 @@ client = mqtt.Client("autopilotServiceDemo"+ n, transport="websockets")
 # Brokers para conectarnos, el publico de hives y el de dronseetac
 
 # me conecto al broker publico y gratuito
-#broker_address = "broker.hivemq.com"
-#broker_port = 8000
-
-broker_address="dronseetac.upc.edu"
+broker_address = "broker.hivemq.com"
 broker_port = 8000
-client.username_pw_set("dronsEETAC","mimara1456.")
+
+#broker_address="dronseetac.upc.edu"
+#broker_port = 8000
+#client.username_pw_set("dronsEETAC","mimara1456.")
 client.on_message = on_message
 
 
