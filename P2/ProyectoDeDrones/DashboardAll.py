@@ -143,6 +143,7 @@ class LocalVideoReceiver:
                if isinstance(frame, VideoFrame):
                    frame = frame.to_ndarray(format="bgr24")
                elif not isinstance(frame, np.ndarray):
+                   print(f" tipo desconocido {type(frame)}, saltando")
                    continue
 
                selected_ids = set(self.object_getter())
@@ -1304,42 +1305,41 @@ class DashboardAllApp:
                pass
 
    async def _video_receiver(self, mode):
+       stop_event = self.local_video_stop_event if mode == "local" else self.global_video_stop_event
+       window_title = "Local Camera" if mode == "local" else "Global Camera"
+       receiver = LocalVideoReceiver(lambda: self._get_selected_object_ids(mode), stop_event, window_title)
+
+       signaling = TcpSocketSignaling("localhost", 9999)
+       pc = RTCPeerConnection()
+
+       @pc.on("track")
+       def on_track(track):
+           if isinstance(track, MediaStreamTrack):
+               loop = asyncio.get_event_loop()
+               loop.create_task(receiver.handle_track(track))
 
        try:
-            signaling = TcpSocketSignaling("localhost", 9999)
-            pc = RTCPeerConnection()
-            stop_event = self.local_video_stop_event if mode == "local" else self.global_video_stop_event
-            window_title = "Local Camera" if mode == "local" else "Global Camera"
-            receiver = LocalVideoReceiver(lambda: self._get_selected_object_ids(mode), stop_event, window_title)
+           await signaling.connect()
 
-            @pc.on("track")
-            def on_track(track):
-                if isinstance(track, MediaStreamTrack):
-                    asyncio.ensure_future(receiver.handle_track(track))
+           offer = await signaling.receive()
+           await pc.setRemoteDescription(offer)
+           answer = await pc.createAnswer()
+           await pc.setLocalDescription(answer)
+           await signaling.send(pc.localDescription)
 
-            try:
-                await signaling.connect()
-                offer = await signaling.receive()
-                await pc.setRemoteDescription(offer)
-                answer = await pc.createAnswer()
-                await pc.setLocalDescription(answer)
-                await signaling.send(pc.localDescription)
 
-                while not stop_event.is_set() and pc.connectionState != "connected":
-                    await asyncio.sleep(0.1)
-
-                while not stop_event.is_set():
-                    await asyncio.sleep(0.2)
-            except Exception:
-                pass
-            finally:
-                try:
-                    await pc.close()
-                except Exception:
-                    pass
+           while not stop_event.is_set():
+               await asyncio.sleep(0.2)
 
        except Exception as e:
-         print(f"DEBUG VIDEO: Error conectando al signal: {e}")
+           print(f" error: {e}")
+       finally:
+           try:
+               await pc.close()
+           except Exception:
+               pass
+
+
 
 
 
