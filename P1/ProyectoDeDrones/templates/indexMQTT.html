@@ -75,21 +75,23 @@
     </nav>
 
     <div id="tab-control" class="tab-content container mt-3">
-        <div class="d-flex gap-2 align-items-center mb-2 w-100">
-            <div class="dropdown w-50">
-                <button class="btn btn-primary dropdown-toggle w-100" type="button" id="botonConectar" data-bs-toggle="dropdown" aria-expanded="false" style="border: 2px solid #555; height: 50px; margin-bottom: 10px; box-sizing: border-box; background-color: cadetblue; font-size: 18px">Conectar</button>
+        
+        <!-- 🔵Esto para poner los botones de CONECTAR y el COM🔵 -->
+       <!-- <div class="d-flex gap-2 align-items-center mb-2 w-100"> -->
+            <!--<div class="dropdown w-50"> -->
+               <!-- <button class="btn btn-primary dropdown-toggle w-100" type="button" id="botonConectar" data-bs-toggle="dropdown" aria-expanded="false" style="border: 2px solid #555; height: 50px; margin-bottom: 10px; box-sizing: border-box; background-color: cadetblue; font-size: 18px">Conectar</button> -->
 
-                <ul class="dropdown-menu w-100" aria-labelledby="botonConectar">
-                     <li><a class="dropdown-item" href="#" onclick="ejecutarOpcion(1)">Proceso</a></li>
-                     <li><a class="dropdown-item" href="#" onclick="ejecutarOpcion(2)">Simulación </a></li>
-                </ul>
-            </div>
+               <!-- <ul class="dropdown-menu w-100" aria-labelledby="botonConectar"> -->
+                   <!--  <li><a class="dropdown-item" href="#" onclick="ejecutarOpcion(1)">Proceso</a></li> -->
+                    <!-- <li><a class="dropdown-item" href="#" onclick="ejecutarOpcion(2)">Simulación </a></li> -->
+               <!-- </ul> -->
+           <!-- </div> -->
 
-            <div class="w-50">
-                <input type="number" id="port" class="form-control" style="border: 2px solid #555; height: 50px; margin-bottom: 10px; box-sizing: border-box;" placeholder="Puerto de connexón(ej: 11)">
-            </div>
+           <!-- <div class="w-50"> -->
+               <!-- <input type="number" id="port" class="form-control" style="border: 2px solid #555; height: 50px; margin-bottom: 10px; box-sizing: border-box;" placeholder="Puerto de connexón(ej: 11)"> -->
+            <!--</div> -->
 
-        </div>
+       <!-- </div> -->
 
         <!-- 🔵 Altura + despegar (segunda fila, orden vertical, ancho completo)-->
         <div class="d-flex gap-2 align-items-center mb-2">
@@ -232,21 +234,21 @@
 
 
         // Nos conectamos a un broker o a dronseetac o a hivemq
-        //const client = mqtt.connect('ws://dronseetac.upc.edu:8000', {
-            //clean: false,
-            //keepalive: 60,
-            //clientId: 'webapp_' + Math.random().toString(16).substr(2, 8),
-            //reconnectPeriod: 1000,
-            //username: 'dronsEETAC',
-            //password: 'mimara1456.'
-        //});
-
-        const client = mqtt.connect('ws://broker.hivemq.com:8000/mqtt', {
+        const client = mqtt.connect('ws://dronseetac.upc.edu:8000', {
             clean: false,
             keepalive: 60,
             clientId: 'webapp_' + Math.random().toString(16).substr(2, 8),
             reconnectPeriod: 1000,
+            username: 'dronsEETAC',
+            password: 'mimara1456.'
         });
+
+        //const client = mqtt.connect('ws://broker.hivemq.com:8000/mqtt', {
+        //    clean: false,
+        //    keepalive: 60,
+        //    clientId: 'webapp_' + Math.random().toString(16).substr(2, 8),
+        //    reconnectPeriod: 1000,
+        //});
 
 
 

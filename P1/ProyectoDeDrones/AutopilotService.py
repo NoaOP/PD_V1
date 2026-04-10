@@ -113,6 +113,8 @@ def on_message(cli, userdata, message):
 
     sending_topic = "Grup2/autopilotServiceDemo/" + origin # lo necesitaré para enviar las respuestas
 
+
+    # Solo util si estan los botones de Simulacion / proceso activos
     if command == 'Simulacion':
         payload_raw = message.payload.decode("utf-8")
         try:
@@ -123,9 +125,9 @@ def on_message(cli, userdata, message):
             if opcion == 1:
                 # Opció 1: COM
                 connection_string = f'COM{num_puerto}'
-                baud = 115200
+                baud = 57600
                 dron.connect(connection_string, baud, freq=10)
-                publish_event('connected')
+                publish_event('connectedCOM')
                 print(f"Conectando a Dron Real en {connection_string}...")
 
             elif opcion == 2:
@@ -224,12 +226,12 @@ client = mqtt.Client("autopilotServiceDemo"+ n, transport="websockets")
 # Brokers para conectarnos, el publico de hives y el de dronseetac
 
 # me conecto al broker publico y gratuito
-broker_address = "broker.hivemq.com"
-broker_port = 8000
-
-#broker_address="dronseetac.upc.edu"
+#broker_address = "broker.hivemq.com"
 #broker_port = 8000
-#client.username_pw_set("dronsEETAC","mimara1456.")
+
+broker_address="dronseetac.upc.edu"
+broker_port = 8000
+client.username_pw_set("dronsEETAC","mimara1456.")
 client.on_message = on_message
 
 
