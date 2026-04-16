@@ -375,7 +375,8 @@ class DashboardAllApp:
         if self.map_widget is None:
             return
         lat, lon = self._extract_lat_lon(telemetry_info)
-        heading  = telemetry_info.get("heading", 0)
+        raw_heading = telemetry_info.get("heading")
+        heading = float(raw_heading) if raw_heading is not None else 0.0
         if lat is None or lon is None:
             return
 
@@ -844,57 +845,62 @@ class DashboardAllApp:
                         padx=5, pady=5)
         left_panel.columnconfigure(0, weight=1)
 
-        connect_btn = tk.Button(left_panel, text="Conectar",
+        connect_btn = tk.Button(left_panel, text="Conectar (MAVProxy)",
                                 bg=self.global_color, fg="white",
                                 command=self._global_connect)
         connect_btn.grid(row=0, column=0, padx=5, pady=5,
                          sticky=tk.N + tk.S + tk.E + tk.W)
+        connect_sim_btn = tk.Button(left_panel, text="Conectar (Simulador)",
+                                    bg=self.global_color, fg="white",
+                                    command=self._global_connect_sim)
+        connect_sim_btn.grid(row=1, column=0, padx=5, pady=5,
+                             sticky=tk.N + tk.S + tk.E + tk.W)
 
         arm_takeoff_btn = tk.Button(left_panel, text="Despegar",
                                     bg=self.global_color, fg="white",
                                     command=self._global_takeoff)
-        arm_takeoff_btn.grid(row=1, column=0, padx=5, pady=5,
+        arm_takeoff_btn.grid(row=2, column=0, padx=5, pady=5,
                              sticky=tk.N + tk.S + tk.E + tk.W)
 
         land_btn = tk.Button(left_panel, text="Aterrizar",
                              bg=self.global_color, fg="white",
                              command=self._global_land)
-        land_btn.grid(row=2, column=0, padx=5, pady=5,
+        land_btn.grid(row=3, column=0, padx=5, pady=5,
                       sticky=tk.N + tk.S + tk.E + tk.W)
 
         rtl_btn = tk.Button(left_panel, text="RTL",
                             bg=self.global_color, fg="white",
                             command=self._global_rtl)
-        rtl_btn.grid(row=3, column=0, padx=5, pady=5,
+        rtl_btn.grid(row=4, column=0, padx=5, pady=5,
                      sticky=tk.N + tk.S + tk.E + tk.W)
 
         heading_sldr = tk.Scale(left_panel, label="Grados:", resolution=5,
                                 from_=0, to=360, tickinterval=45,
                                 orient=tk.HORIZONTAL)
-        heading_sldr.grid(row=4, column=0, padx=5, pady=5,
+        heading_sldr.grid(row=5, column=0, padx=5, pady=5,
                           sticky=tk.N + tk.S + tk.E + tk.W)
         heading_sldr.bind("<ButtonRelease-1>", self._global_change_heading)
 
         speed_sldr = tk.Scale(left_panel, label="Velocidad (m/s):", resolution=1,
                               from_=0, to=20, tickinterval=5, orient=tk.HORIZONTAL)
-        speed_sldr.grid(row=5, column=0, padx=5, pady=5,
+        speed_sldr.grid(row=6, column=0, padx=5, pady=5,
                         sticky=tk.N + tk.S + tk.E + tk.W)
         speed_sldr.bind("<ButtonRelease-1>", self._global_change_speed)
 
         start_telem_btn = tk.Button(left_panel, text="Empezar telemetria",
                                     bg=self.global_color, fg="white",
                                     command=self._global_start_telem)
-        start_telem_btn.grid(row=6, column=0, padx=5, pady=5,
+        start_telem_btn.grid(row=7, column=0, padx=5, pady=5,
                              sticky=tk.N + tk.S + tk.E + tk.W)
 
         stop_telem_btn = tk.Button(left_panel, text="Parar telemetria",
                                    bg=self.global_color, fg="white",
                                    command=self._global_stop_telem)
-        stop_telem_btn.grid(row=7, column=0, padx=5, pady=5,
+        stop_telem_btn.grid(row=8, column=0, padx=5, pady=5,
                             sticky=tk.N + tk.S + tk.E + tk.W)
 
         telemetry_frame = tk.LabelFrame(left_panel, text="Telemetria")
-        telemetry_frame.grid(row=8, column=0, padx=5, pady=10,
+        telemetry_frame.grid(row=9, column=0, padx=5, pady=10,
                              sticky=tk.N + tk.S + tk.E + tk.W)
         self._build_global_telemetry(telemetry_frame)
 
@@ -975,6 +981,7 @@ class DashboardAllApp:
 
         self.global_widgets.update({
             "connect_btn":           connect_btn,
+            "connect_sim_btn":       connect_sim_btn,
             "arm_takeoff_btn":       arm_takeoff_btn,
             "land_btn":              land_btn,
             "rtl_btn":               rtl_btn,
@@ -1186,14 +1193,24 @@ class DashboardAllApp:
         if self.mode != "local" or not self.local_widgets:
             return
         self.last_local_telemetry = telemetry_info
+
+        alt_raw = telemetry_info.get("alt")
+        heading_raw = telemetry_info.get("heading")
+        ground_raw = telemetry_info.get("groundSpeed")
+
+        alt_val = round(float(alt_raw), 2) if alt_raw is not None else 0.0
+        heading_val = round(float(heading_raw), 2) if heading_raw is not None else 0.0
+        ground_val = round(float(ground_raw), 2) if ground_raw is not None else 0.0
+
+
         self._safe_widget_config(self.local_widgets.get("alt_show"),
-                                 text=round(telemetry_info.get("alt", 0), 2))
+                                 text=alt_val)
         self._safe_widget_config(self.local_widgets.get("heading_show"),
-                                 text=round(telemetry_info.get("heading", 0), 2))
+                                 text=heading_val)
         self._safe_widget_config(self.local_widgets.get("state_show"),
                                  text=telemetry_info.get("state", "--"))
         self._safe_widget_config(self.local_widgets.get("speed_show"),
-                                 text=round(telemetry_info.get("groundSpeed", 0), 2))
+                                 text=ground_val)
         self._safe_widget_config(self.local_widgets.get("mode_show"),
                                  text=telemetry_info.get("flightMode", "--"))
         self._update_map_from_telemetry(telemetry_info)
@@ -1337,6 +1354,16 @@ class DashboardAllApp:
         self._safe_widget_config(self.global_widgets.get("connect_btn"),
                                  text="Conectando...", fg="black", bg="orange")
 
+    def _global_connect_sim(self):
+        if not self._global_autopilot_available():
+            self._safe_widget_config(self.global_widgets.get("connect_sim_btn"),
+                                     text="Autopilot tancat", fg="white", bg="red")
+            return
+
+        # Enviamos el payload "2,0" para que el Autopilot entre en la opción 2 (TCP)
+        self._global_publish("interfazGlobal/autopilotServiceDemo/Simulacion", "2,0")
+        self._safe_widget_config(self.global_widgets.get("connect_sim_btn"),
+                                 text="Conectando Sim...", fg="black", bg="orange")
     def _global_takeoff(self):
         if not self._global_autopilot_available():
             self._safe_widget_config(self.global_widgets.get("arm_takeoff_btn"),
@@ -1409,13 +1436,27 @@ class DashboardAllApp:
     def _global_show_telemetry(self, telemetry_info):
         if self.mode != "global" or not self.global_widgets:
             return
+
+        btn_mav = self.global_widgets.get("connect_btn")
+        btn_sim = self.global_widgets.get("connect_sim_btn")
+        if btn_mav and btn_sim:
+            self._safe_widget_config(btn_mav, text="Conectado", fg="white", bg="green")
+            self._safe_widget_config(btn_sim, text="Conectado", fg="white", bg="green")
+
+
         self.last_global_telemetry = telemetry_info
-        self._safe_widget_config(self.global_widgets.get("alt_show"),
-                                 text=round(telemetry_info.get("alt", 0), 2))
-        self._safe_widget_config(self.global_widgets.get("heading_show"),
-                                 text=round(telemetry_info.get("heading", 0), 2))
-        self._safe_widget_config(self.global_widgets.get("state_show"),
-                                 text=telemetry_info.get("state", "--"))
+
+        alt_raw = telemetry_info.get("alt")
+        heading_raw = telemetry_info.get("heading")
+
+        alt_val = round(float(alt_raw), 2) if alt_raw is not None else 0.0
+        heading_val = round(float(heading_raw), 2) if heading_raw is not None else 0.0
+
+
+
+        self._safe_widget_config(self.global_widgets.get("alt_show"), text=alt_val)
+        self._safe_widget_config(self.global_widgets.get("heading_show"), text=heading_val)
+        self._safe_widget_config(self.global_widgets.get("state_show"), text=telemetry_info.get("state", "--"))
         self._update_map_from_telemetry(telemetry_info)
         self._drive_global_to_map_target(telemetry_info)
 
@@ -1445,6 +1486,11 @@ class DashboardAllApp:
             self._run_on_ui_thread(
                 self._safe_widget_config,
                 self.global_widgets.get("connect_btn"),
+                text="Conectado", fg="white", bg="green")
+
+            self._run_on_ui_thread(
+                self._safe_widget_config,
+                self.global_widgets.get("connect_sim_btn"),
                 text="Conectado", fg="white", bg="green")
 
         elif topic == "Grup2/autopilotServiceDemo/interfazGlobal/flying":

@@ -19,12 +19,15 @@ MQTT_USERNAME    = os.getenv("MQTT_USERNAME", "dronsEETAC")
 MQTT_PASSWORD    = os.getenv("MQTT_PASSWORD", "mimara1456.")
 
 
-def publish_event(event):
+def publish_event(origin, event):
     """Publica un event a totes les interfícies que han interaccionat."""
-    global active_origins, client
-    for origin in active_origins:
-        topic = "Grup2/autopilotServiceDemo/" + origin + "/" + event
-        client.publish(topic)
+    # global active_origins, client
+    # for origin in active_origins:
+    #     topic = "Grup2/autopilotServiceDemo/" + origin + "/" + event
+    #     client.publish(topic)
+    global client
+    topic = "Grup2/autopilotServiceDemo/" + origin + "/" + event
+    client.publish(topic)
 
 
 def publish_telemetry_info(telemetry_info):
@@ -60,17 +63,42 @@ def on_message(cli, userdata, message):
     if command == "connect":
         if dron.state != "disconnected":
             # Ja connectat: resposta immediata
-            publish_event("connected")
+            publish_event(origin,"connected")
         else:
             # Connexió NO BLOQUEJANT per no congelar el loop MQTT
             # wait_heartbeat() pot trigar 10-30s → el loop MQTT quedaria mut
+            print("Conectando via MAVProxy...")
             dron.connect(
                 MAVPROXY_AUTOPILOT_ENDPOINT,
                 MAVPROXY_AUTOPILOT_BAUD,
                 freq=4,
                 blocking=False,
-                callback=_on_connected_callback
+                #callback=_on_connected_callback
+                callback = lambda: publish_event(origin, "connected")
             )
+
+     # afegit per la simulacio de la web app
+    elif command == 'Simulacion':
+        if dron.state != "disconnected":
+            publish_event(origin, "connected")
+        else:
+            payload_raw = message.payload.decode("utf-8")
+            try:
+                partes = payload_raw.split(',')
+                opcion = int(partes[0])
+                if opcion == 1:  # Dron Real COM
+                    puerto_com = f'COM{partes[1]}'
+                    print(f"Conectando a Dron Real en {puerto_com}...")
+                    dron.connect(puerto_com, 57600, freq=4, blocking=False,
+                                callback=lambda: publish_event(origin, 'connected'))
+                elif opcion == 2:  # Simulador TCP
+                    print("Conectando a Simulador TCP...")
+                    dron.connect('tcp:127.0.0.1:5763', 115200, freq=4, blocking=False,
+                                callback=lambda: publish_event(origin, 'connected'))
+            except Exception as e:
+                print(f"Error conexión Simulacion: {e}")
+
+
 
     elif command == "arm_takeOff":
         # Només actuar si està connectat o armat, no si ja vola
@@ -84,10 +112,10 @@ def on_message(cli, userdata, message):
             print(f"Armant i despegant a {altura_deseada}m")
             dron.arm()
             dron.takeOff(altura_deseada, blocking=False,
-                         callback=publish_event, params="flying")
+                         callback=lambda p: publish_event(origin, p), params="flying")
         elif dron.state == "flying":
             # Ja en vol: notifica igualment per sincronitzar la UI
-            publish_event("flying")
+            publish_event(origin,"flying")
 
     elif command == "go":
         if dron.state == "flying":
@@ -96,11 +124,11 @@ def on_message(cli, userdata, message):
 
     elif command == "Land":
         if dron.state in ("flying", "armed", "connected"):
-            dron.Land(blocking=False, callback=publish_event, params="landed")
+            dron.Land(blocking=False, callback=lambda p: publish_event(origin, p), params="landed")
 
     elif command == "RTL":
         if dron.state in ("flying", "armed", "connected"):
-            dron.RTL(blocking=False, callback=publish_event, params="atHome")
+            dron.RTL(blocking=False, callback=lambda p: publish_event(origin, p), params="atHome")
 
     elif command == "startTelemetry":
         dron.send_telemetry_info(publish_telemetry_info)

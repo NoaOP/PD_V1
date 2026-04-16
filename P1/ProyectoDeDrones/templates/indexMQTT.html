@@ -77,21 +77,14 @@
     <div id="tab-control" class="tab-content container mt-3">
 
         <!-- 🔵Esto para poner los botones de CONECTAR y el COM🔵 -->
-       <!-- <div class="d-flex gap-2 align-items-center mb-2 w-100"> -->
-            <!--<div class="dropdown w-50"> -->
-               <!-- <button class="btn btn-primary dropdown-toggle w-100" type="button" id="botonConectar" data-bs-toggle="dropdown" aria-expanded="false" style="border: 2px solid #555; height: 50px; margin-bottom: 10px; box-sizing: border-box; background-color: cadetblue; font-size: 18px">Conectar</button> -->
+       <div class="d-flex gap-2 align-items-center mb-2 w-100">
+            <button id="botonConectarMAV" class="boton boton-blau w-50" onclick="conectarMAV()">Conectar (MAVProxy)</button>
+            <button id="botonConectarSim" class="boton boton-blau w-50" onclick="conectarSim()">Conectar (Simulador)</button>
+       </div>
 
-               <!-- <ul class="dropdown-menu w-100" aria-labelledby="botonConectar"> -->
-                   <!--  <li><a class="dropdown-item" href="#" onclick="ejecutarOpcion(1)">Proceso</a></li> -->
-                    <!-- <li><a class="dropdown-item" href="#" onclick="ejecutarOpcion(2)">Simulación </a></li> -->
-               <!-- </ul> -->
-           <!-- </div> -->
 
-           <!-- <div class="w-50"> -->
-               <!-- <input type="number" id="port" class="form-control" style="border: 2px solid #555; height: 50px; margin-bottom: 10px; box-sizing: border-box;" placeholder="Puerto de connexón(ej: 11)"> -->
-            <!--</div> -->
 
-       <!-- </div> -->
+
 
         <!-- 🔵 Altura + despegar (segunda fila, orden vertical, ancho completo)-->
         <div class="d-flex gap-2 align-items-center mb-2">
@@ -173,6 +166,7 @@
             <p><strong>Altitud:</strong> <span id="altitudValor">0</span> m</p>
         </div>
     </div>
+
 
     <!-- Ventana del mapa -->
     <div id="tab-mapa" class="tab-content container mt-3" style="display:none">
@@ -265,8 +259,18 @@
                 console.log("El dron confirma conexión. Pidiendo telemetría...");
                 const botonDespegar = document.getElementById('botonDespegar');
                 botonDespegar.classList.remove('boton-verde','boton-amarillo');
-                document.getElementById('botonConectar').classList.remove('boton-amarillo');
-                document.getElementById('botonConectar').classList.add('boton-verde');
+
+                // Poner en verde el botón de MAVProxy
+                const btnMAV = document.getElementById('botonConectarMAV');
+                btnMAV.classList.remove('boton-amarillo', 'boton-blau');
+                btnMAV.classList.add('boton-verde');
+
+
+                // Poner en verde el botón del Simulador
+                const btnSim = document.getElementById('botonConectarSim');
+                btnSim.classList.remove('boton-amarillo', 'boton-blau');
+                btnSim.classList.add('boton-verde');
+
 
                 client.publish('mobileFlask/autopilotServiceDemo/startTelemetry');
 
@@ -274,6 +278,22 @@
 
             // Escuchar los datos de telemetría
             if (topic === "Grup2/autopilotServiceDemo/mobileFlask/telemetryInfo") {
+
+                // Si me llega telemetría, significa que estamos conectados
+                const btnMAV = document.getElementById('botonConectarMAV');
+                const btnSim = document.getElementById('botonConectarSim');
+
+                if (btnMAV.classList.contains('boton-amarillo') || btnSim.classList.contains('boton-amarillo')) {
+                    btnMAV.classList.remove('boton-amarillo', 'boton-blau');
+                    btnMAV.classList.add('boton-verde');
+                    btnMAV.innerText = "Connected";
+
+                    btnSim.classList.remove('boton-amarillo', 'boton-blau');
+                    btnSim.classList.add('boton-verde');
+                    btnSim.innerText = "Connected";
+                }
+
+
                 const data = JSON.parse(message.toString());
 
                 // Extraer Latitud y Longitud
@@ -560,18 +580,26 @@
         }
 
 
-        function ejecutarOpcion(num) {
-            console.log("Seleccionada opción:", num);
-            const COM = document.getElementById('port').value || '11';
-            const mensaje = num+"," + COM;
-            client.publish('mobileFlask/autopilotServiceDemo/Simulacion', mensaje);
+        function conectarMAV() {
+            console.log("Conectando a MAVProxy...");
+            // Publicamos al topic de connect (por defecto en el AutopilotService usa MAVProxy)
+            client.publish('mobileFlask/autopilotServiceDemo/connect');
 
-            const btn = document.getElementById('botonConectar');
-            btn.classList.remove('btn-primary', 'boton-verde');
+            const btn = document.getElementById('botonConectarMAV');
+            btn.innerText = "Conectando...";
+            btn.classList.remove('boton-blau', 'boton-verde');
             btn.classList.add('boton-amarillo');
+        }
 
-            //if (num === 1) {alert("Cambiando a Proceso");}
-            //else if (num === 2) {alert("Cambiando Simulacion");}
+        function conectarSim() {
+            console.log("Conectando al Simulador (TCP)...");
+            // Mandamos "2,0" para que el AutopilotService entre en la opción 2
+            client.publish('mobileFlask/autopilotServiceDemo/Simulacion', '2,0');
+
+            const btn = document.getElementById('botonConectarSim');
+            btn.innerText = "Conectando Sim...";
+            btn.classList.remove('boton-blau', 'boton-verde');
+            btn.classList.add('boton-amarillo');
         }
 
     </script>
