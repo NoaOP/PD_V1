@@ -10,6 +10,7 @@ import time
 import tkinter as tk
 import atexit
 from tkinter import messagebox
+import random
 
 import paho.mqtt.client as mqtt
 from P2.ProyectoDeDrones.dronLink.Dron import Dron
@@ -822,6 +823,8 @@ class DashboardAllApp:
             except Exception:
                 pass
 
+        #client_id = "InterfazGlobal_" + str(random.randint(0, 10000))
+        #self.global_client = mqtt.Client(client_id, transport="websockets")
         self.global_client = mqtt.Client("InterfazGlobal", transport="websockets")
         self.global_client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
         self.global_client.on_message = self._global_on_message
