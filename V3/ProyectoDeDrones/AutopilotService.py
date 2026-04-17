@@ -8,7 +8,7 @@ import time
 import json
 
 import paho.mqtt.client as mqtt
-from V3.ProyectoDeDrones.dronLink.Dron import Dron
+from P2.ProyectoDeDrones.dronLink.Dron import Dron
 
 active_origins    = set()
 last_telemetry_time = 0

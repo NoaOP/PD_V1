@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/leaflet-rotatedmarker@0.2.0/leaflet.rotatedMarker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
 </head>
 
 <style>
@@ -71,6 +72,7 @@
     <nav class="nav nav-pills nav-justified bg-dark p-2">
         <button class="nav-link active text-white" onclick="abrirTab(event, 'tab-control')">Control</button>
         <button class="nav-link text-white" onclick="abrirTab(event, 'tab-mapa')">Mapa</button>
+        <button class="nav-link text-white" onclick="abrirTab(event, 'tab-settings')">Ajustes</button>
         <button class="nav-link text-white" onclick="abrirTab(event, 'tab-video')">Video</button>
     </nav>
 
@@ -171,10 +173,51 @@
     <!-- Ventana del mapa -->
     <div id="tab-mapa" class="tab-content container mt-3" style="display:none">
         <h2 class="text-center">Posición GPS</h2>
-        <div id="map" style="height: 500px; background: #eee; border-radius: 10px;">
-            <p class="text-center pt-5">Cargando mapa...</p>
+
+        <div id="map" style="height: 400px; background: #eee; border-radius: 10px;"> </div>
+
+            <div class="text-center mb-2">
+                <span id="indicador-vuelo" class="badge boton-rojo" style="font-size: 1.1rem; padding: 10px 20px; transition: all 0.5s ease;border: 2px solid #555; border-radius: 5px;">
+                    <span id="texto-vuelo">Wait to fly</span>
+                </span>
+            </div>
+
+
+            <div class="d-flex justify-content-around align-items-center mt-4" style="background: #333; border-radius: 15px; padding: 20px;">
+
+            <div id="joystick-container" style="width: 150px; height: 150px; position: relative; background: #444; border-radius: 50%;">
+                <p style="color: white; position: absolute; bottom: -30px; width: 100%; text-align: center;">Movimiento</p>
+            </div>
+
+            <div class="d-flex flex-column gap-2" style="width: 100px;">
+                <button onclick="moverDron('Up')" class="box">Up</button>
+                <button onclick="moverDron('Stop')" class="box">STOP</button>
+                <button onclick="moverDron('Down')" class="box">Down</button>
+            </div>
         </div>
     </div>
+
+
+
+    <!-- Ventana de settings (tipos de pincel o color) -->
+    <div id="tab-settings" class="tab-content container mt-3" style="display:none">
+        <h2 class="text-center">Ajustes del Mapa</h2>
+
+        <div class="card p-4 mt-3" style="background-color: white; border: 2px solid cadetblue;">
+            <div class="mb-4">
+                <label for="colorTrazo" class="form-label fw-bold">Color de la trayectoria:</label>
+                <input type="color" class="form-control form-control-color w-100" id="colorTrazo" value="#ff0000" title="Selecciona un color" onchange="actualizarEstiloRuta()">
+            </div>
+
+            <div class="mb-4">
+                <label for="grosorTrazo" class="form-label fw-bold">Grosor del trazo: <span id="grosorValor">3</span>px</label>
+                <input type="range" class="form-range" id="grosorTrazo" min="1" max="10" step="1" value="3" oninput="actualizarEstiloRuta()">
+            </div>
+
+        </div>
+    </div>
+
+
 
     <!-- Ventana del videostream -->
     <div id="tab-video" class="tab-content container mt-3" style="display:none">
@@ -197,10 +240,11 @@
             // Coordenadas iniciales (DroneLab)
             const latInicial = 41.276478;
             const lonInicial = 1.988571;
-            map = L.map('map').setView([latInicial, lonInicial], 15); // Donde iniciar y a que altura
+            map = L.map('map').setView([latInicial, lonInicial], 19); // Donde iniciar y a que zoom
 
             // Añadir el diseño del mapa
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 22,
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
@@ -295,6 +339,30 @@
 
 
                 const data = JSON.parse(message.toString());
+
+                // indicador de si puede o no volar (en la ventana de mapa)
+                const indicador = document.getElementById('indicador-vuelo');
+                const texto = document.getElementById('texto-vuelo');
+                const joystickCont = document.getElementById('joystick-container');
+
+                if (data.state === 'flying') {
+                    texto.innerText = "Ready to fly";
+                    indicador.classList.remove('boton-rojo', 'boton-amarillo');
+                    indicador.classList.add('boton-verde');
+                    joystickCont.style.pointerEvents = "auto"; // desbloquea el joystick
+                } else if (data.state === 'takingOff' || data.state === 'armed') {
+                    texto.innerText = "Getting ready";
+                    indicador.classList.remove('boton-rojo', 'boton-verde');
+                    indicador.classList.add('boton-amarillo');
+                    joystickCont.style.pointerEvents = "none"; // bloqueja el joystick
+                } else {
+                    texto.innerText = "Wait to fly";
+                    indicador.classList.remove('boton-verde', 'boton-amarillo');
+                    indicador.classList.add('boton-rojo');
+                    joystickCont.style.pointerEvents = "none"; // bloqueja el joystick
+                }
+
+
 
                 // Extraer Latitud y Longitud
                 const lat = data.lat || data.latitude;
@@ -601,6 +669,81 @@
             btn.classList.remove('boton-blau', 'boton-verde');
             btn.classList.add('boton-amarillo');
         }
+
+
+        let joystick;
+
+        function initJoystick() {
+            if (joystick) joystick.destroy();
+
+            const options = {
+                zone: document.getElementById('joystick-container'), mode: 'static', position: { left: '50%', top: '50%' },
+                color: 'cadetblue', size: 120, threshold: 0.1, restJoystick: true
+                };
+
+            joystick = nipplejs.create(options);
+
+            let lastTime = 0;
+            const interval = 50; // enviamos cada 50ms
+
+            joystick.on('move', function (evt, data) {
+                const now = Date.now();
+                if (now - lastTime < interval) return;
+                lastTime = now;
+
+                if (data.angle) {
+                    let angle = data.angle.degree;
+                    let finalDir = "";
+
+                    // de moment fen en 8 direcions si no hi haguessin prous podem probar de fer mes
+                    if (angle > 67.5 && angle <= 112.5) finalDir = "North";
+                    else if (angle > 22.5 && angle <= 67.5) finalDir = "NorthEast";
+                    else if (angle <= 22.5 || angle > 337.5) finalDir = "East";
+                    else if (angle > 292.5 && angle <= 337.5) finalDir = "SouthEast";
+                    else if (angle > 247.5 && angle <= 292.5) finalDir = "South";
+                    else if (angle > 202.5 && angle <= 247.5) finalDir = "SouthWest";
+                    else if (angle > 157.5 && angle <= 202.5) finalDir = "West";
+                    else if (angle > 112.5 && angle <= 157.5) finalDir = "NorthWest";
+
+                    if (finalDir) {
+                        client.publish('mobileFlask/autopilotServiceDemo/go', finalDir);
+                    }
+                }
+            });
+
+            joystick.on('end', function () {
+                client.publish('mobileFlask/autopilotServiceDemo/go', 'Stop');
+            });
+        }
+
+        const originalAbrirTab = abrirTab;
+        abrirTab = function(evt, nombreTab) {
+            originalAbrirTab(evt, nombreTab);
+            if (nombreTab === 'tab-mapa') {
+                setTimeout(initJoystick, 300);
+            }
+        };
+
+
+
+        // funcion ventana settings
+        function actualizarEstiloRuta() {
+            const nuevoColor = document.getElementById('colorTrazo').value;
+            const nuevoGrosor = document.getElementById('grosorTrazo').value;
+
+            // Actualizar el texto
+            document.getElementById('grosorValor').innerText = nuevoGrosor;
+
+            // Aplicar el polyline del mapa
+            if (polyline) {
+                polyline.setStyle({
+                    color: nuevoColor,
+                    weight: nuevoGrosor
+                });
+            }
+        }
+
+
 
     </script>
 </body>
