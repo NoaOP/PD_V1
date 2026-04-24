@@ -28,9 +28,10 @@ def publish_event(origin, event):
     """Publica un event a totes les interfícies que han interaccionat."""
     # global active_origins, client
     # for origin in active_origins:
-    #     topic = "Grup2/autopilotServiceDemo/" + origin + "/" + event
+    #     topic = "Grup21/autopilotServiceDemo/" + origin + "/" + event
     #     client.publish(topic)
     global client
+
     topic = "Grup25/autopilotServiceDemo/" + origin + "/" + event
     client.publish(topic)
 
@@ -43,6 +44,7 @@ def publish_telemetry_info(telemetry_info):
         return
     last_telemetry_time = current_time
     for origin in active_origins:
+
         topic = "Grup25/autopilotServiceDemo/" + origin + "/telemetryInfo"
         client.publish(topic, json.dumps(telemetry_info))
 
