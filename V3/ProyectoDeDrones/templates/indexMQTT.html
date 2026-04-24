@@ -61,6 +61,65 @@
         border-radius: 8px;
     }
 
+    .opcion-formato {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .preview-linea {
+        width: 240px;
+        height: 24px;
+        display: inline-block;
+        position: relative;
+        --preview-color: #000000;
+    }
+
+    .preview-solid {
+        border-top: 4px solid var(--preview-color);
+    }
+
+    .preview-dash-short {
+        border-top: 4px dashed var(--preview-color);
+    }
+
+    .preview-dash-long {
+        height: 4px;
+        margin-top: 10px;
+        background-image: repeating-linear-gradient(
+            to right,
+            var(--preview-color) 0 22px,
+            transparent 22px 36px
+        );
+    }
+
+    .preview-dots {
+        background-image: radial-gradient(circle, var(--preview-color) 3px, transparent 4px);
+        background-size: 16px 16px;
+        background-repeat: repeat-x;
+        background-position: center;
+    }
+
+    .preview-stars::before {
+        content: "★★★★★★★★★★★★★★★★★";
+        color: var(--preview-color);
+        font-size: 17px;
+        position: absolute;
+        top: -2px;
+        left: 0;
+        white-space: nowrap;
+    }
+
+    .preview-hearts::before {
+        content: "♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥";
+        color: var(--preview-color);
+        font-size: 18px;
+        position: absolute;
+        top: -2px;
+        left: 0;
+        white-space: nowrap;
+    }
+
     .spacer { width: 100px; height: 100px; }
 </style>
 
@@ -187,6 +246,54 @@
                 <label for="grosorTrazo" class="form-label fw-bold">Grosor del trazo: <span id="grosorValor">3</span>px</label>
                 <input type="range" class="form-range" id="grosorTrazo" min="1" max="10" step="1" value="3" onchange="actualizarEstiloRuta()">
             </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold">Formato de línea:</label>
+
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-center align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="botonFormatoLinea">
+                        <span class="preview-linea preview-solid"></span>
+                    </button>
+
+                    <ul class="dropdown-menu w-100 text-center">
+                        <li>
+                            <button class="dropdown-item opcion-formato justify-content-center" onclick="seleccionarFormatoLinea('solid')">
+                                <span class="preview-linea preview-solid"></span>
+                            </button>
+                        </li>
+
+                        <li>
+                            <button class="dropdown-item opcion-formato justify-content-center" onclick="seleccionarFormatoLinea('dash-short')">
+                                <span class="preview-linea preview-dash-short"></span>
+                            </button>
+                        </li>
+
+                        <li>
+                            <button class="dropdown-item opcion-formato justify-content-center" onclick="seleccionarFormatoLinea('dash-long')">
+                                <span class="preview-linea preview-dash-long"></span>
+                            </button>
+                        </li>
+
+                        <li>
+                            <button class="dropdown-item opcion-formato justify-content-center" onclick="seleccionarFormatoLinea('dots')">
+                                <span class="preview-linea preview-dots"></span>
+                            </button>
+                        </li>
+
+                        <li>
+                            <button class="dropdown-item opcion-formato justify-content-center" onclick="seleccionarFormatoLinea('stars')">
+                                <span class="preview-linea preview-stars"></span>
+                            </button>
+                        </li>
+
+                        <li>
+                            <button class="dropdown-item opcion-formato justify-content-center" onclick="seleccionarFormatoLinea('hearts')">
+                                <span class="preview-linea preview-hearts"></span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -204,11 +311,13 @@
         let map, droneMarker, pc;
         let dronePath = [];
         let tramoActual = null;
+        let decoracionActual = null;
         let ultimoPuntoRuta = null;
 
         let estiloRutaActual = {
             color: 'red',
-            weight: 3
+            weight: 3,
+            formato: 'solid'
         };
 
         const configuration = {iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]};
@@ -237,12 +346,14 @@
                 rotationOrigin: 'center center'
             }).addTo(map);
 
-            tramoActual = L.polyline([], estiloRutaActual).addTo(map);
-
+            tramoActual = crearNuevoTramo();
             window.map = map;
         }
 
-        window.onload = inicializarMapa;
+        window.onload = function() {
+            inicializarMapa();
+            actualizarColorPreviews();
+        };
 
         const client = mqtt.connect('ws://dronseetac.upc.edu:8000', {
             clean: false,
@@ -328,7 +439,7 @@
                     dronePath.push(nuevaPos);
 
                     if (!tramoActual) {
-                        tramoActual = L.polyline([], estiloRutaActual).addTo(map);
+                        tramoActual = crearNuevoTramo();
                     }
 
                     if (tramoActual.getLatLngs().length === 0 && ultimoPuntoRuta) {
@@ -336,6 +447,25 @@
                     }
 
                     tramoActual.addLatLng(nuevaPos);
+
+                    if (estiloRutaActual.formato === 'dots') {
+                        if (dronePath.length % 5 === 0) {
+                            añadirPuntoDecorativo(nuevaPos);
+                        }
+                    }
+
+                    if (estiloRutaActual.formato === 'stars') {
+                        if (dronePath.length % 5 === 0) {
+                            añadirEstrellaDecorativa(nuevaPos);
+                        }
+                    }
+
+                    if (estiloRutaActual.formato === 'hearts') {
+                        if (dronePath.length % 5 === 0) {
+                            añadirCorazonDecorativo(nuevaPos);
+                        }
+                    }
+
                     ultimoPuntoRuta = nuevaPos;
                 }
 
@@ -695,26 +825,187 @@
             }
         };
 
+        function obtenerOpcionesLinea() {
+            let opciones = {
+                color: estiloRutaActual.color,
+                weight: estiloRutaActual.weight
+            };
+
+            if (estiloRutaActual.formato === 'dash-short') {
+                opciones.dashArray = '6, 6';
+            }
+
+            else if (estiloRutaActual.formato === 'dash-long') {
+                opciones.dashArray = '20, 12';
+            }
+
+            else if (
+                estiloRutaActual.formato === 'dots' ||
+                estiloRutaActual.formato === 'stars' ||
+                estiloRutaActual.formato === 'hearts'
+            ) {
+                opciones.opacity = 0;
+            }
+
+            return opciones;
+        }
+
+        function crearNuevoTramo() {
+            decoracionActual = L.layerGroup().addTo(map);
+
+            const nuevoTramo = L.polyline([], obtenerOpcionesLinea()).addTo(map);
+
+            if (ultimoPuntoRuta) {
+                nuevoTramo.addLatLng(ultimoPuntoRuta);
+            }
+
+            return nuevoTramo;
+        }
+
+        function añadirPuntoDecorativo(posicion) {
+            if (!decoracionActual) {
+                decoracionActual = L.layerGroup().addTo(map);
+            }
+
+            L.circleMarker(posicion, {
+                radius: estiloRutaActual.weight * 1.4,
+                color: estiloRutaActual.color,
+                fillColor: estiloRutaActual.color,
+                fillOpacity: 1,
+                weight: 1
+            }).addTo(decoracionActual);
+        }
+
+        function añadirEstrellaDecorativa(posicion) {
+            if (!decoracionActual) {
+                decoracionActual = L.layerGroup().addTo(map);
+            }
+
+            const tamano = estiloRutaActual.weight * 5;
+
+            const estrella = L.divIcon({
+                className: '',
+                html: `<div style="
+                    color: ${estiloRutaActual.color};
+                    font-size: ${tamano}px;
+                    line-height: ${tamano}px;
+                    width: ${tamano}px;
+                    height: ${tamano}px;
+                    text-align: center;
+                    transform: translate(-50%, -50%);
+                ">★</div>`,
+                iconSize: [0, 0],
+                iconAnchor: [0, 0]
+            });
+
+            L.marker(posicion, {
+                icon: estrella,
+                interactive: false
+            }).addTo(decoracionActual);
+        }
+
+        function añadirCorazonDecorativo(posicion) {
+            if (!decoracionActual) {
+                decoracionActual = L.layerGroup().addTo(map);
+            }
+
+            const tamano = estiloRutaActual.weight * 5;
+
+            const corazon = L.divIcon({
+                className: '',
+                html: `<div style="
+                    color: ${estiloRutaActual.color};
+                    font-size: ${tamano}px;
+                    line-height: ${tamano}px;
+                    width: ${tamano}px;
+                    height: ${tamano}px;
+                    text-align: center;
+                    transform: translate(-50%, -50%);
+                ">♥</div>`,
+                iconSize: [0, 0],
+                iconAnchor: [0, 0]
+            });
+
+            L.marker(posicion, {
+                icon: corazon,
+                interactive: false
+            }).addTo(decoracionActual);
+        }
+
         function actualizarEstiloRuta() {
             const nuevoColor = document.getElementById('colorTrazo').value;
             const nuevoGrosor = parseInt(document.getElementById('grosorTrazo').value);
 
             document.getElementById('grosorValor').innerText = nuevoGrosor;
+            actualizarColorPreviews();
 
-            if (estiloRutaActual.color === nuevoColor && estiloRutaActual.weight === nuevoGrosor) {
+            if (
+                estiloRutaActual.color === nuevoColor &&
+                estiloRutaActual.weight === nuevoGrosor
+            ) {
                 return;
             }
 
             estiloRutaActual = {
                 color: nuevoColor,
-                weight: nuevoGrosor
+                weight: nuevoGrosor,
+                formato: estiloRutaActual.formato
             };
 
-            tramoActual = L.polyline([], estiloRutaActual).addTo(map);
+            tramoActual = crearNuevoTramo();
+        }
 
-            if (ultimoPuntoRuta) {
-                tramoActual.addLatLng(ultimoPuntoRuta);
+        function actualizarColorPreviews() {
+            const colorActual = document.getElementById('colorTrazo').value;
+
+            document.querySelectorAll('.preview-linea').forEach(preview => {
+                preview.style.setProperty('--preview-color', colorActual);
+            });
+        }
+
+        function seleccionarFormatoLinea(formato) {
+            const boton = document.getElementById('botonFormatoLinea');
+
+            boton.innerHTML = '';
+
+            const preview = document.createElement('span');
+            preview.classList.add('preview-linea');
+
+            if (formato === 'solid') {
+                preview.classList.add('preview-solid');
             }
+            else if (formato === 'dash-short') {
+                preview.classList.add('preview-dash-short');
+            }
+            else if (formato === 'dash-long') {
+                preview.classList.add('preview-dash-long');
+            }
+            else if (formato === 'dots') {
+                preview.classList.add('preview-dots');
+            }
+            else if (formato === 'stars') {
+                preview.classList.add('preview-stars');
+            }
+            else if (formato === 'hearts') {
+                preview.classList.add('preview-hearts');
+            }
+
+            boton.appendChild(preview);
+            boton.classList.add('dropdown-toggle');
+
+            actualizarColorPreviews();
+
+            if (estiloRutaActual.formato === formato) {
+                return;
+            }
+
+            estiloRutaActual = {
+                color: document.getElementById('colorTrazo').value,
+                weight: parseInt(document.getElementById('grosorTrazo').value),
+                formato: formato
+            };
+
+            tramoActual = crearNuevoTramo();
         }
 
     </script>
