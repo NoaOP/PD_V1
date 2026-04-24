@@ -133,11 +133,15 @@
 
     <div id="tab-control" class="tab-content container mt-3">
 
+
+        <!-- 🔵Esto para poner los botones de CONECTAR el simulador o al MAVProxy🔵 -->
        <div class="d-flex gap-2 align-items-center mb-2 w-100">
             <button id="botonConectarMAV" class="boton boton-blau w-50" onclick="conectarMAV()">Conectar (MAVProxy)</button>
             <button id="botonConectarSim" class="boton boton-blau w-50" onclick="conectarSim()">Conectar (Simulador)</button>
        </div>
 
+
+        <!-- 🔵 Altura + despegar (segunda fila, orden vertical, ancho completo)-->
         <div class="d-flex gap-2 align-items-center mb-2">
             <button id="botonDespegar" class="boton" onclick="despegarDron()">Despegar</button>
             <input type="number" id="altura" class="form-control " style="border: 2px solid #555;height: 50px;margin-bottom: 0; box-sizing: border-box;" placeholder="Altura en metros">
@@ -214,11 +218,17 @@
 
         <div id="map" style="height: 400px; background: #eee; border-radius: 10px;"> </div>
 
-        <div class="text-center mb-2">
-            <span id="indicador-vuelo" class="badge boton-rojo" style="font-size: 1.1rem; padding: 10px 20px; transition: all 0.5s ease;border: 2px solid #555; border-radius: 5px;">
+
+        <div class="d-flex gap-2 align-items-center mb-2 w-100">
+
+            <!-- <span id="indicador-vuelo" class="badge boton-rojo" style="font-size: 1.1rem; padding: 10px; border: 2px solid #555; border-radius: 5px; width: 100%; text-align: center;">  -->
+            <span id="indicador-vuelo" class="badge boton-rojo d-flex align-items-center justify-content-center w-50" style="font-size: 1.1rem; padding: 10px 20px; transition: all 0.5s ease; border: 2px solid #555; border-radius: 5px; height: 50px;">
                 <span id="texto-vuelo">Wait to fly</span>
             </span>
+
+            <button id="botonPintar" class="boton boton-blau w-50" onclick="pintar()" style="border: 2px solid #555; border-radius: 5px; height: 50px;">Pintar</button>
         </div>
+
 
         <div class="d-flex justify-content-around align-items-center mt-4" style="background: #333; border-radius: 15px; padding: 20px;">
             <div id="joystick-container" style="width: 150px; height: 150px; position: relative; background: #444; border-radius: 50%;">
@@ -294,6 +304,11 @@
                     </ul>
                 </div>
             </div>
+
+            <div class="mt-4">
+                <button id="botonTriangulo" class="boton boton-blau" onclick="hacerTriangulo()">Triángulo</button>
+            </div>
+
         </div>
     </div>
 
@@ -310,10 +325,10 @@
 
         let map, droneMarker, pc;
         let dronePath = [];
+        let pol = false;
         let tramoActual = null;
         let decoracionActual = null;
         let ultimoPuntoRuta = null;
-
         let estiloRutaActual = {
             color: 'red',
             weight: 3,
@@ -355,6 +370,22 @@
             actualizarColorPreviews();
         };
 
+        // Funció per pintar o no la trajectoria
+        function pintar(){
+            if (pol === true) {
+                pol = false;
+                document.getElementById("botonPintar").innerText = "Pintar (OFF)";
+                document.getElementById("botonPintar").classList.remove('boton-blau', 'boton-verde');
+
+            } else {
+                pol = true;
+                document.getElementById("botonPintar").innerText = "Pintar (ON)";
+                document.getElementById("botonPintar").classList.add('boton-verde');
+            }
+        }
+
+
+        // Nos conectamos a un broker o a dronseetac o a hivemq
         const client = mqtt.connect('ws://dronseetac.upc.edu:8000', {
             clean: false,
             keepalive: 60,
@@ -366,13 +397,14 @@
 
         client.on('connect', function () {
             console.log('Conectado al broker MQTT');
-            client.subscribe('Grup21/autopilotServiceDemo/mobileFlask/#');
+            client.subscribe('Grup25/autopilotServiceDemo/mobileFlask/#');
         });
 
         client.on('message', function (topic, message) {
             console.log("Mensaje recibido en:", topic, "Contenido:", message.toString());
 
-            if (topic === "Grup21/autopilotServiceDemo/mobileFlask/connected") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/connected") {
+
                 console.log("El dron confirma conexión. Pidiendo telemetría...");
 
                 const botonDespegar = document.getElementById('botonDespegar');
@@ -389,7 +421,8 @@
                 client.publish('mobileFlask/autopilotServiceDemo/startTelemetry');
             }
 
-            if (topic === "Grup21/autopilotServiceDemo/mobileFlask/telemetryInfo") {
+            // Escuchar los datos de telemetría
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/telemetryInfo") {
 
                 const btnMAV = document.getElementById('botonConectarMAV');
                 const btnSim = document.getElementById('botonConectarSim');
@@ -436,7 +469,9 @@
                     droneMarker.setLatLng(nuevaPos);
                     map.panTo(nuevaPos);
 
-                    dronePath.push(nuevaPos);
+                    // Dibujar el rastro si esta activo
+                    if (pol === true) {
+                        dronePath.push(nuevaPos);
 
                     if (!tramoActual) {
                         tramoActual = crearNuevoTramo();
@@ -467,6 +502,7 @@
                     }
 
                     ultimoPuntoRuta = nuevaPos;
+
                 }
 
                 const heading = data.heading || 0;
@@ -523,13 +559,15 @@
                 }
             }
 
-            if (topic === "Grup21/autopilotServiceDemo/mobileFlask/videoOffer") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/videoOffer") {
+
                 const data = JSON.parse(message.toString());
                 console.log("Oferta de video recibida del dron");
                 recibirVideo(data.offer);
             }
 
-            if (topic === "Grup21/autopilotServiceDemo/mobileFlask/iceCandidate") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/iceCandidate") {
+
                 const data = JSON.parse(message.toString());
                 if (pc && data.candidate) {
                     pc.addIceCandidate(new RTCIceCandidate(data.candidate));
@@ -556,6 +594,10 @@
         function rtlDron() {
             client.publish('mobileFlask/autopilotServiceDemo/RTL');
             document.getElementById('botonRTL').classList.add('boton-amarillo');
+        }
+
+        function hacerTriangulo() {
+            client.publish('mobileFlask/autopilotServiceDemo/triangle', 'start');
         }
 
         function cambiarHeading(valor) {

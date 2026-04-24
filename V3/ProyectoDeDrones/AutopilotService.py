@@ -6,6 +6,7 @@ import random
 import os
 import time
 import json
+import threading
 
 import paho.mqtt.client as mqtt
 from P2.ProyectoDeDrones.dronLink.Dron import Dron
@@ -30,7 +31,8 @@ def publish_event(origin, event):
     #     topic = "Grup21/autopilotServiceDemo/" + origin + "/" + event
     #     client.publish(topic)
     global client
-    topic = "Grup21/autopilotServiceDemo/" + origin + "/" + event
+
+    topic = "Grup25/autopilotServiceDemo/" + origin + "/" + event
     client.publish(topic)
 
 
@@ -42,7 +44,8 @@ def publish_telemetry_info(telemetry_info):
         return
     last_telemetry_time = current_time
     for origin in active_origins:
-        topic = "Grup21/autopilotServiceDemo/" + origin + "/telemetryInfo"
+
+        topic = "Grup25/autopilotServiceDemo/" + origin + "/telemetryInfo"
         client.publish(topic, json.dumps(telemetry_info))
 
 
@@ -51,6 +54,29 @@ def _on_connected_callback():
     publish_event("connected")
     print("Dron connectat correctament via MAVProxy")
 
+def do_triangle(origin):
+    global dron
+    try:
+        if dron.state != "flying":
+            return
+        dron.go("North")
+        time.sleep(2)
+
+        dron.go("SouthEast")
+        time.sleep(2)
+
+        dron.go("SouthWest")
+        time.sleep(2)
+
+        dron.go("Stop")
+        publish_event(origin, "triangleDone")
+
+    except Exception as e:
+        print(f"Error haciendo triángulo: {e}")
+        try:
+            dron.go("Stop")
+        except:
+            pass
 
 def on_message(cli, userdata, message):
     global active_origins, client, dron
@@ -69,15 +95,13 @@ def on_message(cli, userdata, message):
             # Ja connectat: resposta immediata
             publish_event(origin,"connected")
         else:
-            # Connexió NO BLOQUEJANT per no congelar el loop MQTT
-            # wait_heartbeat() pot trigar 10-30s → el loop MQTT quedaria mut
+            # Connexio no bloquejant perque vagi fluid el MQTT
             print("Conectando via MAVProxy...")
             dron.connect(
                 MAVPROXY_AUTOPILOT_ENDPOINT,
                 MAVPROXY_AUTOPILOT_BAUD,
                 freq=4,
                 blocking=False,
-                #callback=_on_connected_callback
                 callback = lambda: publish_event(origin, "connected")
             )
 
@@ -98,6 +122,7 @@ def on_message(cli, userdata, message):
                 elif opcion == 2:  # Simulador TCP
                     print("Conectando a Simulador TCP...")
                     dron.connect('tcp:127.0.0.1:5763', 115200, freq=4, blocking=False,
+
                                 callback=lambda: publish_event(origin, 'connected'))
             except Exception as e:
                 print(f"Error conexión Simulacion: {e}")
@@ -125,6 +150,17 @@ def on_message(cli, userdata, message):
         if dron.state == "flying":
             direction = message.payload.decode("utf-8")
             dron.go(direction)
+
+
+    elif command == "triangle":
+        if dron.state == "flying":
+            threading.Thread(
+                target=do_triangle,
+                args=(origin,),
+                daemon=True
+            ).start()
+
+
 
     elif command == "Land":
         if dron.state in ("flying", "armed", "connected"):
