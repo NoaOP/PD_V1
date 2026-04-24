@@ -376,11 +376,21 @@
                 pol = false;
                 document.getElementById("botonPintar").innerText = "Pintar (OFF)";
                 document.getElementById("botonPintar").classList.remove('boton-blau', 'boton-verde');
+                document.getElementById("botonPintar").classList.add('boton-blau');
+
+                // IMPORTANT: tallem la línia actual perquè no segueixi pintant ni uneixi punts
+                tramoActual = null;
+                ultimoPuntoRuta = null;
 
             } else {
                 pol = true;
                 document.getElementById("botonPintar").innerText = "Pintar (ON)";
                 document.getElementById("botonPintar").classList.add('boton-verde');
+                document.getElementById("botonPintar").classList.add('boton-verde');
+
+                // IMPORTANT: comencem un tram nou des de zero
+                tramoActual = crearNuevoTramo();
+                ultimoPuntoRuta = null;
             }
         }
 
@@ -473,35 +483,37 @@
                     if (pol === true) {
                         dronePath.push(nuevaPos);
 
-                    if (!tramoActual) {
-                        tramoActual = crearNuevoTramo();
-                    }
 
-                    if (tramoActual.getLatLngs().length === 0 && ultimoPuntoRuta) {
-                        tramoActual.addLatLng(ultimoPuntoRuta);
-                    }
-
-                    tramoActual.addLatLng(nuevaPos);
-
-                    if (estiloRutaActual.formato === 'dots') {
-                        if (dronePath.length % 5 === 0) {
-                            añadirPuntoDecorativo(nuevaPos);
+                        if (!tramoActual) {
+                            tramoActual = crearNuevoTramo();
                         }
-                    }
 
-                    if (estiloRutaActual.formato === 'stars') {
-                        if (dronePath.length % 5 === 0) {
-                            añadirEstrellaDecorativa(nuevaPos);
+                        if (tramoActual.getLatLngs().length === 0 && ultimoPuntoRuta) {
+                            tramoActual.addLatLng(ultimoPuntoRuta);
                         }
-                    }
 
-                    if (estiloRutaActual.formato === 'hearts') {
-                        if (dronePath.length % 5 === 0) {
-                            añadirCorazonDecorativo(nuevaPos);
+                        tramoActual.addLatLng(nuevaPos);
+
+                        if (estiloRutaActual.formato === 'dots') {
+                            if (dronePath.length % 5 === 0) {
+                                añadirPuntoDecorativo(nuevaPos);
+                            }
                         }
-                    }
 
-                    ultimoPuntoRuta = nuevaPos;
+                        if (estiloRutaActual.formato === 'stars') {
+                            if (dronePath.length % 5 === 0) {
+                                añadirEstrellaDecorativa(nuevaPos);
+                            }
+                        }
+
+                        if (estiloRutaActual.formato === 'hearts') {
+                            if (dronePath.length % 5 === 0) {
+                                añadirCorazonDecorativo(nuevaPos);
+                            }
+                        }
+
+                        ultimoPuntoRuta = nuevaPos;
+                    }
 
                 }
 
