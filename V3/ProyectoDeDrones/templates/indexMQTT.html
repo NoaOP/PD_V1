@@ -286,13 +286,13 @@
 
         client.on('connect', function () {
             console.log('Conectado al broker MQTT');
-            client.subscribe('Grup25/autopilotServiceDemo/mobileFlask/#');
+            client.subscribe('Grup21/autopilotServiceDemo/mobileFlask/#');
         });
 
         client.on('message', function (topic, message) {
             console.log("Mensaje recibido en:", topic, "Contenido:", message.toString());
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/connected") {
+            if (topic === "Grup21/autopilotServiceDemo/mobileFlask/connected") {
 
                 console.log("El dron confirma conexión. Pidiendo telemetría...");
 
@@ -311,7 +311,7 @@
             }
 
             // Escuchar los datos de telemetría
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/telemetryInfo") {
+            if (topic === "Grup21/autopilotServiceDemo/mobileFlask/telemetryInfo") {
 
                 const btnMAV = document.getElementById('botonConectarMAV');
                 const btnSim = document.getElementById('botonConectarSim');
@@ -433,14 +433,14 @@
                 }
             }
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/videoOffer") {
+            if (topic === "Grup21/autopilotServiceDemo/mobileFlask/videoOffer") {
 
                 const data = JSON.parse(message.toString());
                 console.log("Oferta de video recibida del dron");
                 recibirVideo(data.offer);
             }
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/iceCandidate") {
+            if (topic === "Grup21/autopilotServiceDemo/mobileFlask/iceCandidate") {
 
                 const data = JSON.parse(message.toString());
                 if (pc && data.candidate) {
