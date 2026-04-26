@@ -139,3 +139,27 @@ https://drive.google.com/file/d/10JzNUpuTVQDBkeTfOPZDLzyI7tp5GlI8/view?usp=drive
 
 
 **6.Debe permitir capturar imagenes del stream de video (hacer fotos) y guardarlas, de manera que el usuario pueda verlas cuando quiera en un formulario que muestre una galería de las fotos tomadas**
+
+
+### 5.1.3 WebApp
+
+**1.Debe tener una pestaña que muestre los botones para controlar el dron, otra para mostrar un mapa geolocalizado con la posición del dron en cada momento y otra con el stream de video que se recibe del dron**
+La WebApp está organizada en tres pestañas principales: Control, Mapa y Video. Esta estructura permite separar las funciones principales de la aplicación y facilita su uso.
+En la pestaña Control, el usuario puede enviar comandos al dron, como conectar, despegar, aterrizar, ejecutar RTL, modificar el heading, cambiar la velocidad, mover el dron mediante botones direccionales y activar el control por voz. También se muestra información básica como la altitud actual del dron.
+En la pestaña Mapa, se muestra un mapa geolocalizado basado en Leaflet y OpenStreetMap, donde se puede visualizar la posición del dron a partir de la telemetría recibida.
+En la pestaña Video, el usuario puede iniciar y detener el stream de vídeo recibido desde el servicio de cámara. Esta pestaña incluye una zona reservada para visualizar en tiempo real la imagen capturada por el dron.
+Por tanto, este requisito queda cumplido porque la WebApp integra en una misma interfaz las tres funciones principales: control del dron, visualización de mapa y recepción de vídeo.
+En las imágenes se puede ver la distribución de la web:
+
+<img style="width:auto; height:200px" alt="Captura de pantalla 2026-04-26 174239" src="https://github.com/user-attachments/assets/2a7795c2-ba4e-45f3-94a9-f1d60c792a8b" />
+
+<img style="width:auto; height:200px" alt="Captura de pantalla 2026-04-26 174257" src="https://github.com/user-attachments/assets/f0326b57-e6b7-4598-ad00-c70a2bcd1320" />
+
+<img style="width:auto; height:100px img-align:center" alt="Captura de pantalla 2026-04-26 174311" src="https://github.com/user-attachments/assets/76b16c5a-8730-41fe-a6f6-766a17b64f3b" />
+
+
+**2.Debe comunicarse con el servicio de autopiloto por MQTT y con el servicio de cámara por WebRTC**
+
+
+**3.El usuario debe poder controlar el dron mediante la voz, diciendo palabras clave como: "Despega", "Aterriza", "Vuela hacia el Norte", etc. Para implementar este requisito es muy importante mirar lo que se explica en el apartado 5.2**
+
