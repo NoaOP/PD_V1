@@ -108,3 +108,19 @@ CameraService puede atender las peticiones de vídeo procedentes de distintos m�
 
 ### 5.1.2 Dashboard en C#
 
+**1.Debe funcionar en modo global, es decir, haciendo peticiones al servicio de autopiloto por MQTT**
+
+
+**2.Debe mostrar al usuario un mapa geolocalizado con la ubicación del dron en cada momento**
+
+
+**3.El usuario debe poder clicar en el mapa para hacer que el dron se dirija a ese punto**
+
+
+**4.Debe mostrar el stream de video que se recibe por WebRTC del servicio de cámara. Para implementar este requisito es muy importante mirar lo que se explica en el apartado 5.2**
+
+
+**5.El usuario debe poder solicitar el reconocimiento de uno o varios objetos de entre un subconjunto del data ser de COCO**
+
+
+**6.Debe permitir capturar imagenes del stream de video (hacer fotos) y guardarlas, de manera que el usuario pueda verlas cuando quiera en un formulario que muestre una galería de las fotos tomadas**
