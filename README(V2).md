@@ -113,6 +113,19 @@ CameraService puede atender las peticiones de vídeo procedentes de distintos m�
 
 **2.Debe mostrar al usuario un mapa geolocalizado con la ubicación del dron en cada momento**
 
+El dashboard en C# incorpora un mapa geolocalizado para mostrar la posición actual del dron durante el vuelo. Este mapa está implementado en el archivo MapForm.cs, donde se crea una ventana independiente llamada Mapa del dron.
+Para mostrar el mapa, se utiliza un componente WebBrowser dentro del formulario de C#. Dentro de este navegador se carga una página HTML con la librería Leaflet y mapas de OpenStreetMap. Esta parte permite representar el entorno geográfico y colocar un marcador sobre la posición del dron.
+
+La posición del dron se actualiza a partir de los datos de telemetría recibidos. En Form1.cs, la función ProcesarTelemetria extrae la latitud y la longitud del dron y si el mapa está abierto llama a mapForm.UpdateLocation(lat, lon) para actualizar su posición en el mapa.
+Después, en MapForm.cs, la función UpdateLocation envía las nuevas coordenadas al mapa y ejecuta la función JavaScript updateMarker, que mueve el marcador del dron y centra su posición.
+
+<img width="400" height="300" alt="Captura de pantalla 2026-04-26 170441" src="https://github.com/user-attachments/assets/e3982c4a-a3e9-4422-919b-be279da4fb31" />
+
+
+
+
+
+
 
 **3.El usuario debe poder clicar en el mapa para hacer que el dron se dirija a ese punto**
 
