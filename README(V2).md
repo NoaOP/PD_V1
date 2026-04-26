@@ -66,9 +66,45 @@ La interacción con el servicio de cámara se realiza mediante WebRTC. El archiv
 
 
 **8. Tanto en modo local como en modo global el usuario debe poder solicitar el reconocimiento de objetos en el stream de video. Incluso debe poder solicitar que se reconozcan varios tipos de objetos simultaneamente, seleccionados de entre un subconjunto del data set de COCO**
+El dashboard permite activar el reconocimiento de objetos sobre el vídeo recibido por WebRTC. Para ello, la interfaz incluye un apartado llamado Deteccion de objects, donde el usuario puede seleccionar uno o varios objetos de un subconjunto del dataset COCO. En el código, este subconjunto se define así:
 
+COCO_SUBSET = [
+    ("Persona", 0),
+    ("Perro", 16),
+    ("Banana", 46),
+    ("Naranja", 49),
+    ("Pizza", 53),
+    ("Pastel", 55),
+    ("Reloj", 74),
+]
+```python
+def _get_selected_object_ids(self, mode):
+    vars_map = self.local_detect_vars if mode == "local" else self.global_detect_vars
+    selected = {obj_id for obj_id, var in vars_map.items() if var.get() == 1}
+
+    if mode == "local":
+        self.local_selected_objects = selected
+    else:
+        self.global_selected_objects = selected
+
+    return selected
+```
+Esta función comprueba qué casillas están activadas y devuelve el conjunto de identificadores COCO seleccionados.
 
 **9. El servicio de cámara debe suministrar el stream de video por WebRTC a todos los módulos que lo soliciten**
+En el CameraService.py, la clase CustomVideoStreamTrack lee continuamente frames de la cámara y los prepara para enviarlos por WebRTC:
+```python
+class CustomVideoStreamTrack(VideoStreamTrack):
+    def __init__(self, camera_id=0):
+        super().__init__()
+        self.cap = cv2.VideoCapture(camera_id)
+
+    async def recv(self):
+        pts, time_base = await self.next_timestamp()
+        ret, frame = self.cap.read()
+```
+Además, el servicio también escucha peticiones mediante MQTT para poder suministrar vídeo a la web app. Cuando recibe el comando startVideo, inicia una conexión WebRTC y publica una oferta de vídeo para que el cliente pueda responder y establecer la conexión.
+CameraService puede atender las peticiones de vídeo procedentes de distintos módulos, como el dashboard Python o la interfaz web. El vídeo se transmite mediante WebRTC, mientras que MQTT se utiliza para iniciar la conexión con los clientes web.
 
 ### 5.1.2 Dashboard en C#
 
