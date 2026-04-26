@@ -122,13 +122,15 @@ Después, en MapForm.cs, la función UpdateLocation envía las nuevas coordenada
 <img width="400" height="300" alt="Captura de pantalla 2026-04-26 170441" src="https://github.com/user-attachments/assets/e3982c4a-a3e9-4422-919b-be279da4fb31" />
 
 
-
-
-
-
-
 **3.El usuario debe poder clicar en el mapa para hacer que el dron se dirija a ese punto**
+El dashboard en C# permite que el usuario interactúe directamente con el mapa geolocalizado. Además de mostrar la posición actual del dron, el mapa permite seleccionar un punto de destino haciendo clic sobre él.
 
+Cuando el usuario clica sobre una posición del mapa, el programa obtiene las coordenadas geográficas de ese punto, es decir, la latitud y la longitud. A continuación, estas coordenadas se envían al dashboard para que pueda ordenar al dron desplazarse hacia esa ubicación.
+
+De esta forma, el usuario no necesita introducir manualmente las coordenadas del destino, sino que puede seleccionar visualmente el punto sobre el mapa. Esto hace que la navegación sea más intuitiva y parecida al funcionamiento de Mission Planner, donde el operador puede controlar el movimiento del dron a partir de posiciones geográficas.
+
+El funcionamiento del mapa geolocalizado y la navegación mediante clic se muestra en el siguiente vídeo:
+https://drive.google.com/file/d/10JzNUpuTVQDBkeTfOPZDLzyI7tp5GlI8/view?usp=drive_link
 
 **4.Debe mostrar el stream de video que se recibe por WebRTC del servicio de cámara. Para implementar este requisito es muy importante mirar lo que se explica en el apartado 5.2**
 
