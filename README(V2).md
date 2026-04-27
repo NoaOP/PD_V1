@@ -159,7 +159,34 @@ En las imágenes se puede ver la distribución de la web:
 
 
 **2.Debe comunicarse con el servicio de autopiloto por MQTT y con el servicio de cámara por WebRTC**
+La WebApp se comunica con el servicio de autopiloto mediante MQTT. Para ello, la WebApp publica un mensaje en un tópico MQTT:
+
+```python
+client.subscribe("+/autopilotServiceDemo/#")
+```
+Después, en AutopilotService.py se interpreta el comando recibido y se ejecuta la acción correspondiente. Este ambién publica telemetría de vuelta hacia la WebApp para que esta pueda actualizar datos
+La comunicación con el servicio de cámara se realiza mediante WebRTC. El CameraService.py captura la imagen de la cámara y crea una pista de vídeo WebRTC:
+
+```python
+video_sender_mqtt = CustomVideoStreamTrack(0)
+pc_mqtt.addTrack(video_sender_mqtt)
+```
+Para iniciar el vídeo desde la WebApp, el servicio de cámara escucha peticiones MQTT. Cuando recibe el comando startVideo, crea una conexión WebRTC y envía una oferta de vídeo al cliente:
+
+```python
+if command == "startVideo":
+    asyncio.run_coroutine_threadsafe(start_mqtt_video(client, origin), async_loop)
+```
 
 
 **3.El usuario debe poder controlar el dron mediante la voz, diciendo palabras clave como: "Despega", "Aterriza", "Vuela hacia el Norte", etc. Para implementar este requisito es muy importante mirar lo que se explica en el apartado 5.2**
+
+La WebApp incorpora control por voz para que el usuario pueda enviar comandos al dron sin utilizar los botones de la interfaz. Para ello, se incluye un botón de Activar Voz, que permite iniciar el reconocimiento de voz desde el navegador.
+
+El funcionamiento se basa en detectar palabras clave pronunciadas por el usuario y asociarlas a comandos concretos del dron. Por ejemplo, órdenes como Despega, Aterriza o Vuela hacia el Norte se traducen en comandos que la WebApp envía al servicio de autopiloto mediante MQTT.
+
+Una vez reconocida la instrucción, la WebApp publica el comando correspondiente en el tópico MQTT adecuado. El AutopilotService recibe ese mensaje, interpreta la orden y ejecuta la acción sobre el dron.
+
+Video demostración:
+
 
