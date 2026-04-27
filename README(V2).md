@@ -188,5 +188,5 @@ El funcionamiento se basa en detectar palabras clave pronunciadas por el usuario
 Una vez reconocida la instrucción, la WebApp publica el comando correspondiente en el tópico MQTT adecuado. El AutopilotService recibe ese mensaje, interpreta la orden y ejecuta la acción sobre el dron.
 
 Video demostración:
-
+https://drive.google.com/file/d/1L-1oa3KyzixC-jj256QstCRX338SNpr1/view?usp=drive_link
 
