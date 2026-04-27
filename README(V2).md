@@ -190,3 +190,8 @@ Una vez reconocida la instrucción, la WebApp publica el comando correspondiente
 Video demostración:
 https://drive.google.com/file/d/1L-1oa3KyzixC-jj256QstCRX338SNpr1/view?usp=drive_link
 
+### 5.1.4 Demostracion de la versión 2
+
+En el siguiente vídeo se puede observar cómo el dashboard en modo local se conecta correctamente a MAVProxy y, a través de este, al dron. Durante la prueba, también se comprueba que Mission Planner, AutopilotService y el dashboard quedan conectados correctamente, y que el dron puede armarse desde la interfaz local sin problemas. Sin embargo, se detectó un problema con el servicio de autopiloto, ya que este se cerraba automáticamente durante la ejecución. Como consecuencia, aunque el dashboard en modo global y la WebApp sí conseguían conectarse correctamente al broker MQTT, no fue posible completar la conexión final con el dron.
+
+https://drive.google.com/file/d/1AuBXLqTKAH5cpQQEY1pTa2rTry3trTI4/view?usp=drive_link
