@@ -159,7 +159,39 @@ En las imágenes se puede ver la distribución de la web:
 
 
 **2.Debe comunicarse con el servicio de autopiloto por MQTT y con el servicio de cámara por WebRTC**
+La WebApp se comunica con el servicio de autopiloto mediante MQTT. Para ello, la WebApp publica un mensaje en un tópico MQTT:
+
+```python
+client.subscribe("+/autopilotServiceDemo/#")
+```
+Después, en AutopilotService.py se interpreta el comando recibido y se ejecuta la acción correspondiente. Este ambién publica telemetría de vuelta hacia la WebApp para que esta pueda actualizar datos
+La comunicación con el servicio de cámara se realiza mediante WebRTC. El CameraService.py captura la imagen de la cámara y crea una pista de vídeo WebRTC:
+
+```python
+video_sender_mqtt = CustomVideoStreamTrack(0)
+pc_mqtt.addTrack(video_sender_mqtt)
+```
+Para iniciar el vídeo desde la WebApp, el servicio de cámara escucha peticiones MQTT. Cuando recibe el comando startVideo, crea una conexión WebRTC y envía una oferta de vídeo al cliente:
+
+```python
+if command == "startVideo":
+    asyncio.run_coroutine_threadsafe(start_mqtt_video(client, origin), async_loop)
+```
 
 
 **3.El usuario debe poder controlar el dron mediante la voz, diciendo palabras clave como: "Despega", "Aterriza", "Vuela hacia el Norte", etc. Para implementar este requisito es muy importante mirar lo que se explica en el apartado 5.2**
 
+La WebApp incorpora control por voz para que el usuario pueda enviar comandos al dron sin utilizar los botones de la interfaz. Para ello, se incluye un botón de Activar Voz, que permite iniciar el reconocimiento de voz desde el navegador.
+
+El funcionamiento se basa en detectar palabras clave pronunciadas por el usuario y asociarlas a comandos concretos del dron. Por ejemplo, órdenes como Despega, Aterriza o Vuela hacia el Norte se traducen en comandos que la WebApp envía al servicio de autopiloto mediante MQTT.
+
+Una vez reconocida la instrucción, la WebApp publica el comando correspondiente en el tópico MQTT adecuado. El AutopilotService recibe ese mensaje, interpreta la orden y ejecuta la acción sobre el dron.
+
+Video demostración:
+https://drive.google.com/file/d/1L-1oa3KyzixC-jj256QstCRX338SNpr1/view?usp=drive_link
+
+### 5.1.4 Demostracion de la versión 2
+
+En el siguiente vídeo se puede observar cómo el dashboard en modo local se conecta correctamente a MAVProxy y, a través de este, al dron. Durante la prueba, también se comprueba que Mission Planner, AutopilotService y el dashboard quedan conectados correctamente, y que el dron puede armarse desde la interfaz local sin problemas. Sin embargo, se detectó un problema con el servicio de autopiloto, ya que este se cerraba automáticamente durante la ejecución. Como consecuencia, aunque el dashboard en modo global y la WebApp sí conseguían conectarse correctamente al broker MQTT, no fue posible completar la conexión final con el dron.
+
+https://drive.google.com/file/d/1AuBXLqTKAH5cpQQEY1pTa2rTry3trTI4/view?usp=drive_link
