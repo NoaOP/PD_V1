@@ -32,7 +32,7 @@ def publish_event(origin, event):
     #     client.publish(topic)
     global client
 
-    topic = "Grup21/autopilotServiceDemo/" + origin + "/" + event
+    topic = "Grup25/autopilotServiceDemo/" + origin + "/" + event
     client.publish(topic)
 
 
@@ -45,7 +45,7 @@ def publish_telemetry_info(telemetry_info):
     last_telemetry_time = current_time
     for origin in active_origins:
 
-        topic = "Grup21/autopilotServiceDemo/" + origin + "/telemetryInfo"
+        topic = "Grup25/autopilotServiceDemo/" + origin + "/telemetryInfo"
         client.publish(topic, json.dumps(telemetry_info))
 
 
@@ -114,7 +114,7 @@ def on_message(cli, userdata, message):
             try:
                 partes = payload_raw.split(',')
                 opcion = int(partes[0])
-                if opcion == 1:  # Dron Real COM
+                if opcion == 1:  # Dron Real COM, no se utiliza
                     puerto_com = f'COM{partes[1]}'
                     print(f"Conectando a Dron Real en {puerto_com}...")
                     dron.connect(puerto_com, 57600, freq=4, blocking=False,
@@ -191,6 +191,46 @@ def on_message(cli, userdata, message):
                 dron.changeNavSpeed(velocidad)
             except (ValueError, TypeError):
                 pass
+
+
+
+    elif command == "executeLawnmower":
+        # Solo ejecutamos si estamos volando, armados o conectados
+        if dron.state in ("flying", "armed", "connected"):
+            try:
+                payload_str = message.payload.decode("utf-8")
+                lista_waypoints = json.loads(payload_str)
+
+                print(f"RECIBIDO PLAN DE VUELO: {len(lista_waypoints)} waypoints.")
+
+                # Cogemos la altura del primer waypoint (o usamos 5 por defecto)
+                altura_base = lista_waypoints[0]['alt'] if len(lista_waypoints) > 0 else 5.0
+
+                # Creamos el diccionario que tu función uploadMission exige
+                mission = {
+                    "takeOffAlt": altura_base,
+                    "waypoints": lista_waypoints,
+                    "speed": 2  # Velocidad de navegación
+                }
+
+                print("Subiendo misión nativa al autopiloto...")
+                # 1. Cargamos la misión en el dron de forma bloqueante (esperamos a que suba entera)
+                dron.uploadMission(mission, blocking=True)
+
+                print("Misión subida. Iniciando ejecución autónoma...")
+
+                # Usamos un thread para vigilar la misión sin bloquear el MQTT
+                def run_and_hold():
+                    dron.executeMission(blocking=True)  # Esperamos a que termine los puntos
+                    print("Misión finalizada. Cambiando a modo LOITER para evitar RTL.")
+                    dron.go("Stop")  # Esto suele forzar el modo LOITER o GUIDED quieto
+                    publish_event(origin, "missionCompleted")
+
+                threading.Thread(target=run_and_hold, daemon=True).start()
+
+            except Exception as e:
+                print(f"Error al ejecutar Misión: {e}")
+
 
 
 def on_connect(client, userdata, flags, rc):
