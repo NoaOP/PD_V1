@@ -1,0 +1,349 @@
+﻿using csDronLink;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Formulario
+{
+    public partial class Form1 : Form
+    {
+        Dron dron = new Dron();
+        private int AlturaSeleccionada = 10;
+        private float ultimaBateria = -1; // Para almacenar el último valor de batería
+
+        public Form1()
+        {
+            InitializeComponent();
+            // No queremos que nos molesten con la excepción Cross-Threading
+            CheckForIllegalCrossThreadCalls = false;
+            // Configuramos los 9 botones de movimiento. Todos ellos tendrán asociada la misma función
+            // para gestionar el evento click, pero en el tag ponemos la palabra que identifica la dirección 
+            // del movimiento, que es la palabra que hay que pasarle como parámetro al dron para que haga la
+            // operación. El texto es el código de una flechita que representa la dirección del movimineto.
+
+            Font letraGrande = new Font("Arial", 14);
+            Font letraPequeña = new Font("Arial", 12);
+
+            // Ahora configuramos los botones de navegación
+
+            button9.Text = "NW";
+            button9.Tag = "NorthWest";
+            button9.Click += navButton_Click;
+            button9.Font = letraGrande;
+
+
+            button10.Text = "N";
+            button10.Tag = "North";
+            button10.Click += navButton_Click;
+            button10.Font = letraGrande;
+
+
+            button11.Text = "NE";
+            button11.Tag = "NorthEast";
+            button11.Click += navButton_Click;
+            button11.Font = letraGrande;
+
+
+            button12.Text = "W";
+            button12.Tag = "West";
+            button12.Click += navButton_Click;
+            button12.Font = letraGrande;
+
+
+            button13.Text = "Stop";
+            button13.Tag = "Stop";
+            button13.Click += navButton_Click;
+            button13.Font = letraPequeña;
+
+
+            button14.Text = "E";
+            button14.Tag = "East";
+            button14.Click += navButton_Click;
+            button14.Font = letraGrande;
+
+
+            button15.Text = "SW";
+            button15.Tag = "SouthWest";
+            button15.Click += navButton_Click;
+            button15.Font = letraGrande;
+
+
+            button16.Text = "S";
+            button16.Tag = "South";
+            button16.Click += navButton_Click;
+            button16.Font = letraGrande;
+
+
+            button17.Text = "SE";
+            button17.Tag = "SouthEast";
+            button17.Click += navButton_Click;
+            button17.Font = letraGrande;
+
+        }
+
+        private void but_connect_Click(object sender, EventArgs e)
+        {
+            dron.Conectar("simulacion");
+            but_connect.BackColor = Color.Green;
+            but_connect.ForeColor = Color.White;
+        }
+
+
+        private void EnAire(byte id, object param)
+        {
+            // Esto es lo que haré cuando el dron haya alcanzado la altura de despegue
+            despegarBtn.BackColor = Color.Green;
+            despegarBtn.ForeColor = Color.White;
+            despegarBtn.Text = (string)param;
+        }
+
+        private void but_takeoff_Click(object sender, EventArgs e)
+        {
+            // Click en boton para dspegar
+            // Llamada no bloqueante para no bloquear el formulario
+            dron.Despegar(AlturaSeleccionada, bloquear: false, EnAire, "Volando");
+            despegarBtn.BackColor = Color.Yellow;
+        }
+
+        private void navButton_Click(object sender, EventArgs e)
+        {
+            // Aqui vendremos cuando se clique cualquiera de los botones de navagación
+            // En el tag del boton tenemos la dirección de navegación.
+            Button b = (Button)sender;
+            string tag = b.Tag.ToString();
+            dron.Navegar(tag);
+
+        }
+
+        private void EnTierra(byte id, object mensaje)
+        {
+            // Aqui vendre cuando el dron esté en tierra
+            // El mensaje me dice si vengo de un aterrizaje o de un RTL
+            if ((string)mensaje == "Aterrizaje")
+                button7.BackColor = Color.Green;
+            else
+                button6.BackColor = Color.Green;
+        }
+
+        
+
+
+        private void aterrizarBtn_Click(object sender, EventArgs e)
+        {
+            // Click en el botón de aterrizar
+            dron.Aterrizar(bloquear: false, EnTierra, "Aterrizaje");
+            button7.BackColor = Color.Yellow;
+        }
+
+        private void RTLBtn_Click(object sender, EventArgs e)
+        {
+            // Click en el botón de RTL
+            dron.RTL(bloquear: false, EnTierra, "RTL");
+            button6.BackColor = Color.Yellow;
+        }
+
+        private void enviarTelemetriaBtn_Click(object sender, EventArgs e)
+        {
+
+            dron.EnviarDatosTelemetria(ProcesarTelemetria);
+        }
+
+        private void detenerTelemetriaBtn_Click(object sender, EventArgs e)
+        {
+            dron.DetenerDatosTelemetria();
+        }
+
+        // Per calcular la velocitat estimada
+        private double? lastLatDeg = null;
+        private double? lastLonDeg = null;
+        private DateTime? lastTime = null;
+
+        private void ProcesarTelemetria(byte id, List<(string nombre, float valor)> telemetria)
+        {
+            if (telemetria == null || telemetria.Count < 4)
+                return;
+
+            // --- Dades bàsiques que JA arriben de la DLL ---
+            double alt = telemetria[0].valor;
+
+            double lat = ((double)telemetria[1].valor) / 0.1E+8; // graus
+            double lon = ((double)telemetria[2].valor) / 0.1E+8; // graus
+
+            float headingRaw = telemetria[3].valor;              // graus
+            float heading = (headingRaw % 360f + 360f) % 360f;   // normalitzar 0..360
+
+            // Intentar obtener información de batería si está disponible
+            if (telemetria.Count > 4)
+            {
+                // Buscar si hay datos de batería en la telemetría
+                var batInfo = telemetria.FirstOrDefault(t => t.nombre.ToLower().Contains("bat"));
+                if (batInfo.nombre != null)
+                {
+                    ultimaBateria = batInfo.valor;
+                }
+            }
+
+            // --- Pintar a la UI ---
+            altitudLbl.Text = alt.ToString("0.000");
+            latitudLbl.Text = lat.ToString("0.000000");
+            longitudLbl.Text = lon.ToString("0.000000");
+            headLbl.Text = heading.ToString("0.00");
+
+            // --- GroundSpeed estimada (ràpida) ---
+            var now = DateTime.UtcNow;
+
+            if (lastLatDeg.HasValue && lastLonDeg.HasValue && lastTime.HasValue)
+            {
+                double dt = (now - lastTime.Value).TotalSeconds;
+
+                if (dt > 0.05) // evita valors bojos si arriben massa ràpid
+                {
+                    double dLat = lat - lastLatDeg.Value;
+                    double dLon = lon - lastLonDeg.Value;
+
+                    // Conversió ràpida graus -> metres (aprox local)
+                    double metersPerDegLat = 111320.0;
+                    double metersPerDegLon = 111320.0 * Math.Cos(lat * Math.PI / 180.0);
+
+                    double dx = dLon * metersPerDegLon;
+                    double dy = dLat * metersPerDegLat;
+
+                    double speed_ms = Math.Sqrt(dx * dx + dy * dy) / dt;
+
+                    groundSpeedLbl.Text = speed_ms.ToString("0.00"); // m/s
+                                                                     // Si la vols en km/h:
+                                                                     // groundSpeedLbl.Text = (speed_ms * 3.6).ToString("0.0");
+                }
+            }
+            else
+            {
+                groundSpeedLbl.Text = "---";
+            }
+
+            // Guardar per al següent càlcul
+            lastLatDeg = lat;
+            lastLonDeg = lon;
+            lastTime = now;
+        }
+
+        private void headingTrackBar_Scroll(object sender, EventArgs e)
+        {
+            // Recojo el valor del heading seleccionado
+            int n = headingTrackBar.Value;
+            headingLbl.Text = n.ToString();
+        }
+
+
+        private void headingTrackBar_MouseUp(object sender, MouseEventArgs e)
+        {
+            // Cuando se libera la barra de desplazamiento recojo el valor
+            // definitivo para el heading y lo envío al dron
+            float valorSeleccionado = headingTrackBar.Value;
+            dron.CambiarHeading(valorSeleccionado, bloquear: false);
+        }
+
+        private void velocidadTrackBar_Scroll(object sender, EventArgs e)
+        {
+            // Recojo y muestro el valor la velocidad según se mueve 
+            // la barra de desplazamiento
+            int n = velocidadTrackBar.Value;
+            velocidadLbl.Text = n.ToString();
+
+        }
+
+        private void velocidadTrackBar_MouseUp(object sender, MouseEventArgs e)
+        {
+            // Cuando se libera la barra de desplazamiento recojo el valor
+            // definitivo para la velocidad y lo envío al dron
+            int valorSeleccionado = velocidadTrackBar.Value;
+            dron.CambiaVelocidad(valorSeleccionado);
+           
+        }
+
+        
+
+
+        private void trackBar1_Scroll(object sender, EventArgs e)
+        {
+            // Recojo y muestro el valor la altura según se mueve 
+            // la barra de desplazamiento
+            int n = trackBar1.Value;
+            AlturaLbl.Text = n.ToString();
+        }
+
+
+        private void trackBar1_MouseUp_1(object sender, MouseEventArgs e)
+        {
+            // Cuando se libera la barra de desplazamiento recojo el valor
+            // definitivo para la altura
+            AlturaSeleccionada = trackBar1.Value;
+        }
+
+        private void emergenciaBtn1_Click(object sender, EventArgs e)
+        {
+            // Botón de emergencia: detiene inmediatamente el movimiento y aterriza
+            // 1. Primero detenemos cualquier movimiento
+            dron.Navegar("Stop");
+
+            // 2. Iniciamos aterrizaje inmediato sin bloquear
+            dron.Aterrizar(bloquear: false, null, null);
+
+            // 3. Feedback visual
+            emergenciaBtn1.BackColor = Color.DarkRed;
+            emergenciaBtn1.Text = "DETENIDO";
+
+            // 4. Alerta al usuario
+            MessageBox.Show("¡EMERGENCIA ACTIVADA!\n\nDron detenido y aterrizando inmediatamente.", 
+                "Parada de Emergencia", 
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+        }
+
+        private void estadoBtn_Click(object sender, EventArgs e)
+        {
+            // Botón de estado: muestra información de la batería del dron
+            try
+            {
+                // Obtenemos información del estado del dron
+                float bateria = dron.ObtenerEstadoBateria();
+
+                // Mostramos la información en una ventana
+                string mensaje = string.Format(
+                    "📊 ESTADO DEL DRON\n\n" +
+                    "🔋 Batería: {0:F1}%\n\n" +
+                    "Estado: {1}",
+                    bateria,
+                    bateria > 20 ? "✅ OK" : "⚠️ BATERÍA BAJA"
+                );
+
+                MessageBox.Show(mensaje, "Estado del Dron", 
+                    MessageBoxButtons.OK, 
+                    bateria > 20 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al obtener el estado del dron:\n" + ex.Message, 
+                    "Error", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error);
+            }
+        }
+
+
+    }
+
+
+
+
+
+
+
+}
+
