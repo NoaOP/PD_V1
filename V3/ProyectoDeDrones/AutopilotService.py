@@ -28,11 +28,11 @@ def publish_event(origin, event):
     """Publica un event a totes les interfícies que han interaccionat."""
     # global active_origins, client
     # for origin in active_origins:
-    #     topic = "Grup21/autopilotServiceDemo/" + origin + "/" + event
+    #     topic = "Grup212/autopilotServiceDemo/" + origin + "/" + event
     #     client.publish(topic)
     global client
 
-    topic = "Grup21/autopilotServiceDemo/" + origin + "/" + event
+    topic = "Grup212/autopilotServiceDemo/" + origin + "/" + event
     client.publish(topic)
 
 
@@ -45,14 +45,8 @@ def publish_telemetry_info(telemetry_info):
     last_telemetry_time = current_time
     for origin in active_origins:
 
-        topic = "Grup21/autopilotServiceDemo/" + origin + "/telemetryInfo"
+        topic = "Grup212/autopilotServiceDemo/" + origin + "/telemetryInfo"
         client.publish(topic, json.dumps(telemetry_info))
-
-
-def _on_connected_callback():
-    """Cridat per dronLink quan la connexió MAVProxy s'estableix (no bloquejant)."""
-    publish_event("connected")
-    print("Dron connectat correctament via MAVProxy")
 
 def do_triangle(origin):
     global dron
@@ -60,13 +54,16 @@ def do_triangle(origin):
         if dron.state != "flying":
             return
         dron.go("North")
-        time.sleep(2)
+        time.sleep(4)
 
         dron.go("SouthEast")
-        time.sleep(2)
+        time.sleep(4)
 
         dron.go("SouthWest")
-        time.sleep(2)
+        time.sleep(4)
+
+        dron.go("North")
+        time.sleep(4)
 
         dron.go("Stop")
         publish_event(origin, "triangleDone")
@@ -77,6 +74,111 @@ def do_triangle(origin):
             dron.go("Stop")
         except:
             pass
+
+
+def do_cuadrado(origin):
+    global dron
+    try:
+        if dron.state != "flying":
+            return
+        dron.go("North")
+        time.sleep(6)
+
+        dron.go("East")
+        time.sleep(6)
+
+        dron.go("South")
+        time.sleep(6)
+
+        dron.go("West")
+        time.sleep(6)
+
+        dron.go("Stop")
+        publish_event(origin, "CuadradoDone")
+
+    except Exception as e:
+        print(f"Error haciendo el cuadrado: {e}")
+        try:
+            dron.go("Stop")
+        except:
+            pass
+
+
+def do_redonda(origin):
+    global dron
+    try:
+        if dron.state != "flying":
+            return
+        dron.go("North")
+        time.sleep(2)
+        dron.go("NorthEast")
+        time.sleep(2)
+        dron.go("East")
+        time.sleep(2)
+        dron.go("SouthEast")
+        time.sleep(2)
+        dron.go("South")
+        time.sleep(2)
+        dron.go("SouthWest")
+        time.sleep(2)
+        dron.go("West")
+        time.sleep(2)
+        dron.go("NorthWest")
+        time.sleep(2)
+
+        dron.go("Stop")
+        publish_event(origin, "redondaDone")
+
+    except Exception as e:
+        print(f"Error haciendo Redonda: {e}")
+        try:
+            dron.go("Stop")
+        except:
+            pass
+
+def do_corazon(origin):
+    global dron
+    try:
+        if dron.state != "flying":
+            return
+
+        dron.go("NorthEast")
+        time.sleep(3)
+        dron.go("East")
+        time.sleep(2)
+        dron.go("SouthEast")
+        time.sleep(2)
+        dron.go("South")
+        time.sleep(2)
+        dron.go("SouthWest")
+        time.sleep(6)
+        dron.go("NorthWest")
+        time.sleep(6)
+        dron.go("North")
+        time.sleep(2)
+        dron.go("NorthEast")
+        time.sleep(2)
+        dron.go("East")
+        time.sleep(2)
+        dron.go("SouthEast")
+        time.sleep(2)
+
+
+        dron.go("Stop")
+        publish_event(origin, "corazonDone")
+
+    except Exception as e:
+        print(f"Error haciendo corazón: {e}")
+        try:
+            dron.go("Stop")
+        except:
+            pass
+
+def _on_connected_callback():
+    """Cridat per dronLink quan la connexió MAVProxy s'estableix (no bloquejant)."""
+    publish_event("connected")
+    print("Dron connectat correctament via MAVProxy")
+
 
 def on_message(cli, userdata, message):
     global active_origins, client, dron
@@ -156,6 +258,27 @@ def on_message(cli, userdata, message):
         if dron.state == "flying":
             threading.Thread(
                 target=do_triangle,
+                args=(origin,),
+                daemon=True
+            ).start()
+    elif command == "cuadrado":
+        if dron.state == "flying":
+            threading.Thread(
+                target=do_cuadrado,
+                args=(origin,),
+                daemon=True
+            ).start()
+    elif command == "redonda":
+        if dron.state == "flying":
+            threading.Thread(
+                target=do_redonda,
+                args=(origin,),
+                daemon=True
+            ).start()
+    elif command == "corazon":
+        if dron.state == "flying":
+            threading.Thread(
+                target=do_corazon,
                 args=(origin,),
                 daemon=True
             ).start()

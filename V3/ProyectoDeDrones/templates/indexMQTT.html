@@ -120,6 +120,28 @@
         white-space: nowrap;
     }
 
+    .glitter-particle {
+        position: relative;
+        transform: translate(-50%, -50%);
+        line-height: 1;
+        font-weight: bold;
+        pointer-events: none;
+        animation: glitterTwinkle 0.9s ease-in-out infinite alternate;
+    }
+
+    @keyframes glitterTwinkle {
+        from {
+            opacity: 0.45;
+            transform: translate(-50%, -50%) scale(0.75);
+            filter: brightness(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.15);
+            filter: brightness(1.4);
+        }
+    }
+
     .spacer { width: 100px; height: 100px; }
 </style>
 
@@ -299,11 +321,23 @@
 
             <div class="d-flex gap-2 mt-4">
                 <button id="botonBorrar" class="boton boton-blau" onclick="toggleBorrador()">Borrar</button>
-                 <button id="botonTemporal" class="boton boton-blau" onclick="toggleTemporal()">Línea temporal 10s</button>
-                <button id="botonTriangulo" class="boton boton-blau" onclick="hacerTriangulo()">Triángulo</button>
+                <button id="botonTemporal" class="boton boton-blau" onclick="toggleTemporal()">Línea temporal 10s</button>
+                <button id="botonArcoiris" class="boton boton-blau w-50" onclick="toggleArcoiris()">Arcoíris</button>
+                <button id="botonPurpurina" class="boton boton-blau w-50" onclick="togglePurpurina()">Purpurina</button>
             </div>
 
         </div>
+
+        <div class="card p-4 mt-3" style="background-color: white; border: 2px solid cadetblue;">
+            <label for="colorTrazo" class="form-label fw-bold">Geometrias:</label>
+            <div class="d-flex gap-2 mt-4">
+                <button id="botonTriangulo" class="boton boton-blau" onclick="hacerTriangulo()">Triángulo</button>
+                <button id="botonCuadrado" class="boton boton-blau" onclick="hacerCuadrado()">Cuadrado</button>
+                <button id="botonRedonda" class="boton boton-blau" onclick="hacerRedonda()">Redonda</button>
+                <button id="botonCorazon" class="boton boton-blau" onclick="hacerCorazon()">Corazon</button>
+            </div>
+        </div>
+
     </div>
 
     <div id="tab-video" class="tab-content container mt-3" style="display:none">
@@ -324,6 +358,10 @@
         let modoTemporal = false;
         let ultimoPuntoRuta = null;
         let ultimoPuntoBorrador = null;
+        let modoArcoiris = false;
+        let modoPurpurina = false;
+        let contadorArcoiris = 0;
+        let contadorPurpurina = 0;
 
         let elementosDibujo = [];
 
@@ -332,8 +370,18 @@
             weight: 3,
             formato: 'solid'
         };
+        const coloresArcoiris = [
+            '#ff0000',
+            '#ff7f00',
+            '#ffff00',
+            '#00ff00',
+            '#0000ff',
+            '#4b0082',
+            '#9400d3'
+        ];
 
         const configuration = {iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]};
+
 
         function inicializarMapa() {
             const latInicial = 41.276478;
@@ -436,13 +484,13 @@
 
         client.on('connect', function () {
             console.log('Conectado al broker MQTT');
-            client.subscribe('Grup25/autopilotServiceDemo/mobileFlask/#');
+            client.subscribe('Grup212/autopilotServiceDemo/mobileFlask/#');
         });
 
         client.on('message', function (topic, message) {
             console.log("Mensaje recibido en:", topic, "Contenido:", message.toString());
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/connected") {
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/connected") {
                 console.log("El dron confirma conexión. Pidiendo telemetría...");
 
                 const botonDespegar = document.getElementById('botonDespegar');
@@ -459,7 +507,7 @@
                 client.publish('mobileFlask/autopilotServiceDemo/startTelemetry');
             }
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/telemetryInfo") {
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/telemetryInfo") {
 
                 const btnMAV = document.getElementById('botonConectarMAV');
                 const btnSim = document.getElementById('botonConectarSim');
@@ -522,6 +570,7 @@
                             estiloRutaActual.formato === 'solid' ||
                             estiloRutaActual.formato === 'dash-short' ||
                             estiloRutaActual.formato === 'dash-long'
+
                         ) {
                             if (ultimoPuntoRuta) {
                                 añadirSegmentoLinea(ultimoPuntoRuta, nuevaPos);
@@ -543,6 +592,14 @@
                         if (estiloRutaActual.formato === 'hearts') {
                             if (dronePath.length % 5 === 0) {
                                 añadirCorazonDecorativo(nuevaPos);
+                            }
+                        }
+                        if (modoPurpurina === true) {
+                            contadorPurpurina++;
+
+                            // només dibuixa purpurina cada 4 actualitzacions
+                            if (contadorPurpurina % 3 === 0) {
+                                añadirPurpurinaDecorativa(nuevaPos, data.heading || 0);
                             }
                         }
 
@@ -604,13 +661,13 @@
                 }
             }
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/videoOffer") {
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/videoOffer") {
                 const data = JSON.parse(message.toString());
                 console.log("Oferta de video recibida del dron");
                 recibirVideo(data.offer);
             }
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/iceCandidate") {
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/iceCandidate") {
                 const data = JSON.parse(message.toString());
                 if (pc && data.candidate) {
                     pc.addIceCandidate(new RTCIceCandidate(data.candidate));
@@ -641,6 +698,35 @@
 
         function hacerTriangulo() {
             client.publish('mobileFlask/autopilotServiceDemo/triangle', 'start');
+            const btn = document.getElementById('botonTriangulo');
+            btn.classList.replace('boton-blau', 'boton-verde');
+            setTimeout(() => {
+                btn.classList.replace('boton-verde', 'boton-blau');
+            }, 10000);
+        }
+        function hacerCuadrado() {
+            client.publish('mobileFlask/autopilotServiceDemo/cuadrado', 'start');
+            const btn = document.getElementById('botonCuadrado');
+            btn.classList.replace('boton-blau', 'boton-verde');
+            setTimeout(() => {
+                btn.classList.replace('boton-verde', 'boton-blau');
+            }, 10000);
+        }
+        function hacerRedonda() {
+            client.publish('mobileFlask/autopilotServiceDemo/redonda', 'start');
+            const btn = document.getElementById('botonRedonda');
+            btn.classList.replace('boton-blau', 'boton-verde');
+            setTimeout(() => {
+                btn.classList.replace('boton-verde', 'boton-blau');
+            }, 10000);
+        }
+        function hacerCorazon() {
+            client.publish('mobileFlask/autopilotServiceDemo/corazon', 'start');
+            const btn = document.getElementById('botonCorazon');
+            btn.classList.replace('boton-blau', 'boton-verde');
+            setTimeout(() => {
+                btn.classList.replace('boton-verde', 'boton-blau');
+            }, 10000);
         }
 
         function cambiarHeading(valor) {
@@ -913,7 +999,9 @@
         function obtenerOpcionesLinea() {
             let opciones = {
                 color: estiloRutaActual.color,
-                weight: estiloRutaActual.weight
+                weight: estiloRutaActual.weight,
+                lineCap: 'butt'
+
             };
 
             if (estiloRutaActual.formato === 'dash-short') {
@@ -942,7 +1030,11 @@
         }
 
         function añadirSegmentoLinea(pos1, pos2) {
-            const linea = L.polyline([pos1, pos2], obtenerOpcionesLinea()).addTo(map);
+            let opciones = obtenerOpcionesLinea();
+
+            opciones.color = obtenerColorDibujo();
+
+            const linea = L.polyline([pos1, pos2], opciones).addTo(map);
 
             guardarElementoDibujo({
                 tipo: 'linea',
@@ -952,10 +1044,12 @@
         }
 
         function añadirPuntoDecorativo(posicion) {
+            const color = obtenerColorDibujo();
+
             const punto = L.circleMarker(posicion, {
                 radius: estiloRutaActual.weight * 1.4,
-                color: estiloRutaActual.color,
-                fillColor: estiloRutaActual.color,
+                color: color,
+                fillColor: color,
                 fillOpacity: 1,
                 weight: 1
             }).addTo(map);
@@ -967,13 +1061,16 @@
             });
         }
 
+
+
         function añadirEstrellaDecorativa(posicion) {
             const tamano = estiloRutaActual.weight * 5;
+            const color = obtenerColorDibujo();
 
             const estrella = L.divIcon({
                 className: '',
                 html: `<div style="
-                    color: ${estiloRutaActual.color};
+                    color: ${color};
                     font-size: ${tamano}px;
                     line-height: ${tamano}px;
                     width: ${tamano}px;
@@ -999,11 +1096,12 @@
 
         function añadirCorazonDecorativo(posicion) {
             const tamano = estiloRutaActual.weight * 5;
+            const color = obtenerColorDibujo();
 
             const corazon = L.divIcon({
                 className: '',
                 html: `<div style="
-                    color: ${estiloRutaActual.color};
+                    color: ${color};
                     font-size: ${tamano}px;
                     line-height: ${tamano}px;
                     width: ${tamano}px;
@@ -1026,6 +1124,70 @@
                 posicion: posicion
             });
         }
+
+        function añadirPurpurinaDecorativa(posicion, heading) {
+            const color = obtenerColorDibujo();   // si arcoíris està activat, agafa el color que toca; si no, el triat
+            const grosor = estiloRutaActual.weight;
+
+            const puntoBase = map.latLngToLayerPoint(L.latLng(posicion[0], posicion[1]));
+            const headingRad = heading * Math.PI / 180;
+
+            // El grossor controla l'amplada de la cua, no la mida de cada partícula
+            const cantidad = Math.max(3, Math.round(grosor*2));
+            const distanciaBase = 5 + grosor * 0.8;
+            const longitudCola = 5 + grosor * 1.2;
+            const anchoCola = Math.max(1.2, grosor * 0.3);
+
+            for (let i = 0; i < cantidad; i++) {
+                const atras = distanciaBase + Math.random() * longitudCola;
+                const lateral = (Math.random() - 0.5) * anchoCola;
+
+                const x = puntoBase.x - Math.sin(headingRad) * atras + Math.cos(headingRad) * lateral;
+                const y = puntoBase.y + Math.cos(headingRad) * atras + Math.sin(headingRad) * lateral;
+
+                const puntoPurpurina = map.layerPointToLatLng(L.point(x, y));
+
+                // Partícules petites i brillants
+                const tamano = 2 + grosor * 0.35 + Math.random() * 0.8;
+                const opacidad = 0.6 + Math.random() * 0.3;
+                const brillo1 = 3;
+                const brillo2 = 7;
+
+                const simbolos = ['✦', '✧', '•'];
+                const simbolo = simbolos[Math.floor(Math.random() * simbolos.length)];
+
+                const particula = L.marker(puntoPurpurina, {
+                    icon: L.divIcon({
+                        className: '',
+                        html: `<div class="glitter-particle"
+                                    style="
+                                        color: ${color};
+                                        font-size: ${tamano}px;
+                                        opacity: ${opacidad};
+                                        -webkit-text-stroke: 0.1px white;
+                                        text-shadow:
+                                            0 0 ${brillo1}px ${color},
+                                            0 0 ${brillo2}px ${color},
+                                            0 0 ${brillo2}px ${color};
+                                        animation-delay: ${Math.random() * 0.8}s;
+                                    ">
+                                    ${simbolo}
+                                </div>`,
+                        iconSize: [0, 0],
+                        iconAnchor: [0, 0]
+                    }),
+                    interactive: false
+                }).addTo(map);
+
+                guardarElementoDibujo({
+                    tipo: 'decoracion',
+                    layer: particula,
+                    posicion: [puntoPurpurina.lat, puntoPurpurina.lng]
+                });
+            }
+        }
+
+
 
         function distanciaPuntoSegmento(p, a, b) {
             const x = p.x;
@@ -1143,6 +1305,53 @@
             });
         }
 
+        function toggleArcoiris() {
+            const btn = document.getElementById('botonArcoiris');
+
+            if (modoArcoiris === true) {
+                modoArcoiris = false;
+                btn.classList.remove('boton-verde');
+                btn.classList.add('boton-blau');
+                btn.innerText = "Arcoíris";
+            } else {
+                modoArcoiris = true;
+                btn.classList.remove('boton-blau');
+                btn.classList.add('boton-verde');
+                btn.innerText = "Arcoíris (ON)";
+            }
+
+            ultimoPuntoRuta = null;
+        }
+
+        function togglePurpurina() {
+            const btn = document.getElementById('botonPurpurina');
+
+            if (modoPurpurina === true) {
+                modoPurpurina = false;
+                btn.classList.remove('boton-verde');
+                btn.classList.add('boton-blau');
+                btn.innerText = "Purpurina";
+            } else {
+                modoPurpurina = true;
+                btn.classList.remove('boton-blau');
+                btn.classList.add('boton-verde');
+                btn.innerText = "Purpurina (ON)";
+            }
+
+            ultimoPuntoRuta = null;
+        }
+
+
+        function obtenerColorDibujo() {
+            if (modoArcoiris === true) {
+                const color = coloresArcoiris[contadorArcoiris % coloresArcoiris.length];
+                contadorArcoiris++;
+                return color;
+            }
+
+            return estiloRutaActual.color;
+        }
+
         function seleccionarFormatoLinea(formato) {
             const boton = document.getElementById('botonFormatoLinea');
 
@@ -1183,6 +1392,8 @@
 
             ultimoPuntoRuta = null;
         }
+
+
 
     </script>
 </body>
