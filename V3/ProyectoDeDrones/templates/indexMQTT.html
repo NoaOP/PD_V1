@@ -158,6 +158,13 @@
 </style>
 
 <body>
+
+    <nav class="navbar navbar-dark bg-dark border-bottom border-secondary">
+        <div class="container-fluid justify-content-center">
+            <span class="navbar-brand mb-0 h2 fw-bold text-white">Modo Piloto</span>
+        </div>
+    </nav>
+
     <nav class="nav nav-pills nav-justified bg-dark p-2">
         <button class="nav-link active text-white" onclick="abrirTab(event, 'tab-control')">Control</button>
         <button class="nav-link text-white" onclick="abrirTab(event, 'tab-mapa')">Mapa</button>
@@ -497,7 +504,7 @@
                     // Solo actuamos si el usuario ha pulsado primero "Rellenar"
                     if (modoPintura) {
                         console.log("¡Clic dentro del polígono detectado!");
-
+                        document.getElementById('btnRellenar').innerText = "Rellenando...";
                         modoPintura = false;
                         document.getElementById('map').classList.remove('cursor-pintura');
 
@@ -562,6 +569,7 @@
 
                 ultimoPuntoRuta = null;
             }
+            publicarEstadoVisual();
         }
 
         function toggleBorrador() {
@@ -583,6 +591,7 @@
                 ultimoPuntoBorrador = null;
                 ultimoPuntoRuta = null;
             }
+            publicarEstadoVisual();
         }
 
         function toggleTemporal() {
@@ -599,6 +608,7 @@
                 btn.classList.add('boton-verde');
                 btn.innerText = "Línea temporal 10s (ON)";
 
+                publicarEstadoVisual();
                 ultimoPuntoRuta = null;
             }
         }
@@ -621,13 +631,14 @@
 
         client.on('connect', function () {
             console.log('Conectado al broker MQTT');
-            client.subscribe('Grup212/autopilotServiceDemo/mobileFlask/#');
+            client.subscribe('Grup25/autopilotServiceDemo/mobileFlask/#');
+            publicarEstadoVisual();
         });
 
         client.on('message', function (topic, message) {
             console.log("Mensaje recibido en:", topic, "Contenido:", message.toString());
 
-            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/connected") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/connected") {
                 console.log("El dron confirma conexión. Pidiendo telemetría...");
 
                 const botonDespegar = document.getElementById('botonDespegar');
@@ -808,13 +819,13 @@
                 }
             }
 
-            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/videoOffer") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/videoOffer") {
                 const data = JSON.parse(message.toString());
                 console.log("Oferta de video recibida del dron");
                 recibirVideo(data.offer);
             }
 
-            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/iceCandidate") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/iceCandidate") {
                 const data = JSON.parse(message.toString());
                 if (pc && data.candidate) {
                     pc.addIceCandidate(new RTCIceCandidate(data.candidate));
@@ -1451,6 +1462,7 @@
                 formato: estiloRutaActual.formato
             };
 
+            publicarEstadoVisual();
             ultimoPuntoRuta = null;
         }
 
@@ -1477,6 +1489,7 @@
                 btn.innerText = "Arcoíris (ON)";
             }
 
+            publicarEstadoVisual();
             ultimoPuntoRuta = null;
         }
 
@@ -1495,6 +1508,7 @@
                 btn.innerText = "Purpurina (ON)";
             }
 
+            publicarEstadoVisual();
             ultimoPuntoRuta = null;
         }
 
@@ -1547,6 +1561,7 @@
                 formato: formato
             };
 
+            publicarEstadoVisual();
             ultimoPuntoRuta = null;
         }
 
@@ -1592,9 +1607,11 @@
 
         function rellenarZona() {
             if (!zonaPoligono || zonaPoligono.length < 3) {
-                alert("Dibuja un polígono válido primero.");
                 return;
             }
+
+            document.getElementById('btnRellenar').innerText = "Rellenando...";
+
 
             // Calculamos la ruta (separación de 2 metros por defecto)
             lawnmowerPath = calcularLawnmower(zonaPoligono, 2);
@@ -1720,6 +1737,20 @@
             document.getElementById('map').classList.add('cursor-pintura');
 
             console.log("Modo pintura activado. Haz clic dentro del polígono.");
+        }
+
+
+
+        function publicarEstadoVisual() {
+            const estadoVisual = {
+                pol: pol,
+                estilo: estiloRutaActual,
+                arcoiris: modoArcoiris,
+                purpurina: modoPurpurina,
+                borrar: modoBorrar,
+                temporal: modoTemporal
+            };
+            client.publish('Grup25/autopilotServiceDemo/mobileFlask/syncVisuals', JSON.stringify(estadoVisual));
         }
 
     </script>
