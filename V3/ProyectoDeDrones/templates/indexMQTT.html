@@ -89,15 +89,7 @@
         border-top: 4px dashed var(--preview-color);
     }
 
-    .preview-dash-long {
-        height: 4px;
-        margin-top: 10px;
-        background-image: repeating-linear-gradient(
-            to right,
-            var(--preview-color) 0 22px,
-            transparent 22px 36px
-        );
-    }
+
 
     .preview-dots {
         background-image: radial-gradient(circle, var(--preview-color) 3px, transparent 4px);
@@ -271,8 +263,8 @@
         <div class="card p-4 mt-3" style="background-color: white; border: 2px solid cadetblue;">
             <label class="form-label fw-bold">Rellenar zona</label>
             <div class="d-flex gap-2 justify-content-center mt-3 mb-2">
-                <button id="btnDibujar" class="boton boton-blau" onclick="activarDibujo()">✏️ Dibujar Zona</button>
-                <button id="btnLimpiar" class="boton boton-gris" onclick="limpiarZona()">🗑️ Limpiar</button>
+                <button id="btnDibujar" class="boton boton-blau" onclick="activarDibujo()">✏️ Dibujar plantilla</button>
+                <button id="btnLimpiar" class="boton boton-gris" onclick="limpiarZona()">🗑️ Eliminar plantilla</button>
                 <button id="btnRellenar" class="boton boton-amarillo" onclick="prepararRelleno()" disabled>🎨 Rellenar</button>
             </div>
         </div>
@@ -329,11 +321,7 @@
                             </button>
                         </li>
 
-                        <li>
-                            <button class="dropdown-item opcion-formato justify-content-center" onclick="seleccionarFormatoLinea('dash-long')">
-                                <span class="preview-linea preview-dash-long"></span>
-                            </button>
-                        </li>
+
 
                         <li>
                             <button class="dropdown-item opcion-formato justify-content-center" onclick="seleccionarFormatoLinea('dots')">
@@ -368,7 +356,7 @@
 
 
         <div class="card p-4 mt-3" style="background-color: white; border: 2px solid cadetblue;">
-            <label class="form-label fw-bold">Párametros de Misión:</label>
+            <label class="form-label fw-bold">Párametros de Plantilla:</label>
             <div class="mb-4">
                 <label for="inputAltitudMision" class="form-label fw-bold">Altitud de Vuelo: <span id="altitudMisionValor">5</span> m</label>
                 <input type="range" class="form-range" id="inputAltitudMision" min="2" max="50" step="1" value="5" oninput="document.getElementById('altitudMisionValor').innerText = this.value">
@@ -418,6 +406,7 @@
         let contadorPurpurina = 0;
 
         let elementosDibujo = [];
+        let lineaTrazoActual = null;
 
         let estiloRutaActual = {
             color: 'red',
@@ -497,6 +486,8 @@
                     // Solo actuamos si el usuario ha pulsado primero "Rellenar"
                     if (modoPintura) {
                         console.log("¡Clic dentro del polígono detectado!");
+                        document.getElementById('btnRellenar').innerText = "Rellenando...";
+
 
                         modoPintura = false;
                         document.getElementById('map').classList.remove('cursor-pintura');
@@ -553,6 +544,7 @@
                 document.getElementById("botonPintar").classList.add('boton-blau');
 
                 ultimoPuntoRuta = null;
+                lineaTrazoActual = null;
 
             } else {
                 pol = true;
@@ -600,6 +592,7 @@
                 btn.innerText = "Línea temporal 10s (ON)";
 
                 ultimoPuntoRuta = null;
+                lineaTrazoActual = null;
             }
         }
 
@@ -648,7 +641,7 @@
 
 
             // Escuchar los datos de telemetría
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/telemetryInfo") {
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/telemetryInfo") {
 
 
                 // Si me llega telemetría, significa que estamos conectados
@@ -715,8 +708,8 @@
 
                         if (
                             estiloRutaActual.formato === 'solid' ||
-                            estiloRutaActual.formato === 'dash-short' ||
-                            estiloRutaActual.formato === 'dash-long'
+                            estiloRutaActual.formato === 'dash-short'
+
 
                         ) {
                             if (ultimoPuntoRuta) {
@@ -1165,9 +1158,7 @@
                 opciones.dashArray = '6, 6';
             }
 
-            else if (estiloRutaActual.formato === 'dash-long') {
-                opciones.dashArray = '20, 12';
-            }
+
 
             return opciones;
         }
@@ -1182,23 +1173,52 @@
                     }
 
                     elementosDibujo = elementosDibujo.filter(e => e !== elemento);
+                    if (lineaTrazoActual === elemento.layer) {
+                    lineaTrazoActual = null;
+                    ultimoPuntoRuta = null;
+                }
+
                 }, 10000);
             }
         }
 
         function añadirSegmentoLinea(pos1, pos2) {
             let opciones = obtenerOpcionesLinea();
-
             opciones.color = obtenerColorDibujo();
 
-            const linea = L.polyline([pos1, pos2], opciones).addTo(map);
+            // Si està activat arcoíris, fem segments separats perquè cada tros tingui un color diferent
+            if (modoArcoiris === true|| modoArcoiris === true)  {
+                const linea = L.polyline([pos1, pos2], opciones).addTo(map);
 
-            guardarElementoDibujo({
-                tipo: 'linea',
-                layer: linea,
-                puntos: [pos1, pos2]
-            });
+                guardarElementoDibujo({
+                    tipo: 'linea',
+                    layer: linea,
+                    puntos: [pos1, pos2]
+                });
+
+                return;
+            }
+
+            // Per línia normal i discontínua curta, fem una sola polyline contínua
+            // Així el dashArray funciona sempre, no només amb "rellenar"
+            if (lineaTrazoActual === null) {
+                lineaTrazoActual = L.polyline([pos1, pos2], opciones).addTo(map);
+
+                guardarElementoDibujo({
+                    tipo: 'lineaContinua',
+                    layer: lineaTrazoActual,
+                    puntos: [pos1, pos2]
+                });
+            } else {
+                lineaTrazoActual.addLatLng(pos2);
+
+                const elemento = elementosDibujo.find(e => e.layer === lineaTrazoActual);
+                if (elemento) {
+                    elemento.puntos.push(pos2);
+                }
+            }
         }
+
 
         function añadirPuntoDecorativo(posicion) {
             const color = obtenerColorDibujo();
@@ -1382,14 +1402,17 @@
             elementosDibujo = elementosDibujo.filter(elemento => {
                 let borrar = false;
 
-                if (elemento.tipo === 'linea') {
-                    const p1 = map.latLngToLayerPoint(L.latLng(elemento.puntos[0][0], elemento.puntos[0][1]));
-                    const p2 = map.latLngToLayerPoint(L.latLng(elemento.puntos[1][0], elemento.puntos[1][1]));
+                if (elemento.tipo === 'linea' || elemento.tipo === 'lineaContinua') {
+                    for (let i = 0; i < elemento.puntos.length - 1; i++) {
+                        const p1 = map.latLngToLayerPoint(L.latLng(elemento.puntos[i][0], elemento.puntos[i][1]));
+                        const p2 = map.latLngToLayerPoint(L.latLng(elemento.puntos[i + 1][0], elemento.puntos[i + 1][1]));
 
-                    const distancia = distanciaSegmentoSegmento(gomaA, gomaB, p1, p2);
+                        const distancia = distanciaSegmentoSegmento(gomaA, gomaB, p1, p2);
 
-                    if (distancia <= radioBorradoPx) {
-                        borrar = true;
+                        if (distancia <= radioBorradoPx) {
+                            borrar = true;
+                            break;
+                        }
                     }
                 }
 
@@ -1452,6 +1475,7 @@
             };
 
             ultimoPuntoRuta = null;
+            lineaTrazoActual = null;
         }
 
         function actualizarColorPreviews() {
@@ -1478,6 +1502,7 @@
             }
 
             ultimoPuntoRuta = null;
+            lineaTrazoActual = null;
         }
 
         function togglePurpurina() {
@@ -1523,9 +1548,7 @@
             else if (formato === 'dash-short') {
                 preview.classList.add('preview-dash-short');
             }
-            else if (formato === 'dash-long') {
-                preview.classList.add('preview-dash-long');
-            }
+
             else if (formato === 'dots') {
                 preview.classList.add('preview-dots');
             }
@@ -1548,23 +1571,7 @@
             };
 
             ultimoPuntoRuta = null;
-        }
-
-
-        function actualizarEstiloRuta() {
-            const nuevoColor = document.getElementById('colorTrazo').value;
-            const nuevoGrosor = document.getElementById('grosorTrazo').value;
-
-            // Actualizar el texto
-            document.getElementById('grosorValor').innerText = nuevoGrosor;
-
-            // Aplicar el polyline del mapa
-            if (polyline) {
-                polyline.setStyle({
-                    color: nuevoColor,
-                    weight: nuevoGrosor
-                });
-            }
+            lineaTrazoActual = null;
         }
 
         function activarDibujo() {
