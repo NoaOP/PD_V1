@@ -4,8 +4,16 @@ app = Flask(__name__)
 
 
 @app.route('/')
-def index():
+def inicio():
+    return render_template('inicio.html')
+
+@app.route('/pilot')
+def pilot():
     return render_template('indexMQTT.html')
+
+@app.route('/spectator')
+def spectator():
+    return render_template('spectator.html')
 
 if __name__ == '__main__':
 
