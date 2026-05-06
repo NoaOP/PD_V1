@@ -7,12 +7,16 @@ import os
 import time
 import json
 import threading
+import math
+
 
 import paho.mqtt.client as mqtt
 from P2.ProyectoDeDrones.dronLink.Dron import Dron
 
 active_origins    = set()
 last_telemetry_time = 0
+last_telemetry_info = None
+writing_lock = threading.Lock()
 
 # MAVProxy endpoint per a l'AutopilotService (port diferent del dashboard local)
 MAVPROXY_AUTOPILOT_ENDPOINT = os.getenv("MAVPROXY_AUTOPILOT_ENDPOINT", "udp:127.0.0.1:14551")
@@ -37,20 +41,24 @@ def publish_event(origin, event):
 
     client.publish(topic)
 
-
 def publish_telemetry_info(telemetry_info):
     """Publica telemetria amb fre de 0.5s per no saturar el broker."""
-    global active_origins, client, last_telemetry_time
+    global active_origins, client, last_telemetry_time, last_telemetry_info
+
+    # Guardem sempre l’última telemetria, encara que no la publiquem
+    last_telemetry_info = telemetry_info
+
     current_time = time.time()
     if current_time - last_telemetry_time < 0.5:
         return
+
     last_telemetry_time = current_time
+
     for origin in active_origins:
 
-
-        topic = "Grup25/autopilotServiceDemo/" + origin + "/telemetryInfo"
-
+        topic = "Grup212/autopilotServiceDemo/" + origin + "/telemetryInfo"
         client.publish(topic, json.dumps(telemetry_info))
+
 
 def do_triangle(origin):
     global dron
@@ -178,6 +186,396 @@ def do_corazon(origin):
         except:
             pass
 
+# =========================================================
+# ESCRIPTURA DE TEXT AMB PUNTS GPS
+# =========================================================
+
+METRES_PER_UNIT = 0.8      # Mida de la lletra. Si vols més gran: 1.0. Si vols més petit: 0.6
+LETTER_GAP = 1.5           # Separació entre lletres
+SPACE_GAP = 4.0            # Separació entre paraules
+WRITING_SPEED = 0.7        # Velocitat del dron quan escriu
+GOTO_SETTLE_TIME = 0.2     # Petita pausa entre punts
+
+LETTER_PATHS = {
+    "A": {
+        "width": 4,
+        "strokes": [
+            [(0, 0), (2, 5), (4, 0)],
+            [(1, 2.3), (3, 2.3)]
+        ]
+    },
+
+    "B": {
+        "width": 4,
+        "strokes": [
+            [(0, 0), (0, 5), (3, 5), (4, 4), (4, 3), (3, 2.5), (0, 2.5)],
+            [(0, 2.5), (3, 2.5), (4, 2), (4, 1), (3, 0), (0, 0)]
+        ]
+    },
+
+    "C": {
+        "width": 4,
+        "strokes": [
+            [(4, 5), (0, 5), (0, 0), (4, 0)]
+        ]
+    },
+
+    "D": {
+        "width": 4,
+        "strokes": [
+            [(0, 0), (0, 5), (3, 5), (4, 4), (4, 1), (3, 0), (0, 0)]
+        ]
+    },
+
+    "E": {
+        "width": 4,
+        "strokes": [
+            [(4, 5), (0, 5), (0, 0), (4, 0)],
+            [(0, 2.5), (3, 2.5)]
+        ]
+    },
+
+    "F": {
+        "width": 4,
+        "strokes": [
+            [(0, 0), (0, 5), (4, 5)],
+            [(0, 2.5), (3, 2.5)]
+        ]
+    },
+
+    "G": {
+        "width": 4,
+        "strokes": [
+            [(4, 5), (0, 5), (0, 0), (4, 0), (4, 2), (2.5, 2)]
+        ]
+    },
+
+    "H": {
+        "width": 4,
+        "strokes": [
+            [(0, 0), (0, 5)],
+            [(4, 0), (4, 5)],
+            [(0, 2.5), (4, 2.5)]
+        ]
+    },
+
+    "I": {
+        "width": 3,
+        "strokes": [
+            [(0, 5), (3, 5)],
+            [(1.5, 5), (1.5, 0)],
+            [(0, 0), (3, 0)]
+        ]
+    },
+
+    "J": {
+        "width": 4,
+        "strokes": [
+            [(0, 5), (4, 5), (4, 1), (3, 0), (1, 0), (0, 1)]
+        ]
+    },
+
+    "K": {
+        "width": 4,
+        "strokes": [
+            [(0, 0), (0, 5)],
+            [(0, 2.5), (4, 5)],
+            [(0, 2.5), (4, 0)]
+        ]
+    },
+
+    "L": {
+        "width": 4,
+        "strokes": [
+            [(0, 5), (0, 0), (4, 0)]
+        ]
+    },
+
+    "M": {
+        "width": 5,
+        "strokes": [
+            [(0, 0), (0, 5), (2.5, 2.5), (5, 5), (5, 0)]
+        ]
+    },
+
+    "N": {
+        "width": 4,
+        "strokes": [
+            [(0, 0), (0, 5), (4, 0), (4, 5)]
+        ]
+    },
+
+    "O": {
+        "width": 4,
+        "strokes": [
+            [(0, 0), (0, 5), (4, 5), (4, 0), (0, 0)]
+        ]
+    },
+
+    "P": {
+        "width": 4,
+        "strokes": [
+            [(0, 0), (0, 5), (3, 5), (4, 4), (4, 3), (3, 2.5), (0, 2.5)]
+        ]
+    },
+
+    "Q": {
+        "width": 4,
+        "strokes": [
+            [(0, 0), (0, 5), (4, 5), (4, 0), (0, 0)],
+            [(2.5, 1.5), (4.5, -0.5)]
+        ]
+    },
+
+    "R": {
+        "width": 4,
+        "strokes": [
+            [(0, 0), (0, 5), (3, 5), (4, 4), (4, 3), (3, 2.5), (0, 2.5)],
+            [(0, 2.5), (4, 0)]
+        ]
+    },
+
+    "S": {
+        "width": 4,
+        "strokes": [
+            [(4, 5), (0, 5), (0, 2.5), (4, 2.5), (4, 0), (0, 0)]
+        ]
+    },
+
+    "T": {
+        "width": 4,
+        "strokes": [
+            [(0, 5), (4, 5)],
+            [(2, 5), (2, 0)]
+        ]
+    },
+
+    "U": {
+        "width": 4,
+        "strokes": [
+            [(0, 5), (0, 0), (4, 0), (4, 5)]
+        ]
+    },
+
+    "V": {
+        "width": 4,
+        "strokes": [
+            [(0, 5), (2, 0), (4, 5)]
+        ]
+    },
+
+    "W": {
+        "width": 5,
+        "strokes": [
+            [(0, 5), (1.2, 0), (2.5, 2.5), (3.8, 0), (5, 5)]
+        ]
+    },
+
+    "X": {
+        "width": 4,
+        "strokes": [
+            [(0, 5), (4, 0)],
+            [(4, 5), (0, 0)]
+        ]
+    },
+
+    "Y": {
+        "width": 4,
+        "strokes": [
+            [(0, 5), (2, 2.5), (4, 5)],
+            [(2, 2.5), (2, 0)]
+        ]
+    },
+
+    "Z": {
+        "width": 4,
+        "strokes": [
+            [(0, 5), (4, 5), (0, 0), (4, 0)]
+        ]
+    }
+}
+
+
+def set_paint(origin, pintar):
+    if origin is None:
+        return
+
+    if pintar:
+        publish_event(origin, "paintOn")
+    else:
+        publish_event(origin, "paintOff")
+
+    time.sleep(0.25)
+
+
+def obtenir_posicio_actual():
+    """
+    Agafa l'última posició rebuda per telemetria.
+    """
+    global last_telemetry_info
+
+    if last_telemetry_info is None:
+        return None, None, None
+
+    lat = (
+        last_telemetry_info.get("lat")
+        or last_telemetry_info.get("latitude")
+    )
+
+    lon = (
+        last_telemetry_info.get("lon")
+        or last_telemetry_info.get("lng")
+        or last_telemetry_info.get("longitude")
+    )
+
+    alt = (
+        last_telemetry_info.get("alt")
+        or last_telemetry_info.get("altitude")
+        or 5
+    )
+
+    return lat, lon, alt
+
+
+def grid_to_gps(lat0, lon0, x, y):
+    """
+    Converteix punts de quadrícula a coordenades GPS.
+    x positiu = Est
+    y positiu = Nord
+    """
+    metres_nord = y * METRES_PER_UNIT
+    metres_est = x * METRES_PER_UNIT
+
+    metres_per_deg_lat = 111320
+    metres_per_deg_lon = 111320 * math.cos(math.radians(lat0))
+
+    lat = lat0 + metres_nord / metres_per_deg_lat
+    lon = lon0 + metres_est / metres_per_deg_lon
+
+    return lat, lon
+
+
+def anar_a_punt(lat, lon, alt):
+    """
+    Porta el dron a un punt GPS.
+    Si la teva llibreria usa goTo en comptes de goto,
+    només canvia dron.goto per dron.goTo.
+    """
+    global dron
+
+    try:
+        dron.goto(lat, lon, alt, blocking=True)
+    except TypeError:
+        try:
+            dron.goto(lat, lon, alt)
+            time.sleep(2)
+        except Exception as e:
+            print(f"Error anant al punt GPS: {e}")
+
+    time.sleep(GOTO_SETTLE_TIME)
+
+
+def dibuixar_trac_gps(stroke, lat0, lon0, alt, x_offset, origin):
+    """
+    Va al primer punt sense pintar.
+    Després encén pintura i segueix tots els punts del traç.
+    """
+    if not stroke:
+        return
+
+    start_x, start_y = stroke[0]
+    lat_start, lon_start = grid_to_gps(lat0, lon0, x_offset + start_x, start_y)
+
+    # Anar al principi del traç sense pintar
+    set_paint(origin, False)
+    anar_a_punt(lat_start, lon_start, alt)
+
+    # Pintar el traç
+    set_paint(origin, True)
+
+    for x, y in stroke[1:]:
+        lat, lon = grid_to_gps(lat0, lon0, x_offset + x, y)
+        anar_a_punt(lat, lon, alt)
+
+    set_paint(origin, False)
+
+
+def escriure_text_gps(texto, origin):
+    global dron, writing_lock
+
+    if not writing_lock.acquire(blocking=False):
+        print("Ja s'està escrivint un altre text.")
+        publish_event(origin, "textError")
+        return
+
+    try:
+        if dron.state != "flying":
+            print("El dron no està volant. No es pot escriure text.")
+            publish_event(origin, "textError")
+            return
+
+        texto = texto.upper().strip()
+
+        if texto == "":
+            publish_event(origin, "textError")
+            return
+
+        lat0, lon0, alt = obtenir_posicio_actual()
+
+        if lat0 is None or lon0 is None:
+            print("No hi ha telemetria GPS encara.")
+            publish_event(origin, "textError")
+            return
+
+        try:
+            dron.changeNavSpeed(WRITING_SPEED)
+        except:
+            pass
+
+        print(f"Començant a escriure text amb punts GPS: {texto}")
+
+        x_actual = 0.0
+
+        set_paint(origin, False)
+
+        for letra in texto:
+            if letra == " ":
+                x_actual += SPACE_GAP
+                continue
+
+            if letra not in LETTER_PATHS:
+                print(f"Lletra no implementada: {letra}")
+                x_actual += 4 + LETTER_GAP
+                continue
+
+            glyph = LETTER_PATHS[letra]
+
+            for stroke in glyph["strokes"]:
+                dibuixar_trac_gps(stroke, lat0, lon0, alt, x_actual, origin)
+
+            # Separació entre lletres sense pintar
+            x_actual += glyph["width"] + LETTER_GAP
+
+        set_paint(origin, False)
+        dron.go("Stop")
+        publish_event(origin, "textDone")
+
+        print("Text acabat correctament.")
+
+    except Exception as e:
+        print(f"Error escrivint text amb GPS: {e}")
+
+        try:
+            set_paint(origin, False)
+            dron.go("Stop")
+            publish_event(origin, "textError")
+        except:
+            pass
+
+    finally:
+        writing_lock.release()
+
+
 def _on_connected_callback():
     """Cridat per dronLink quan la connexió MAVProxy s'estableix (no bloquejant)."""
     publish_event("connected")
@@ -287,7 +685,18 @@ def on_message(cli, userdata, message):
                 daemon=True
             ).start()
 
+    elif command == "writeText":
+        texto = message.payload.decode("utf-8")
 
+        if dron.state == "flying":
+            threading.Thread(
+                target=escriure_text_gps,
+                args=(texto, origin),
+                daemon=True
+            ).start()
+        else:
+            print("No es pot escriure text perquè el dron no està volant.")
+            publish_event(origin, "textError")
 
     elif command == "Land":
         if dron.state in ("flying", "armed", "connected"):

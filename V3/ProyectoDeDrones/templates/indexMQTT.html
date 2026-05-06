@@ -363,6 +363,8 @@
         </div>
 
 
+
+
         <div class="card p-4 mt-3" style="background-color: white; border: 2px solid cadetblue;">
             <label for="colorTrazo" class="form-label fw-bold">Geometría:</label>
             <div class="d-flex gap-2 mt-4">
@@ -398,9 +400,30 @@
             </div>
         </div>
 
+        <div class="card p-4 mt-3" style="background-color: white; border: 2px solid cadetblue;">
+            <label class="form-label fw-bold">Text per dibuixar amb el dron:</label>
+
+            <input
+                id="textoDron"
+                type="text"
+                class="form-control mb-3"
+                placeholder="Escriu una paraula"
+                autocomplete="off"
+                style="text-transform: uppercase; border: 2px solid #555; height: 50px;"
+                oninput="this.value = this.value.toUpperCase();"
+            >
+
+            <button id="botonEscribirTexto" class="boton boton-blau" onclick="enviarTextoDron()">
+                Escriure
+            </button>
+
+        </div>
+
         <label class="form-label" >    </label>
 
     </div>
+
+
 
     <!-- Ventana del videostream -->
     <div id="tab-video" class="tab-content container mt-3" style="display:none">
@@ -411,6 +434,8 @@
         </div>
         <video id="videoRemote" autoplay playsinline muted style="width: 100%; height: auto; min-height: 300px; border-radius: 10px; background: black;"></video>
     </div>
+
+
 
     <script>
 
@@ -597,7 +622,7 @@
             contadorArcoiris = 0;
             contadorPurpurina = 0;
 
-            client.publish('Grup25/autopilotServiceDemo/mobileFlask/clearMap', 'clear');
+            client.publish('Grup212/autopilotServiceDemo/mobileFlask/clearMap', 'clear');
 
             console.log("Mapa limpiado correctamente");
         }
@@ -695,14 +720,78 @@
 
         client.on('connect', function () {
             console.log('Conectado al broker MQTT');
-            client.subscribe('Grup25/autopilotServiceDemo/mobileFlask/#');
+            client.subscribe('Grup212/autopilotServiceDemo/mobileFlask/#');
             publicarEstadoVisual();
         });
 
         client.on('message', function (topic, message) {
             console.log("Mensaje recibido en:", topic, "Contenido:", message.toString());
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/connected") {
+
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/paintOn") {
+                pol = true;
+
+                const btn = document.getElementById("botonPintar");
+                btn.innerText = "Pintar (ON)";
+                btn.classList.remove('boton-blau');
+                btn.classList.add('boton-verde');
+
+                ultimoPuntoRuta = null;
+                lineaTrazoActual = null;
+
+                console.log("Pintura activada automáticamente por el AutopilotService");
+            }
+
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/paintOff") {
+                pol = false;
+
+                const btn = document.getElementById("botonPintar");
+                btn.innerText = "Pintar (OFF)";
+                btn.classList.remove('boton-verde');
+                btn.classList.add('boton-blau');
+
+                ultimoPuntoRuta = null;
+                lineaTrazoActual = null;
+
+                console.log("Pintura desactivada automáticamente por el AutopilotService");
+            }
+
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/textDone") {
+                const btn = document.getElementById('botonEscribirTexto');
+
+                if (btn) {
+                    btn.innerText = "Escriure";
+                    btn.classList.remove('boton-amarillo');
+                    btn.classList.add('boton-verde');
+
+                    setTimeout(() => {
+                        btn.classList.remove('boton-verde');
+                        btn.classList.add('boton-blau');
+                    }, 2000);
+                }
+
+                console.log("El dron ha acabat d'escriure el text.");
+            }
+
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/textError") {
+                const btn = document.getElementById('botonEscribirTexto');
+
+                if (btn) {
+                    btn.innerText = "Error";
+                    btn.classList.remove('boton-amarillo', 'boton-verde');
+                    btn.classList.add('boton-rojo');
+
+                    setTimeout(() => {
+                        btn.innerText = "Escriure";
+                        btn.classList.remove('boton-rojo');
+                        btn.classList.add('boton-blau');
+                    }, 2000);
+                }
+
+                alert("No s'ha pogut escriure el text. Comprova que el dron estigui volant.");
+            }
+
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/connected") {
                 console.log("El dron confirma conexión. Pidiendo telemetría...");
 
                 const botonDespegar = document.getElementById('botonDespegar');
@@ -723,7 +812,7 @@
 
 
             // Escuchar los datos de telemetría
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/telemetryInfo") {
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/telemetryInfo") {
 
 
                 // Si me llega telemetría, significa que estamos conectados
@@ -748,7 +837,7 @@
                 const joystickCont = document.getElementById('joystick-container');
 
                 if (data.state === 'flying') {
-                    texto.innerText = "Ready to fly";
+                    texto.innerText = "Volant";
                     indicador.classList.remove('boton-rojo', 'boton-amarillo');
                     indicador.classList.add('boton-verde');
                     joystickCont.style.pointerEvents = "auto";
@@ -883,13 +972,13 @@
                 }
             }
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/videoOffer") {
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/videoOffer") {
                 const data = JSON.parse(message.toString());
                 console.log("Oferta de video recibida del dron");
                 recibirVideo(data.offer);
             }
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/iceCandidate") {
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/iceCandidate") {
                 const data = JSON.parse(message.toString());
                 if (pc && data.candidate) {
                     pc.addIceCandidate(new RTCIceCandidate(data.candidate));
@@ -951,6 +1040,24 @@
             setTimeout(() => {
                 btn.classList.replace('boton-verde', 'boton-blau');
             }, 10000);
+        }
+
+        function enviarTextoDron() {
+            const texto = document.getElementById('textoDron').value.trim().toUpperCase();
+
+            if (texto === "") {
+                alert("Escriu una paraula primer.");
+                return;
+            }
+
+            client.publish('mobileFlask/autopilotServiceDemo/writeText', texto);
+
+            const btn = document.getElementById('botonEscribirTexto');
+            btn.innerText = "Escrivint...";
+            btn.classList.remove('boton-blau', 'boton-verde', 'boton-rojo');
+            btn.classList.add('boton-amarillo');
+
+            console.log("Text enviat al dron:", texto);
         }
 
         function cambiarHeading(valor) {
@@ -1862,7 +1969,7 @@
                 borrar: modoBorrar,
                 temporal: modoTemporal
             };
-            client.publish('Grup25/autopilotServiceDemo/mobileFlask/syncVisuals', JSON.stringify(estadoVisual));
+            client.publish('Grup212/autopilotServiceDemo/mobileFlask/syncVisuals', JSON.stringify(estadoVisual));
         }
 
     </script>
