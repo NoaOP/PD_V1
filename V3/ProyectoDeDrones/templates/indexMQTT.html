@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 
 <style>
@@ -259,11 +259,16 @@
         <div id="map" style="height: 400px; background: #eee; border-radius: 10px;"> </div>
 
         <div class="d-flex gap-2 align-items-center mb-2 w-100">
-            <span id="indicador-vuelo" class="badge boton-rojo d-flex align-items-center justify-content-center w-50" style="font-size: 1.1rem; padding: 10px 20px; transition: all 0.5s ease; border: 2px solid #555; border-radius: 5px; height: 50px;">
+            <span id="indicador-vuelo" class="badge boton-rojo d-flex align-items-center justify-content-center w-25" style="font-size: 1.1rem; padding: 10px 20px; transition: all 0.5s ease; border: 2px solid #555; border-radius: 5px; height: 50px;">
                 <span id="texto-vuelo">Wait to fly</span>
             </span>
 
-            <button id="botonPintar" class="boton boton-blau w-50" onclick="pintar()" style="border: 2px solid #555; border-radius: 5px; height: 50px;">Pintar</button>
+            <button id="botonPintar" class="boton boton-blau w-25" onclick="pintar()" style="border: 2px solid #555; border-radius: 5px; height: 50px;">Pintar</button>
+
+            <button id="botonLimpiarMapa" class="boton boton-blau w-25" onclick="limpiarMapa()" style="border: 2px solid #555; border-radius: 5px; height: 50px;">Netejar mapa</button>
+
+            <button id="botonGuardarMapa" class="boton boton-blau w-25" onclick="guardarMapa()" style="border: 2px solid #555; border-radius: 5px; height: 50px;">Guardar Imatge</button>
+
         </div>
 
 
@@ -445,11 +450,14 @@
             const latInicial = 41.276478;
             const lonInicial = 1.988571;
 
-            map = L.map('map').setView([latInicial, lonInicial], 19);
+            map = L.map('map', {
+                preferCanvas: true
+            }).setView([latInicial, lonInicial], 19);
 
             // Añadir el diseño del mapa
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 22,
+                crossOrigin: true,
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
@@ -511,7 +519,8 @@
                         polylineLawnmower = L.polyline(latlngsToDraw, {
                             color: '#FFD700',
                             weight: 3,
-                            dashArray: '5, 5'
+                            dashArray: '5, 5',
+                            renderer: L.canvas()
                         }).addTo(map);
 
                         let alturaDeseada = parseFloat(document.getElementById('inputAltitudMision').value) || 5.0;
@@ -525,6 +534,7 @@
                         client.publish('mobileFlask/autopilotServiceDemo/executeLawnmower', payload);
 
                         console.log("Ruta generada y enviada al dron:", flightPlan);
+
                     }
                 });
 
@@ -561,6 +571,57 @@
                 ultimoPuntoRuta = null;
             }
             publicarEstadoVisual();
+        }
+
+        function limpiarMapa() {
+            elementosDibujo.forEach(elemento => {
+                if (elemento.layer && map.hasLayer(elemento.layer)) {
+                    map.removeLayer(elemento.layer);
+                }
+            });
+
+            elementosDibujo = [];
+            dronePath = [];
+            ultimoPuntoRuta = null;
+            ultimoPuntoBorrador = null;
+            lineaTrazoActual = null;
+            contadorArcoiris = 0;
+            contadorPurpurina = 0;
+
+            console.log("Mapa limpiado correctamente");
+        }
+
+        function guardarMapa() {
+            const zonaMapa = document.getElementById('map');
+
+            html2canvas(zonaMapa, {
+                useCORS: true,
+                allowTaint: false,
+                backgroundColor: null,
+                scale: 2
+            }).then(canvas => {
+                const fecha = new Date();
+
+                const dia = String(fecha.getDate()).padStart(2, '0');
+                const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+                const año = fecha.getFullYear();
+
+                const hora = String(fecha.getHours()).padStart(2, '0');
+                const minutos = String(fecha.getMinutes()).padStart(2, '0');
+                const segundos = String(fecha.getSeconds()).padStart(2, '0');
+
+                const nombreArchivo = `DronLab Paint EETAC ${dia}-${mes}-${año} ${hora}-${minutos}-${segundos}.png`;
+
+                const enlace = document.createElement('a');
+                enlace.download = nombreArchivo;
+                enlace.href = canvas.toDataURL('image/png');
+                enlace.click();
+
+                console.log("Captura del mapa guardada:", nombreArchivo);
+            }).catch(error => {
+                console.error("Error al guardar la captura del mapa:", error);
+                alert("No se ha podido guardar la captura del mapa.");
+            });
         }
 
         function toggleBorrador() {
@@ -623,14 +684,14 @@
 
         client.on('connect', function () {
             console.log('Conectado al broker MQTT');
-            client.subscribe('Grup25/autopilotServiceDemo/mobileFlask/#');
+            client.subscribe('Grup212/autopilotServiceDemo/mobileFlask/#');
             publicarEstadoVisual();
         });
 
         client.on('message', function (topic, message) {
             console.log("Mensaje recibido en:", topic, "Contenido:", message.toString());
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/connected") {
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/connected") {
                 console.log("El dron confirma conexión. Pidiendo telemetría...");
 
                 const botonDespegar = document.getElementById('botonDespegar');
@@ -811,13 +872,13 @@
                 }
             }
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/videoOffer") {
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/videoOffer") {
                 const data = JSON.parse(message.toString());
                 console.log("Oferta de video recibida del dron");
                 recibirVideo(data.offer);
             }
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/iceCandidate") {
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/iceCandidate") {
                 const data = JSON.parse(message.toString());
                 if (pc && data.candidate) {
                     pc.addIceCandidate(new RTCIceCandidate(data.candidate));
@@ -1196,9 +1257,37 @@
             let opciones = obtenerOpcionesLinea();
             opciones.color = obtenerColorDibujo();
 
-            // Si està activat arcoíris, fem segments separats perquè cada tros tingui un color diferent
-            if (modoArcoiris === true)  {
-                const linea = L.polyline([pos1, pos2], opciones).addTo(map);
+            // Si està activat arcoíris i línia discontínua curta,
+            // dibuixem un segment sí i un segment no
+            if (modoArcoiris === true && estiloRutaActual.formato === 'dash-short') {
+                let cicle = dronePath.length % 8;
+
+                if (cicle === 0 || cicle === 1 || cicle === 2) {
+                    const linea = L.polyline([pos1, pos2], {
+                        color: opciones.color,
+                        weight: opciones.weight,
+                        lineCap: 'butt',
+                        renderer: L.canvas()
+                    }).addTo(map);
+
+                    guardarElementoDibujo({
+                        tipo: 'linea',
+                        layer: linea,
+                        puntos: [pos1, pos2]
+                    });
+                }
+
+                return;
+            }
+
+            // Si està activat arcoíris però NO és discontínua,
+            // fem segments separats perquè cada tros tingui un color diferent
+            if (modoArcoiris === true) {
+
+                const linea = L.polyline([pos1, pos2], {
+                    ...opciones,
+                    renderer: L.canvas()
+                }).addTo(map);
 
                 guardarElementoDibujo({
                     tipo: 'linea',
@@ -1209,10 +1298,13 @@
                 return;
             }
 
-            // Per línia normal i discontínua curta, fem una sola polyline contínua
-            // Així el dashArray funciona sempre, no només amb "rellenar"
+            // Línia normal o discontínua curta sense arcoíris
             if (lineaTrazoActual === null) {
-                lineaTrazoActual = L.polyline([pos1, pos2], opciones).addTo(map);
+
+               lineaTrazoActual = L.polyline([pos1, pos2], {
+                    ...opciones,
+                    renderer: L.canvas()
+                }).addTo(map);
 
                 guardarElementoDibujo({
                     tipo: 'lineaContinua',
@@ -1238,7 +1330,9 @@
                 color: color,
                 fillColor: color,
                 fillOpacity: 1,
-                weight: 1
+                weight: 1,
+                renderer: L.canvas()
+
             }).addTo(map);
 
             guardarElementoDibujo({
@@ -1634,11 +1728,13 @@
             polylineLawnmower = L.polyline(latlngsToDraw, {
                 color: '#FFD700',
                 weight: 3,
-                dashArray: '5, 5'
+                dashArray: '5, 5',
+                renderer: L.canvas()
             }).addTo(map);
 
             console.log("Ruta generada:", lawnmowerPath);
             alert("Ruta calculada y previsualizada. Aún no se envía al dron.");
+
 
         }
 
@@ -1756,7 +1852,7 @@
                 borrar: modoBorrar,
                 temporal: modoTemporal
             };
-            client.publish('Grup25/autopilotServiceDemo/mobileFlask/syncVisuals', JSON.stringify(estadoVisual));
+            client.publish('Grup212/autopilotServiceDemo/mobileFlask/syncVisuals', JSON.stringify(estadoVisual));
         }
 
     </script>
