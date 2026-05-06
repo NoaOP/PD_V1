@@ -33,7 +33,7 @@ def publish_event(origin, event):
     global client
 
 
-    topic = "Grup212/autopilotServiceDemo/" + origin + "/" + event
+    topic = "Grup25/autopilotServiceDemo/" + origin + "/" + event
 
     client.publish(topic)
 
@@ -48,7 +48,7 @@ def publish_telemetry_info(telemetry_info):
     for origin in active_origins:
 
 
-        topic = "Grup212/autopilotServiceDemo/" + origin + "/telemetryInfo"
+        topic = "Grup25/autopilotServiceDemo/" + origin + "/telemetryInfo"
 
         client.publish(topic, json.dumps(telemetry_info))
 

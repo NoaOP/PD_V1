@@ -13,12 +13,13 @@
     <style>
         body { background-color: white; }
         .telemetry-box {
-            background: #343a40;
+            background: cadetblue;
             color: white;
             border-radius: 8px;
             padding: 15px;
             text-align: center;
             font-size: 1.2rem;
+            border: 2px solid #555;
         }
         .telemetry-value {
             font-size: 1.5rem;
@@ -52,7 +53,7 @@
         <!-- Panel de Estado -->
         <div class="row mb-3">
             <div class="col-12 text-center">
-                <span id="estadoConexion" class="badge bg-warning p-2" style="font-size: 1rem;">Esperant telemetria del pilot...</span>
+                <span id="estadoConexion" class="badge bg-warning p-2" style="font-size: 1rem; border: 2px solid #555">Esperant telemetria del pilot...</span>
             </div>
         </div>
 
@@ -96,6 +97,7 @@
         let modoPurpurina = false;
         let contadorArcoiris = 0;
         let contadorPurpurina = 0;
+        let lineaTrazoActual = null;
         let elementosDibujo = [];
         let estiloRutaActual = { color: 'red', weight: 3, formato: 'solid' };
         const coloresArcoiris = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
@@ -123,11 +125,29 @@
 
         client.on('connect', function () {
             console.log('Espectador conectado al broker');
-            client.subscribe('Grup212/autopilotServiceDemo/+/telemetryInfo');
-            client.subscribe('Grup212/autopilotServiceDemo/+/syncVisuals');
+            client.subscribe('Grup25/autopilotServiceDemo/+/telemetryInfo');
+            client.subscribe('Grup25/autopilotServiceDemo/+/syncVisuals');
+            client.subscribe('Grup25/autopilotServiceDemo/+/clearMap');
         });
 
         client.on('message', function (topic, message) {
+
+            if (topic.endsWith('/clearMap')) {
+            console.log("Recibida orden de limpiar mapa");
+            elementosDibujo.forEach(elemento => {
+                if (elemento.layer && map.hasLayer(elemento.layer)) {
+                    map.removeLayer(elemento.layer);
+                }
+            });
+            elementosDibujo = [];
+            dronePath = [];
+            ultimoPuntoRuta = null;
+            ultimoPuntoBorrador = null;
+            lineaTrazoActual = null;
+            contadorArcoiris = 0;
+            contadorPurpurina = 0;
+            return;
+        }
 
             if (topic.endsWith('/syncVisuals')) {
                 const config = JSON.parse(message.toString());
@@ -137,6 +157,8 @@
                 modoPurpurina = config.purpurina;
                 modoBorrar = config.borrar;
                 modoTemporal = config.temporal;
+                lineaTrazoActual = null;
+                ultimoPuntoRuta = null;
 
                 if (!pol) ultimoPuntoRuta = null;
                 if (!modoBorrar) ultimoPuntoBorrador = null;
@@ -169,17 +191,24 @@
                     else if (pol) {
                         dronePath.push(nuevaPos);
 
-                        if (['solid', 'dash-short', 'dash-long'].includes(estiloRutaActual.formato)) {
-                            if (ultimoPuntoRuta) añadirSegmentoLinea(ultimoPuntoRuta, nuevaPos);
+                        if (['solid', 'dash-short'].includes(estiloRutaActual.formato)) {
+                            if (ultimoPuntoRuta) {
+                                añadirSegmentoLinea(ultimoPuntoRuta, nuevaPos);
+                            }
                         }
-                        if (estiloRutaActual.formato === 'dots' && dronePath.length % 5 === 0) añadirPuntoDecorativo(nuevaPos);
-                        if (estiloRutaActual.formato === 'stars' && dronePath.length % 5 === 0) añadirEstrellaDecorativa(nuevaPos);
-                        if (estiloRutaActual.formato === 'hearts' && dronePath.length % 5 === 0) añadirCorazonDecorativo(nuevaPos);
 
+                        // Ponemos el 10 para que entre simbolos sea la misma distancia que en el modo piloto
+                        if (estiloRutaActual.formato === 'dots' && dronePath.length % 10 === 0) añadirPuntoDecorativo(nuevaPos);
+                        if (estiloRutaActual.formato === 'stars' && dronePath.length % 10 === 0) añadirEstrellaDecorativa(nuevaPos);
+                        if (estiloRutaActual.formato === 'hearts' && dronePath.length % 10 === 0) añadirCorazonDecorativo(nuevaPos);
+
+                        // Para la purpurina
                         if (modoPurpurina) {
                             contadorPurpurina++;
-                            if (contadorPurpurina % 3 === 0) añadirPurpurinaDecorativa(nuevaPos, data.heading || 0);
+                            if (contadorPurpurina % 5 === 0)
+                                añadirPurpurinaDecorativa(nuevaPos, data.heading || 0);
                         }
+
                         ultimoPuntoRuta = nuevaPos;
                     }
                 }
@@ -199,11 +228,22 @@
         }
 
         function obtenerOpcionesLinea() {
-            let opciones = { color: obtenerColorDibujo(), weight: estiloRutaActual.weight, lineCap: 'butt' };
-            if (estiloRutaActual.formato === 'dash-short') opciones.dashArray = '6, 6';
-            else if (estiloRutaActual.formato === 'dash-long') opciones.dashArray = '20, 12';
+            let opciones = {
+                color: estiloRutaActual.color,
+                weight: estiloRutaActual.weight,
+                lineCap: 'butt',
+                lineJoin: 'round',
+                renderer: L.canvas()
+            };
+
+            if (estiloRutaActual.formato === 'dash-short') {
+                // Aumentamos a 12, 15 para que el hueco sea claro
+                opciones.dashArray = '6, 6';
+            }
             return opciones;
         }
+
+
 
         function obtenerColorDibujo() {
             if (modoArcoiris) {
@@ -214,14 +254,76 @@
             return estiloRutaActual.color;
         }
 
+
+
         function añadirSegmentoLinea(pos1, pos2) {
-            const linea = L.polyline([pos1, pos2], obtenerOpcionesLinea()).addTo(map);
-            guardarElementoDibujo({
-                tipo: 'linea',
-                layer: linea,
-                puntos: [pos1, pos2]
+            let opciones = obtenerOpcionesLinea();
+            opciones.color = obtenerColorDibujo();
+
+            // Si està activat arcoíris i línia discontínua curta,
+            // dibuixem un segment sí i un segment no
+            if (modoArcoiris === true && estiloRutaActual.formato === 'dash-short') {
+                let cicle = dronePath.length % 8;
+
+                if (cicle === 0 || cicle === 1 || cicle === 2) {
+                    const linea = L.polyline([pos1, pos2], {
+                        color: opciones.color,
+                        weight: opciones.weight,
+                        lineCap: 'butt',
+                        renderer: L.canvas()
+                    }).addTo(map);
+
+                    guardarElementoDibujo({
+                        tipo: 'linea',
+                        layer: linea,
+                        puntos: [pos1, pos2]
+                    });
+                }
+
+                return;
+            }
+
+            // Si està activat arcoíris però NO és discontínua,
+            // fem segments separats perquè cada tros tingui un color diferent
+            if (modoArcoiris === true) {
+
+                const linea = L.polyline([pos1, pos2], {
+                    ...opciones,
+                    renderer: L.canvas()
+                }).addTo(map);
+
+                guardarElementoDibujo({
+                    tipo: 'linea',
+                    layer: linea,
+                    puntos: [pos1, pos2]
                 });
+
+                return;
+            }
+
+            // Línia normal o discontínua curta sense arcoíris
+            if (lineaTrazoActual === null) {
+
+               lineaTrazoActual = L.polyline([pos1, pos2], {
+                    ...opciones,
+                    renderer: L.canvas()
+                }).addTo(map);
+
+                guardarElementoDibujo({
+                    tipo: 'lineaContinua',
+                    layer: lineaTrazoActual,
+                    puntos: [pos1, pos2]
+                });
+            } else {
+                lineaTrazoActual.addLatLng(pos2);
+
+                const elemento = elementosDibujo.find(e => e.layer === lineaTrazoActual);
+                if (elemento) {
+                    elemento.puntos.push(pos2);
+                }
+            }
         }
+
 
         function añadirPuntoDecorativo(posicion) {
             const color = obtenerColorDibujo();
@@ -265,53 +367,101 @@
         }
 
         function añadirPurpurinaDecorativa(posicion, heading) {
-            const color = obtenerColorDibujo();
+            const color = obtenerColorDibujo();   // si arcoíris està activat, agafa el color que toca; si no, el triat
             const grosor = estiloRutaActual.weight;
+
             const puntoBase = map.latLngToLayerPoint(L.latLng(posicion[0], posicion[1]));
             const headingRad = heading * Math.PI / 180;
+
+            // El grossor controla l'amplada de la cua, no la mida de cada partícula
             const cantidad = Math.max(3, Math.round(grosor*2));
-            const distanciaBase = 5 + grosor * 0.8, longitudCola = 5 + grosor * 1.2, anchoCola = Math.max(1.2, grosor * 0.3);
+            const distanciaBase = 5 + grosor * 0.8;
+            const longitudCola = 5 + grosor * 1.2;
+            const anchoCola = Math.max(1.2, grosor * 0.3);
 
             for (let i = 0; i < cantidad; i++) {
                 const atras = distanciaBase + Math.random() * longitudCola;
                 const lateral = (Math.random() - 0.5) * anchoCola;
+
                 const x = puntoBase.x - Math.sin(headingRad) * atras + Math.cos(headingRad) * lateral;
                 const y = puntoBase.y + Math.cos(headingRad) * atras + Math.sin(headingRad) * lateral;
+
                 const puntoPurpurina = map.layerPointToLatLng(L.point(x, y));
 
+                // Partícules petites i brillants
                 const tamano = 2 + grosor * 0.35 + Math.random() * 0.8;
                 const opacidad = 0.6 + Math.random() * 0.3;
+                const brillo1 = 3;
+                const brillo2 = 7;
+
                 const simbolos = ['✦', '✧', '•'];
                 const simbolo = simbolos[Math.floor(Math.random() * simbolos.length)];
 
                 const particula = L.marker(puntoPurpurina, {
-                    icon: L.divIcon({ className: '', html: `<div class="glitter-particle" style="color: ${color}; font-size: ${tamano}px; opacity: ${opacidad}; text-shadow: 0 0 5px ${color};">${simbolo}</div>` }),
+                    icon: L.divIcon({
+                        className: '',
+                        html: `<div class="glitter-particle"
+                                    style="
+                                        color: ${color};
+                                        font-size: ${tamano}px;
+                                        opacity: ${opacidad};
+                                        -webkit-text-stroke: 0.1px white;
+                                        text-shadow:
+                                            0 0 ${brillo1}px ${color},
+                                            0 0 ${brillo2}px ${color},
+                                            0 0 ${brillo2}px ${color};
+                                        animation-delay: ${Math.random() * 0.8}s;
+                                    ">
+                                    ${simbolo}
+                                </div>`,
+                        iconSize: [0, 0],
+                        iconAnchor: [0, 0]
+                    }),
                     interactive: false
                 }).addTo(map);
 
-                guardarElementoDibujo({ tipo: 'decoracion', layer: particula, posicion: [puntoPurpurina.lat, puntoPurpurina.lng] });
+                guardarElementoDibujo({
+                    tipo: 'decoracion',
+                    layer: particula,
+                    posicion: [puntoPurpurina.lat, puntoPurpurina.lng]
+                });
             }
         }
 
+
+
+
+
+
+
+
+
         function borrarConLineaTransparente(posAnterior, posActual) {
-            const grosor = estiloRutaActual.weight;
-            const radioBorradoPx = Math.max(3, grosor * 1.5);
-            const gomaA = map.latLngToLayerPoint(L.latLng(posAnterior[0], posAnterior[1]));
-            const gomaB = map.latLngToLayerPoint(L.latLng(posActual[0], posActual[1]));
+            const radioBorradoPx = Math.max(3, estiloRutaActual.weight * 1.5);
+            const gomaA = map.latLngToLayerPoint(L.latLng(posAnterior));
+            const gomaB = map.latLngToLayerPoint(L.latLng(posActual));
 
             elementosDibujo = elementosDibujo.filter(elemento => {
                 let borrar = false;
-                if (elemento.tipo === 'linea') {
-                    const p1 = map.latLngToLayerPoint(L.latLng(elemento.puntos[0][0], elemento.puntos[0][1]));
-                    const p2 = map.latLngToLayerPoint(L.latLng(elemento.puntos[1][0], elemento.puntos[1][1]));
-                    if (distanciaSegmentoSegmento(gomaA, gomaB, p1, p2) <= radioBorradoPx) borrar = true;
-                } else if (elemento.tipo === 'decoracion') {
-                    const p = map.latLngToLayerPoint(L.latLng(elemento.posicion[0], elemento.posicion[1]));
+
+                if (elemento.tipo === 'linea' || elemento.tipo === 'lineaContinua') {
+                    for (let i = 0; i < elemento.puntos.length - 1; i++) {
+                        const p1 = map.latLngToLayerPoint(L.latLng(elemento.puntos[i]));
+                        const p2 = map.latLngToLayerPoint(L.latLng(elemento.puntos[i+1]));
+                        if (distanciaSegmentoSegmento(gomaA, gomaB, p1, p2) <= radioBorradoPx) {
+                            borrar = true;
+                            break;
+                        }
+                    }
+                }
+                else if (elemento.tipo === 'decoracion') {
+                    const p = map.latLngToLayerPoint(L.latLng(elemento.posicion));
                     if (distanciaPuntoSegmento(p, gomaA, gomaB) <= radioBorradoPx) borrar = true;
                 }
 
                 if (borrar) {
                     map.removeLayer(elemento.layer);
+                    if (elemento.layer === lineaTrazoActual) lineaTrazoActual = null;
                     return false;
                 }
                 return true;
@@ -341,3 +491,6 @@
     </script>
 </body>
 </html>
+
+
+

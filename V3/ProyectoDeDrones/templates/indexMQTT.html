@@ -597,6 +597,8 @@
             contadorArcoiris = 0;
             contadorPurpurina = 0;
 
+            client.publish('Grup25/autopilotServiceDemo/mobileFlask/clearMap', 'clear');
+
             console.log("Mapa limpiado correctamente");
         }
 
@@ -693,14 +695,14 @@
 
         client.on('connect', function () {
             console.log('Conectado al broker MQTT');
-            client.subscribe('Grup212/autopilotServiceDemo/mobileFlask/#');
+            client.subscribe('Grup25/autopilotServiceDemo/mobileFlask/#');
             publicarEstadoVisual();
         });
 
         client.on('message', function (topic, message) {
             console.log("Mensaje recibido en:", topic, "Contenido:", message.toString());
 
-            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/connected") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/connected") {
                 console.log("El dron confirma conexión. Pidiendo telemetría...");
 
                 const botonDespegar = document.getElementById('botonDespegar');
@@ -721,7 +723,7 @@
 
 
             // Escuchar los datos de telemetría
-            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/telemetryInfo") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/telemetryInfo") {
 
 
                 // Si me llega telemetría, significa que estamos conectados
@@ -881,13 +883,13 @@
                 }
             }
 
-            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/videoOffer") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/videoOffer") {
                 const data = JSON.parse(message.toString());
                 console.log("Oferta de video recibida del dron");
                 recibirVideo(data.offer);
             }
 
-            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/iceCandidate") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/iceCandidate") {
                 const data = JSON.parse(message.toString());
                 if (pc && data.candidate) {
                     pc.addIceCandidate(new RTCIceCandidate(data.candidate));
@@ -1652,7 +1654,6 @@
 
         function seleccionarFormatoLinea(formato) {
             const boton = document.getElementById('botonFormatoLinea');
-
             boton.innerHTML = '';
 
             const preview = document.createElement('span');
@@ -1861,7 +1862,7 @@
                 borrar: modoBorrar,
                 temporal: modoTemporal
             };
-            client.publish('Grup212/autopilotServiceDemo/mobileFlask/syncVisuals', JSON.stringify(estadoVisual));
+            client.publish('Grup25/autopilotServiceDemo/mobileFlask/syncVisuals', JSON.stringify(estadoVisual));
         }
 
     </script>
