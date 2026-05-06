@@ -37,7 +37,7 @@ def publish_event(origin, event):
     global client
 
 
-    topic = "Grup25/autopilotServiceDemo/" + origin + "/" + event
+    topic = "Grup212/autopilotServiceDemo/" + origin + "/" + event
 
     client.publish(topic)
 
