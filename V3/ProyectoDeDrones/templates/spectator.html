@@ -44,7 +44,7 @@
 <body>
     <nav class="navbar navbar-dark bg-dark mb-3">
         <div class="container-fluid justify-content-center">
-            <span class="navbar-brand mb-0 h1">Modo Espectador</span>
+            <span class="navbar-brand mb-0 h1">Mode Espectador</span>
         </div>
     </nav>
 
@@ -52,7 +52,7 @@
         <!-- Panel de Estado -->
         <div class="row mb-3">
             <div class="col-12 text-center">
-                <span id="estadoConexion" class="badge bg-warning p-2" style="font-size: 1rem;">Esperando telemetría del piloto...</span>
+                <span id="estadoConexion" class="badge bg-warning p-2" style="font-size: 1rem;">Esperant telemetria del pilot...</span>
             </div>
         </div>
 
@@ -76,7 +76,7 @@
         <!-- Mapa -->
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-secondary text-white">
-                <h5 class="mb-0">Posición a tiempo real</h5>
+                <h5 class="mb-0">Posició en temps real</h5>
             </div>
             <div class="card-body p-0">
                 <div id="map" style="height: 500px; width: 100%; border-bottom-left-radius: var(--bs-card-inner-border-radius); border-bottom-right-radius: var(--bs-card-inner-border-radius);"></div>
@@ -123,8 +123,8 @@
 
         client.on('connect', function () {
             console.log('Espectador conectado al broker');
-            client.subscribe('Grup25/autopilotServiceDemo/+/telemetryInfo');
-            client.subscribe('Grup25/autopilotServiceDemo/+/syncVisuals');
+            client.subscribe('Grup212/autopilotServiceDemo/+/telemetryInfo');
+            client.subscribe('Grup212/autopilotServiceDemo/+/syncVisuals');
         });
 
         client.on('message', function (topic, message) {
@@ -144,7 +144,7 @@
 
             if (topic.endsWith('/telemetryInfo')) {
                 document.getElementById('estadoConexion').className = "badge bg-success p-2";
-                document.getElementById('estadoConexion').innerText = "Viendo emisión en directo";
+                document.getElementById('estadoConexion').innerText = "Veient l’emissió en directe";
 
                 const data = JSON.parse(message.toString());
                 let alt = parseFloat(data.alt !== undefined ? data.alt : data.altitude);

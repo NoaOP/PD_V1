@@ -99,7 +99,7 @@
     }
 
     .preview-stars::before {
-        content: "★★★★★★★★★★★★★★★★★";
+        content: "★★★★★★★★★★★★★★";
         color: var(--preview-color);
         font-size: 17px;
         position: absolute;
@@ -109,7 +109,7 @@
     }
 
     .preview-hearts::before {
-        content: "♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥";
+        content: "♥♥♥♥♥♥♥♥♥♥♥♥♥♥";
         color: var(--preview-color);
         font-size: 18px;
         position: absolute;
@@ -153,53 +153,53 @@
 
     <nav class="navbar navbar-dark bg-dark border-bottom border-secondary">
         <div class="container-fluid justify-content-center">
-            <span class="navbar-brand mb-0 h2 fw-bold text-white">Modo Piloto</span>
+            <span class="navbar-brand mb-0 h2 fw-bold text-white">Mode Pilot</span>
         </div>
     </nav>
 
     <nav class="nav nav-pills nav-justified bg-dark p-2">
         <button class="nav-link active text-white" onclick="abrirTab(event, 'tab-control')">Control</button>
         <button class="nav-link text-white" onclick="abrirTab(event, 'tab-mapa')">Mapa</button>
-        <button class="nav-link text-white" onclick="abrirTab(event, 'tab-settings')">Ajustes</button>
-        <button class="nav-link text-white" onclick="abrirTab(event, 'tab-video')">Video</button>
+        <button class="nav-link text-white" onclick="abrirTab(event, 'tab-settings')">Configuració</button>
+        <button class="nav-link text-white" onclick="abrirTab(event, 'tab-video')">Vídeo</button>
     </nav>
 
     <div id="tab-control" class="tab-content container mt-3">
 
        <!-- 🔵Esto para poner los botones de CONECTAR y el COM🔵 -->
        <div class="d-flex gap-2 align-items-center mb-2 w-100">
-            <button id="botonConectarMAV" class="boton boton-blau w-50" onclick="conectarMAV()">Conectar (MAVProxy)</button>
-            <button id="botonConectarSim" class="boton boton-blau w-50" onclick="conectarSim()">Conectar (Simulador)</button>
+            <button id="botonConectarMAV" class="boton boton-blau w-50" onclick="conectarMAV()">Connectar (MAVProxy)</button>
+            <button id="botonConectarSim" class="boton boton-blau w-50" onclick="conectarSim()">Connectar (Simulador)</button>
        </div>
 
         <!-- 🔵 Altura + despegar (segunda fila, orden vertical, ancho completo)-->
         <div class="d-flex gap-2 align-items-center mb-2">
-            <button id="botonDespegar" class="boton" onclick="despegarDron()">Despegar</button>
+            <button id="botonDespegar" class="boton" onclick="despegarDron()">Enlairar</button>
             <input type="number" id="altura" class="form-control " style="border: 2px solid #555;height: 50px;margin-bottom: 0; box-sizing: border-box;" placeholder="Altura en metros">
         </div>
 
         <div class="d-flex gap-2">
             <!-- 🔵 Botón de aterrizar (tercera fila, ancho completo) -->
-            <button id="botonAterrizar" class="boton" onclick="aterrizarDron()">Aterrizar Dron</button>
+            <button id="botonAterrizar" class="boton" onclick="aterrizarDron()">Aterrar dron</button>
             <!-- 🔵 Botón de RTL (cuarta fila, ancho completo) -->
-            <button id="botonRTL" class="boton" onclick="rtlDron()">RTL (Volver a casa)</button>
+            <button id="botonRTL" class="boton" onclick="rtlDron()">RTL (Tornar a casa)</button>
         </div>
 
         <!-- 🔵 Botón para control de voz -->
-        <button id="botonMicrofono" class="boton boton-blau" onclick="toggleVoz()"> Control por Voz</button>
+        <button id="botonMicrofono" class="boton boton-blau" onclick="toggleVoz()"> Control per veu</button>
 
         <div class="d-flex gap-2">
             <!-- 🔵 Slider para cambiar el heading y la velocidad (quinta y sexta fila, ancho completo) -->
             <div class="mt-3 mb-3 p-3 text-center text-white w-50" style="background-color: cadetblue; border-radius: 5px; border: 2px solid #555;">
                 <label for="headingSlider" class="form-label" style="font-size: 18px;">
-                    Grados (Heading): <span id="headingValor">0</span>º
+                    Graus (Heading): <span id="headingValor">0</span>º
                 </label>
                 <input type="range" class="form-range w-100" id="headingSlider" min="0" max="360" step="5" value="0" onchange="cambiarHeading(this.value)">
             </div>
 
             <div class="mt-3 mb-3 p-3 text-center text-white w-50" style="background-color: cadetblue; border-radius: 5px; border: 2px solid #555;">
                 <label for="speedSlider" class="form-label" style="font-size: 18px;">
-                    Velocidad: <span id="speedValor">0</span>m/s
+                    Velocitat: <span id="speedValor">0</span>m/s
                 </label>
                 <input type="range" class="form-range w-100" id="speedSlider" min="0" max="10" step="1" value="0" onchange="cambiarSpeed(this.value)">
             </div>
@@ -222,26 +222,26 @@
             <!-- 🔵 Botones de direccion -->
             <div class="direction2">
                 <div class="spacer"></div>
-                <div onclick="moverDron('Forward')" class="box">Forward</div>
+                <div onclick="moverDron('Forward')" class="box">Endavant</div>
                 <div class="spacer"></div>
-                <div onclick="moverDron('Left')" class="box">Left</div>
+                <div onclick="moverDron('Left')" class="box">Esquerra</div>
                 <div onclick="moverDron('Stop')" class="box">Stop</div>
-                <div onclick="moverDron('Right')" class="box">Right</div>
+                <div onclick="moverDron('Right')" class="box">Dreta</div>
                 <div class="spacer"></div>
-                <div onclick="moverDron('Back')" class="box">Back</div>
+                <div onclick="moverDron('Back')" class="box">Enrere</div>
                 <div class="spacer"></div>
             </div>
 
             <!-- 🔵 Botones de altura -->
             <div class="direction2">
                 <div class="spacer"></div>
-                <div onclick="moverDron('Up')" class="box">Up</div>
+                <div onclick="moverDron('Up')" class="box">Amunt</div>
                 <div class="spacer"></div>
                 <div class="spacer"></div>
                 <div onclick="moverDron('Stop')" class="box">Stop</div>
                 <div class="spacer"></div>
                 <div class="spacer"></div>
-                <div onclick="moverDron('Down')" class="box">Down</div>
+                <div onclick="moverDron('Down')" class="box">Avall</div>
                 <div class="spacer"></div>
             </div>
         </div>
@@ -254,43 +254,36 @@
 
     <!-- Ventana del mapa -->
     <div id="tab-mapa" class="tab-content container mt-3" style="display:none">
-        <h2 class="text-center">Posición GPS</h2>
+        <h2 class="text-center">Posició GPS</h2>
+
+        <div class="d-flex justify-content-center gap-2 align-items-center mb-2 w-100">
+            <button id="botonPintar" class="boton boton-blau" onclick="pintar()" style="border: 2px solid #555; border-radius: 5px; height: 50px;">Pintar</button>
+            <button id="botonLimpiarMapa" class="boton boton-blau" onclick="limpiarMapa()" style="border: 2px solid #555; border-radius: 5px; height: 50px;">Netejar</button>
+            <button id="botonGuardarMapa" class="boton boton-blau" onclick="guardarMapa()" style="border: 2px solid #555; border-radius: 5px; height: 50px;">Imatge</button>
+        </div>
 
         <div id="map" style="height: 400px; background: #eee; border-radius: 10px;"> </div>
+        <label class="form-label" >    </label>
 
-        <div class="d-flex gap-2 align-items-center mb-2 w-100">
-            <span id="indicador-vuelo" class="badge boton-rojo d-flex align-items-center justify-content-center w-25" style="font-size: 1.1rem; padding: 10px 20px; transition: all 0.5s ease; border: 2px solid #555; border-radius: 5px; height: 50px;">
-                <span id="texto-vuelo">Wait to fly</span>
+        <div class="d-flex justify-content-center gap-2 align-items-center mb-2">
+            <span id="indicador-vuelo" class="badge boton-rojo d-flex align-items-center justify-content-center w-100" style="font-size: 1.1rem; padding: 10px 20px; transition: all 0.5s ease; border: 2px solid #555; border-radius: 5px; height: 50px;">
+                <span id="texto-vuelo">Espera a volar</span>
             </span>
 
-            <button id="botonPintar" class="boton boton-blau w-25" onclick="pintar()" style="border: 2px solid #555; border-radius: 5px; height: 50px;">Pintar</button>
-
-            <button id="botonLimpiarMapa" class="boton boton-blau w-25" onclick="limpiarMapa()" style="border: 2px solid #555; border-radius: 5px; height: 50px;">Netejar mapa</button>
-
-            <button id="botonGuardarMapa" class="boton boton-blau w-25" onclick="guardarMapa()" style="border: 2px solid #555; border-radius: 5px; height: 50px;">Guardar Imatge</button>
-
         </div>
 
 
-        <div class="card p-4 mt-3" style="background-color: white; border: 2px solid cadetblue;">
-            <label class="form-label fw-bold">Rellenar zona</label>
-            <div class="d-flex gap-2 justify-content-center mt-3 mb-2">
-                <button id="btnDibujar" class="boton boton-blau" onclick="activarDibujo()">✏️ Dibujar plantilla</button>
-                <button id="btnLimpiar" class="boton boton-gris" onclick="limpiarZona()">🗑️ Eliminar plantilla</button>
-                <button id="btnRellenar" class="boton boton-amarillo" onclick="prepararRelleno()" disabled>🎨 Rellenar</button>
-            </div>
-        </div>
 
 
         <div class="d-flex justify-content-around align-items-center mt-4" style="background: #333; border-radius: 15px; padding: 20px;">
             <div id="joystick-container" style="width: 150px; height: 150px; position: relative; background: #444; border-radius: 50%;">
-                <p style="color: white; position: absolute; bottom: -30px; width: 100%; text-align: center;">Movimiento</p>
+                <p style="color: white; position: absolute; bottom: -30px; width: 100%; text-align: center;">Movimient</p>
             </div>
 
             <div class="d-flex flex-column gap-2" style="width: 100px;">
-                <button onclick="moverDron('Up')" class="box">Up</button>
+                <button onclick="moverDron('Up')" class="box">Amunt</button>
                 <button onclick="moverDron('Stop')" class="box">STOP</button>
-                <button onclick="moverDron('Down')" class="box">Down</button>
+                <button onclick="moverDron('Down')" class="box">Avall</button>
             </div>
         </div>
     </div>
@@ -299,21 +292,21 @@
 
     <!-- Ventana de settings (tipos de pincel o color) -->
     <div id="tab-settings" class="tab-content container mt-3" style="display:none">
-        <h2 class="text-center">Ajustes del Mapa</h2>
+        <h2 class="text-center">Configuració del Mapa</h2>
 
         <div class="card p-4 mt-3" style="background-color: white; border: 2px solid cadetblue;">
             <div class="mb-4">
-                <label for="colorTrazo" class="form-label fw-bold">Color de la trayectoria:</label>
+                <label for="colorTrazo" class="form-label fw-bold">Color de la trajectòria:</label>
                 <input type="color" class="form-control form-control-color w-100" id="colorTrazo" value="#ff0000" title="Selecciona un color" onchange="actualizarEstiloRuta()">
             </div>
 
             <div class="mb-4">
-                <label for="grosorTrazo" class="form-label fw-bold">Grosor del trazo / goma: <span id="grosorValor">3</span>px</label>
+                <label for="grosorTrazo" class="form-label fw-bold">Gruix del traç: <span id="grosorValor">3</span>px</label>
                 <input type="range" class="form-range" id="grosorTrazo" min="1" max="10" step="1" value="3" onchange="actualizarEstiloRuta()">
             </div>
 
             <div class="mb-4">
-                <label class="form-label fw-bold">Formato de línea:</label>
+                <label class="form-label fw-bold">Format de línia:</label>
 
                 <div class="dropdown">
                     <button class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-center align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="botonFormatoLinea">
@@ -359,6 +352,10 @@
             <div class="d-flex gap-2 mt-4">
                 <button id="botonBorrar" class="boton boton-blau" onclick="toggleBorrador()">Borrar</button>
                 <button id="botonTemporal" class="boton boton-blau" onclick="toggleTemporal()">Línea temporal 10s</button>
+
+            </div>
+
+            <div class="d-flex gap-2 mt-2">
                 <button id="botonArcoiris" class="boton boton-blau w-50" onclick="toggleArcoiris()">Arcoíris</button>
                 <button id="botonPurpurina" class="boton boton-blau w-50" onclick="togglePurpurina()">Purpurina</button>
             </div>
@@ -366,39 +363,51 @@
         </div>
 
 
+        <div class="card p-4 mt-3" style="background-color: white; border: 2px solid cadetblue;">
+            <label for="colorTrazo" class="form-label fw-bold">Geometría:</label>
+            <div class="d-flex gap-2 mt-4">
+                <button id="botonTriangulo" class="boton boton-blau" onclick="hacerTriangulo()">Triangle</button>
+                <button id="botonCuadrado" class="boton boton-blau" onclick="hacerCuadrado()">Quadrat</button>
+            </div>
+
+            <div class="d-flex gap-2 mt-2">
+                <button id="botonRedonda" class="boton boton-blau" onclick="hacerRedonda()">Rodona</button>
+                <button id="botonCorazon" class="boton boton-blau" onclick="hacerCorazon()">Cor</button>
+            </div>
+        </div>
 
         <div class="card p-4 mt-3" style="background-color: white; border: 2px solid cadetblue;">
-            <label class="form-label fw-bold">Párametros de Plantilla:</label>
+            <label class="form-label fw-bold">Rellenar zona</label>
+            <div class="d-flex gap-2 justify-content-center mt-3 mb-2">
+                <button id="btnDibujar" class="boton boton-blau" onclick="activarDibujo()">Dibuixar plantilla</button>
+                <button id="btnLimpiar" class="boton boton-blau" onclick="limpiarZona()">Eliminar plantilla</button>
+                <button id="btnRellenar" class="boton boton-amarillo" onclick="prepararRelleno()" disabled>Emplenar</button>
+            </div>
+        </div>
+
+        <div class="card p-4 mt-3" style="background-color: white; border: 2px solid cadetblue;">
+            <label class="form-label fw-bold">Paràmetres de Plantilla:</label>
             <div class="mb-4">
-                <label for="inputAltitudMision" class="form-label fw-bold">Altitud de Vuelo: <span id="altitudMisionValor">5</span> m</label>
+                <label for="inputAltitudMision" class="form-label fw-bold">Altitud de Vol: <span id="altitudMisionValor">5</span> m</label>
                 <input type="range" class="form-range" id="inputAltitudMision" min="2" max="50" step="1" value="5" oninput="document.getElementById('altitudMisionValor').innerText = this.value">
             </div>
 
             <div class="mb-4">
-                <label for="inputSeparacionMision" class="form-label fw-bold">Separación de pasadas: <span id="separacionMisionValor">2</span> m</label>
+                <label for="inputSeparacionMision" class="form-label fw-bold">Separació de passades: <span id="separacionMisionValor">2</span> m</label>
                 <input type="range" class="form-range" id="inputSeparacionMision" min="1" max="10" step="0.5" value="2" oninput="document.getElementById('separacionMisionValor').innerText = this.value">
             </div>
         </div>
 
-
-        <div class="card p-4 mt-3" style="background-color: white; border: 2px solid cadetblue;">
-            <label for="colorTrazo" class="form-label fw-bold">Geometrias:</label>
-            <div class="d-flex gap-2 mt-4">
-                <button id="botonTriangulo" class="boton boton-blau" onclick="hacerTriangulo()">Triángulo</button>
-                <button id="botonCuadrado" class="boton boton-blau" onclick="hacerCuadrado()">Cuadrado</button>
-                <button id="botonRedonda" class="boton boton-blau" onclick="hacerRedonda()">Redonda</button>
-                <button id="botonCorazon" class="boton boton-blau" onclick="hacerCorazon()">Corazon</button>
-            </div>
-        </div>
+        <label class="form-label" >    </label>
 
     </div>
 
     <!-- Ventana del videostream -->
     <div id="tab-video" class="tab-content container mt-3" style="display:none">
-        <h2 class="text-center">Streaming en tiempo real</h2>
+        <h2 class="text-center">Transmissió en temps real</h2>
         <div class="d-flex gap-2">
-            <button id="botonVideo" class="boton boton-blau mb-3" onclick="iniciarStreaming()">Iniciar Video</button>
-            <button id="botonStopVideo" class="boton boton-blau mb-3" onclick="detenerStreaming()">Detener Video</button>
+            <button id="botonVideo" class="boton boton-blau mb-3" onclick="iniciarStreaming()">Iniciar Vídeo</button>
+            <button id="botonStopVideo" class="boton boton-blau mb-3" onclick="detenerStreaming()">Detenir Vídeo</button>
         </div>
         <video id="videoRemote" autoplay playsinline muted style="width: 100%; height: auto; min-height: 300px; border-radius: 10px; background: black;"></video>
     </div>
@@ -742,7 +751,7 @@
                     indicador.classList.add('boton-verde');
                     joystickCont.style.pointerEvents = "auto";
                 } else if (data.state === 'takingOff' || data.state === 'armed') {
-                    texto.innerText = "Getting ready";
+                    texto.innerText = "Preparació";
                     indicador.classList.remove('boton-rojo', 'boton-verde');
                     indicador.classList.add('boton-amarillo');
                     joystickCont.style.pointerEvents = "none";
