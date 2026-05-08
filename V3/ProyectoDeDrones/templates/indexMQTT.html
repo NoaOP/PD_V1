@@ -725,7 +725,7 @@
 
         client.on('connect', function () {
             console.log('Conectado al broker MQTT');
-            client.subscribe('Grup212/autopilotServiceDemo/mobileFlask/#');
+            client.subscribe('Grup25/autopilotServiceDemo/mobileFlask/#');
             publicarEstadoVisual();
         });
 
@@ -733,7 +733,7 @@
             console.log("Mensaje recibido en:", topic, "Contenido:", message.toString());
 
 
-            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/paintOn") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/paintOn") {
                 pol = true;
 
                 const btn = document.getElementById("botonPintar");
@@ -747,7 +747,7 @@
                 console.log("Pintura activada automáticamente por el AutopilotService");
             }
 
-            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/paintOff") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/paintOff") {
                 pol = false;
 
                 const btn = document.getElementById("botonPintar");
@@ -761,7 +761,7 @@
                 console.log("Pintura desactivada automáticamente por el AutopilotService");
             }
 
-            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/textDone") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/textDone") {
                 const btn = document.getElementById('botonEscribirTexto');
 
                 if (btn) {
@@ -778,7 +778,7 @@
                 console.log("El dron ha acabat d'escriure el text.");
             }
 
-            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/textError") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/textError") {
                 const btn = document.getElementById('botonEscribirTexto');
 
                 if (btn) {
@@ -796,7 +796,7 @@
                 alert("No s'ha pogut escriure el text. Comprova que el dron estigui volant.");
             }
 
-            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/missionCompleted") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/missionCompleted") {
                 const btnRellenar = document.getElementById('btnRellenar');
 
                 if (btnRellenar) {
@@ -808,7 +808,7 @@
                 console.log("Rellenado finalizado.");
             }
 
-            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/missionError") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/missionError") {
                 const btnRellenar = document.getElementById('btnRellenar');
 
                 if (btnRellenar) {
@@ -820,7 +820,7 @@
                 alert("No s'ha pogut completar el rellenado.");
             }
 
-            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/connected") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/connected") {
                 console.log("El dron confirma conexión. Pidiendo telemetría...");
 
                 const botonDespegar = document.getElementById('botonDespegar');
@@ -841,7 +841,7 @@
 
 
             // Escuchar los datos de telemetría
-            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/telemetryInfo") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/telemetryInfo") {
 
 
                 // Si me llega telemetría, significa que estamos conectados
@@ -1001,13 +1001,13 @@
                 }
             }
 
-            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/videoOffer") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/videoOffer") {
                 const data = JSON.parse(message.toString());
                 console.log("Oferta de video recibida del dron");
                 recibirVideo(data.offer);
             }
 
-            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/iceCandidate") {
+            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/iceCandidate") {
                 const data = JSON.parse(message.toString());
                 if (pc && data.candidate) {
                     pc.addIceCandidate(new RTCIceCandidate(data.candidate));
@@ -2002,7 +2002,7 @@
                 borrar: modoBorrar,
                 temporal: modoTemporal
             };
-            client.publish('Grup212/autopilotServiceDemo/mobileFlask/syncVisuals', JSON.stringify(estadoVisual));
+            client.publish('Grup25/autopilotServiceDemo/mobileFlask/syncVisuals', JSON.stringify(estadoVisual));
         }
 
     </script>

@@ -37,7 +37,7 @@ def publish_event(origin, event):
     global client
 
 
-    topic = "Grup212/autopilotServiceDemo/" + origin + "/" + event
+    topic = "Grup25/autopilotServiceDemo/" + origin + "/" + event
 
     client.publish(topic)
 
@@ -56,7 +56,7 @@ def publish_telemetry_info(telemetry_info):
 
     for origin in active_origins:
 
-        topic = "Grup212/autopilotServiceDemo/" + origin + "/telemetryInfo"
+        topic = "Grup25/autopilotServiceDemo/" + origin + "/telemetryInfo"
         client.publish(topic, json.dumps(telemetry_info))
 
 
@@ -596,18 +596,35 @@ def on_message(cli, userdata, message):
 
     if command == "connect":
         if dron.state != "disconnected":
-            # Ja connectat: resposta immediata
-            publish_event(origin,"connected")
+            publish_event(origin, "connected")
         else:
-            # Connexio no bloquejant perque vagi fluid el MQTT
-            print("Conectando via MAVProxy...")
+            print("Connectant directament via COM3...")
             dron.connect(
-                MAVPROXY_AUTOPILOT_ENDPOINT,
-                MAVPROXY_AUTOPILOT_BAUD,
+                "COM3",  # Forcem el port COM3
+                57600,  # Velocitat típica de ràdio (canvia a 115200 si uses cable USB)
                 freq=4,
                 blocking=False,
-                callback = lambda: publish_event(origin, "connected")
+                # Afegim l'activació de telemetria al callback perquè funcioni el mapa al moment
+                callback=lambda: (
+                    publish_event(origin, "connected"),
+                    dron.send_telemetry_info(publish_telemetry_info)
+                )
             )
+
+    # if command == "connect":
+    #     if dron.state != "disconnected":
+    #         # Ja connectat: resposta immediata
+    #         publish_event(origin,"connected")
+    #     else:
+    #         # Connexio no bloquejant perque vagi fluid el MQTT
+    #         print("Conectando via MAVProxy...")
+    #         dron.connect(
+    #             MAVPROXY_AUTOPILOT_ENDPOINT,
+    #             MAVPROXY_AUTOPILOT_BAUD,
+    #             freq=4,
+    #             blocking=False,
+    #             callback = lambda: publish_event(origin, "connected")
+    #         )
 
      # afegit per la simulacio de la web app
     elif command == 'Simulacion':
@@ -852,7 +869,7 @@ client = mqtt.Client("autopilotServiceDemo" + n, transport="websockets")
 client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
 client.on_message  = on_message
 client.on_connect  = on_connect
-client.connect(MQTT_BROKER_HOST, MQTT_BROKER_PORT)
+client.connect("dronseetac.upc.edu", 8000)
 client.subscribe("+/autopilotServiceDemo/#")
 
 print("AutopilotService esperant peticions...")
