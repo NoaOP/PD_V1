@@ -383,7 +383,7 @@
             <div class="d-flex gap-2 justify-content-center mt-3 mb-2">
                 <button id="btnDibujar" class="boton boton-blau" onclick="activarDibujo()">Dibuixar plantilla</button>
                 <button id="btnLimpiar" class="boton boton-blau" onclick="limpiarZona()">Eliminar plantilla</button>
-                <button id="btnRellenar" class="boton boton-amarillo" onclick="prepararRelleno()" disabled>Emplenar</button>
+                <button id="btnRellenar" class="boton boton-blau" onclick="prepararRelleno()" disabled>Emplenar</button>
             </div>
         </div>
 
@@ -573,10 +573,15 @@
                 });
 
                 // Habilitamos rellenar y bloqueamos dibujar para evitar múltiples zonas
-                document.getElementById('btnRellenar').disabled = false;
-                document.getElementById('btnRellenar').classList.replace('boton-amarillo', 'boton-verde');
+                const btnRellenar = document.getElementById('btnRellenar');
+
+                btnRellenar.disabled = false;
+                btnRellenar.innerText = "Emplenar";
+                btnRellenar.classList.remove('boton-amarillo', 'boton-verde');
+                btnRellenar.classList.add('boton-blau');
+
                 document.getElementById('btnDibujar').disabled = true;
-            });
+                    });
 
         }
 
@@ -791,6 +796,30 @@
                 alert("No s'ha pogut escriure el text. Comprova que el dron estigui volant.");
             }
 
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/missionCompleted") {
+                const btnRellenar = document.getElementById('btnRellenar');
+
+                if (btnRellenar) {
+                    btnRellenar.innerText = "Emplenar";
+                    btnRellenar.classList.remove('boton-amarillo', 'boton-verde');
+                    btnRellenar.classList.add('boton-blau');
+                }
+
+                console.log("Rellenado finalizado.");
+            }
+
+            if (topic === "Grup212/autopilotServiceDemo/mobileFlask/missionError") {
+                const btnRellenar = document.getElementById('btnRellenar');
+
+                if (btnRellenar) {
+                    btnRellenar.innerText = "Emplenar";
+                    btnRellenar.classList.remove('boton-amarillo', 'boton-verde');
+                    btnRellenar.classList.add('boton-blau');
+                }
+
+                alert("No s'ha pogut completar el rellenado.");
+            }
+
             if (topic === "Grup212/autopilotServiceDemo/mobileFlask/connected") {
                 console.log("El dron confirma conexión. Pidiendo telemetría...");
 
@@ -847,7 +876,7 @@
                     indicador.classList.add('boton-amarillo');
                     joystickCont.style.pointerEvents = "none";
                 } else {
-                    texto.innerText = "Wait to fly";
+                    texto.innerText = "Espera a volar";
                     indicador.classList.remove('boton-verde', 'boton-amarillo');
                     indicador.classList.add('boton-rojo');
                     joystickCont.style.pointerEvents = "none";
@@ -1813,12 +1842,13 @@
                 map.removeLayer(polylineLawnmower);
             }
 
-            // Reseteamos botones
             let btnRellenar = document.getElementById('btnRellenar');
+
             btnRellenar.disabled = true;
-            if(btnRellenar.classList.contains('boton-verde')) {
-                btnRellenar.classList.replace('boton-verde', 'boton-amarillo');
-            }
+            btnRellenar.innerText = "Emplenar";
+            btnRellenar.classList.remove('boton-amarillo', 'boton-verde');
+            btnRellenar.classList.add('boton-blau');
+
             document.getElementById('btnDibujar').disabled = false;
         }
 
@@ -1827,8 +1857,11 @@
                 return;
             }
 
-            document.getElementById('btnRellenar').innerText = "Rellenando...";
+            const btnRellenar = document.getElementById('btnRellenar');
 
+            btnRellenar.innerText = "Rellenando...";
+            btnRellenar.classList.remove('boton-blau', 'boton-verde');
+            btnRellenar.classList.add('boton-amarillo');
 
             // Calculamos la ruta (separación de 2 metros por defecto)
             lawnmowerPath = calcularLawnmower(zonaPoligono, 2);

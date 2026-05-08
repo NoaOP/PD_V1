@@ -729,44 +729,111 @@ def on_message(cli, userdata, message):
                 pass
 
 
-
     elif command == "executeLawnmower":
-        # Solo ejecutamos si estamos volando, armados o conectados
-        if dron.state in ("flying", "armed", "connected"):
+
+        if dron.state == "flying":
+
             try:
+
                 payload_str = message.payload.decode("utf-8")
+
                 lista_waypoints = json.loads(payload_str)
 
-                print(f"RECIBIDO PLAN DE VUELO: {len(lista_waypoints)} waypoints.")
+                print(f"RECIBIDA RUTA LAWNMOWER: {len(lista_waypoints)} waypoints.")
 
-                # Cogemos la altura del primer waypoint (o usamos 5 por defecto)
-                altura_base = lista_waypoints[0]['alt'] if len(lista_waypoints) > 0 else 5.0
+                def run_lawnmower_manual():
 
-                # Creamos el diccionario que tu función uploadMission exige
-                mission = {
-                    "takeOffAlt": altura_base,
-                    "waypoints": lista_waypoints,
-                    "speed": 2  # Velocidad de navegación
-                }
+                    try:
 
-                print("Subiendo misión nativa al autopiloto...")
-                # 1. Cargamos la misión en el dron de forma bloqueante (esperamos a que suba entera)
-                dron.uploadMission(mission, blocking=True)
+                        # Bajamos velocidad para que el trazado quede más limpio
 
-                print("Misión subida. Iniciando ejecución autónoma...")
+                        try:
 
-                # Usamos un thread para vigilar la misión sin bloquear el MQTT
-                def run_and_hold():
-                    dron.executeMission(blocking=True)  # Esperamos a que termine los puntos
-                    print("Misión finalizada. Cambiando a modo LOITER para evitar RTL.")
-                    dron.go("Stop")  # Esto suele forzar el modo LOITER o GUIDED quieto
-                    publish_event(origin, "missionCompleted")
+                            dron.changeNavSpeed(2)
 
-                threading.Thread(target=run_and_hold, daemon=True).start()
+                        except:
+
+                            pass
+
+                        # Activamos pintura al empezar a rellenar
+
+                        publish_event(origin, "paintOn")
+
+                        time.sleep(0.3)
+
+                        for wp in lista_waypoints:
+
+                            lat = wp["lat"]
+
+                            lon = wp["lon"]
+
+                            alt = wp.get("alt", 5)
+
+                            print(f"Anant a punt: lat={lat}, lon={lon}, alt={alt}")
+
+                            try:
+
+                                dron.goto(lat, lon, alt, blocking=True)
+
+                            except TypeError:
+
+                                dron.goto(lat, lon, alt)
+
+                                time.sleep(2)
+
+                            time.sleep(0.2)
+
+                        # Apagamos pintura al acabar
+
+                        publish_event(origin, "paintOff")
+
+                        time.sleep(0.3)
+
+                        # Paramos el dron en la última posición, SIN RTL
+
+                        dron.go("Stop")
+
+                        publish_event(origin, "missionCompleted")
+
+                        print("Ruta lawnmower acabada. El dron es queda a l'última posició.")
+
+
+                    except Exception as e:
+
+                        print(f"Error durant la ruta lawnmower manual: {e}")
+
+                        try:
+
+                            publish_event(origin, "paintOff")
+
+                            dron.go("Stop")
+
+                        except:
+
+                            pass
+
+                        publish_event(origin, "missionError")
+
+                threading.Thread(
+
+                    target=run_lawnmower_manual,
+
+                    daemon=True
+
+                ).start()
+
 
             except Exception as e:
-                print(f"Error al ejecutar Misión: {e}")
 
+                print(f"Error al preparar ruta lawnmower: {e}")
+
+                publish_event(origin, "missionError")
+
+        else:
+
+            print("No es pot executar lawnmower perquè el dron no està volant.")
+
+            publish_event(origin, "missionError")
 
 
 def on_connect(client, userdata, flags, rc):
