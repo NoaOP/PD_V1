@@ -160,6 +160,7 @@
     <nav class="nav nav-pills nav-justified bg-dark p-2">
         <button class="nav-link active text-white" onclick="abrirTab(event, 'tab-control')">Control</button>
         <button class="nav-link text-white" onclick="abrirTab(event, 'tab-mapa')">Mapa</button>
+        <button class="nav-link text-white" onclick="abrirTab(event, 'tab-juegos')">Jocs</button>
         <button class="nav-link text-white" onclick="abrirTab(event, 'tab-settings')">Configuració</button>
         <button class="nav-link text-white" onclick="abrirTab(event, 'tab-video')">Vídeo</button>
     </nav>
@@ -263,6 +264,25 @@
         </div>
 
         <div id="map" style="height: 400px; background: #eee; border-radius: 10px;"> </div>
+
+
+        <div id="hudJuego"class="card p-3 mb-3 mt-3 shadow" style="display: none; border: 2px solid cadetblue; background-color: #fff8eb;">
+
+            <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+                <span class="fw-bold fs-5">Temps:
+                    <span id="tiempoJuego" class="text-danger">90s</span>
+                </span>
+                <span class="fw-bold fs-5">Progrés:
+                    <span id="progresoJuegoTexto">0%</span>
+                </span>
+            </div>
+
+            <div class="progress" style="height: 25px; border: 2px solid #555; border-radius: 8px;">
+                <div id="barraProgresoJuego" class="progress-bar progress-bar-striped progress-bar-animated bg-warning text-dark fw-bold" role="progressbar" style="width: 0%; transition: width 0.2s;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+            </div>
+        </div>
+
+
         <label class="form-label" >    </label>
 
         <div class="d-flex justify-content-center gap-2 align-items-center mb-2">
@@ -284,6 +304,40 @@
                 <button onclick="moverDron('Up')" class="box">Amunt</button>
                 <button onclick="moverDron('Stop')" class="box">STOP</button>
                 <button onclick="moverDron('Down')" class="box">Avall</button>
+            </div>
+        </div>
+
+
+
+        <!-- Resultado del Juego -->
+        <div id="modalResultado" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center;">
+            <div class="card p-4 text-center shadow-lg" style="max-width: 300px; border-radius: 15px; border: 3px solid cadetblue;">
+                <h2 id="tituloResultado" class="fw-bold mb-3"></h2>
+                <p id="mensajeResultado" class="fs-5"></p>
+                <button class="boton boton-verde mt-3" onclick="cerrarResultado()">D'acord</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Ventana del juego -->
+    <div id="tab-juegos" class="tab-content container mt-3" style="display:none">
+        <h2 class="text-center">Zona de Jocs</h2>
+
+        <div class="card p-4 mt-3" style="background-color: white; border: 2px solid cadetblue;">
+            <label class="form-label fw-bold text-center mb-3" style="font-size: 1.5rem; color: cadetblue;">Elimina els punts!</label>
+            <p class="text-center mb-2">Selecciona una figura</p>
+            <p class="text-center mb-3">Tens 1 minut i mitg per esborrar tots els punts volant sobre ells</p>
+
+            <div class="d-flex gap-2 justify-content-center align-items-center mb-3">
+
+                <select id="selectorFiguraJuego" class="form-select w-50" style="border: 2px solid #555; height: 50px; font-size: 18px;">
+                    <option value="Quadrat">Quadrat</option>
+                    <option value="Cercle">Cercle</option>
+                    <option value="Estrella">Estrella</option>
+                </select>
+
+                <button id="btnNuevoJuego" class="boton boton-blau w-50 m-0" onclick="iniciarJuegoEraser()" style="height: 50px;">Iniciar Repte</button>
             </div>
         </div>
     </div>
@@ -476,6 +530,17 @@
         let polylineLawnmower = null;
         let modoPintura = false;
 
+        let capaPuntosJuego = L.layerGroup();
+        let puntosJuegoActivos = [];
+        const CENTRO_JUEGO = {
+            lat: 41.276389,
+            lng: 1.988694
+        };
+        let juegoActivo = false;
+        let tiempoRestante = 90;
+        let intervaloJuego = null;
+        let totalPuntosJuego = 0;
+
         const configuration = {iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]};
 
 
@@ -531,11 +596,24 @@
                 // Extraemos y guardamos los vértices del polígono
                 zonaPoligono = layer.getLatLngs()[0];
 
+
+
+                const btnDibujar = document.getElementById('btnDibujar');
+                btnDibujar.classList.replace('boton-verde', 'boton-blau');
+                btnDibujar.disabled = true;
+                document.getElementById('btnRellenar').disabled = false;
+
+
+
                 layer.on('click', function(ev) {
                     // Solo actuamos si el usuario ha pulsado primero "Rellenar"
                     if (modoPintura) {
+
                         console.log("¡Clic dentro del polígono detectado!");
-                        document.getElementById('btnRellenar').innerText = "Rellenando...";
+                        const btn = document.getElementById('btnRellenar');
+                        btn.innerText = "Enplenant...";
+                        btn.classList.replace('boton-amarillo', 'boton-verde');
+                        btn.disabled = true; // Evitamos doble clic
 
                         modoPintura = false;
                         document.getElementById('map').classList.remove('cursor-pintura');
@@ -798,26 +876,51 @@
 
             if (topic === "Grup25/autopilotServiceDemo/mobileFlask/missionCompleted") {
                 const btnRellenar = document.getElementById('btnRellenar');
+                const btnDibujar = document.getElementById('btnDibujar');
 
                 if (btnRellenar) {
                     btnRellenar.innerText = "Emplenar";
+                    btnRellenar.disabled = false;
                     btnRellenar.classList.remove('boton-amarillo', 'boton-verde');
                     btnRellenar.classList.add('boton-blau');
-                }
 
+                }
+                if (btnDibujar) {
+                    btnDibujar.disabled = false;
+                }
                 console.log("Rellenado finalizado.");
             }
 
             if (topic === "Grup25/autopilotServiceDemo/mobileFlask/missionError") {
+<!--                const btnRellenar = document.getElementById('btnRellenar');-->
+<!--                const btnDibujar = document.getElementById('btnDibujar');-->
+
+<!--                if (btnRellenar) {-->
+<!--                    btnRellenar.innerText = "Emplenar";-->
+<!--                    btnRellenar.disabled = false;-->
+<!--                    btnRellenar.classList.remove('boton-amarillo', 'boton-verde');-->
+<!--                    btnRellenar.classList.add('boton-blau');-->
+<!--                }-->
+<!--                if (btnDibujar) {-->
+<!--                    btnDibujar.disabled = false;-->
+<!--                }-->
+<!--                alert("No s'ha pogut completar el rellenado.");-->
+<!--                -->
+
+
                 const btnRellenar = document.getElementById('btnRellenar');
+                btnRellenar.disabled = false;
+                btnRellenar.innerText = "Error - Reintenta";
+                btnRellenar.classList.replace('boton-amarillo', 'boton-rojo');
 
-                if (btnRellenar) {
+                setTimeout(() => {
                     btnRellenar.innerText = "Emplenar";
-                    btnRellenar.classList.remove('boton-amarillo', 'boton-verde');
-                    btnRellenar.classList.add('boton-blau');
-                }
+                    btnRellenar.classList.replace('boton-rojo', 'boton-blau');
+                }, 3000);
 
-                alert("No s'ha pogut completar el rellenado.");
+
+
+
             }
 
             if (topic === "Grup25/autopilotServiceDemo/mobileFlask/connected") {
@@ -890,6 +993,32 @@
                     const nuevaPos = [lat, lon];
 
                     droneMarker.setLatLng(nuevaPos);
+
+                    // MOTOR DEL JUEGO
+                    if (juegoActivo === true) {
+                        let dronLatLng = L.latLng(parseFloat(lat), parseFloat(lon));
+                        let puntosBorrados = false;
+                        puntosJuegoActivos = puntosJuegoActivos.filter(punto => {
+                            let puntoLatLng =
+                                L.latLng(parseFloat(punto.lat),
+                                        parseFloat(punto.lng));
+                            if (dronLatLng.distanceTo(puntoLatLng) < 3.0) {
+                                if (capaPuntosJuego.hasLayer(punto.marker)) {
+                                    capaPuntosJuego.removeLayer(punto.marker);
+                                }
+                                client.publish('Grup25/autopilotServiceDemo/mobileFlask/pointDeleted', JSON.stringify({lat: punto.lat, lng: punto.lng}));
+                                puntosBorrados = true;
+                                return false;
+                            }
+                            return true;
+                        });
+
+                        if (puntosBorrados) {
+                            actualizarProgresoJuego();
+                        }
+                    }
+
+
 
                     // Centrar el mapa en el dron automáticamente
                     map.panTo(nuevaPos);
@@ -1107,6 +1236,190 @@
             client.publish('mobileFlask/autopilotServiceDemo/go', direction);
         }
 
+        // Funciones juego
+        // crear punto
+        function crearPuntoJuego(lat, lng) {
+
+            let marker = L.circleMarker([lat, lng], {
+                radius: 5,
+                color: 'red',
+                fillColor: '#ff4444',
+                fillOpacity: 1
+            });
+
+            marker.addTo(capaPuntosJuego);
+            puntosJuegoActivos.push({
+                lat: lat,
+                lng: lng,
+                marker: marker
+            });
+        }
+
+        // generar figuras
+        function generarFiguraJuego(tipo) {
+            capaPuntosJuego.clearLayers();
+            puntosJuegoActivos = [];
+            if (!map.hasLayer(capaPuntosJuego)) {
+                map.addLayer(capaPuntosJuego);
+            }
+            let centro = CENTRO_JUEGO;
+            const mLat = 1 / 111320;
+            const mLng = 1 / (111320 * Math.cos(centro.lat * Math.PI / 180));
+            let radio = 12.5;
+            if (tipo === 'Cercle') {
+
+                for (let i = 0; i < 24; i++) {
+                    let angulo = (i * 360 / 24) * (Math.PI / 180);
+                    crearPuntoJuego(
+                        centro.lat + (radio * Math.cos(angulo) * mLat),
+                        centro.lng + (radio * Math.sin(angulo) * mLng)
+                    );
+                }
+            }
+            else if (tipo === 'Quadrat') {
+                let lado = radio;
+                for(let i=0; i<6; i++)
+                    crearPuntoJuego(centro.lat + lado*mLat, centro.lng + (lado - i*(lado*2/6))*mLng);
+                for(let i=0; i<6; i++)
+                    crearPuntoJuego(centro.lat + (lado - i*(lado*2/6))*mLat, centro.lng - lado*mLng);
+                for(let i=0; i<6; i++)
+                    crearPuntoJuego(centro.lat - lado*mLat, centro.lng - (lado - i*(lado*2/6))*mLng);
+                for(let i=0; i<6; i++)
+                    crearPuntoJuego(centro.lat - (lado - i*(lado*2/6))*mLat, centro.lng + lado*mLng);
+            }
+
+            else if (tipo === 'Estrella') {
+                let vertices = [];
+                for (let i = 0; i < 10; i++) {
+                    let r = (i % 2 === 0) ? 17.5 : 6.25;
+                    let angulo = (i * 360 / 10) * (Math.PI / 180);
+                    vertices.push({
+                        lat: centro.lat + (r * Math.cos(angulo) * mLat),
+                        lng: centro.lng + (r * Math.sin(angulo) * mLng)
+                    });
+                }
+
+                for (let i = 0; i < vertices.length; i++) {
+                    let v1 = vertices[i];
+                    let v2 = vertices[(i + 1) % vertices.length];
+                    crearPuntoJuego(v1.lat, v1.lng);
+                    crearPuntoJuego(
+                        v1.lat + (v2.lat - v1.lat)*0.33,
+                        v1.lng + (v2.lng - v1.lng)*0.33
+                    );
+                    crearPuntoJuego(
+                        v1.lat + (v2.lat - v1.lat)*0.66,
+                        v1.lng + (v2.lng - v1.lng)*0.66
+                    );
+                }
+            }
+        }
+
+        // iniciar juego
+        function iniciarJuegoEraser() {
+            let figura =document.getElementById('selectorFiguraJuego').value;
+            client.publish('Grup25/autopilotServiceDemo/mobileFlask/gameStart', figura);
+            generarFiguraJuego(figura);
+
+            const btn = document.getElementById('btnNuevoJuego');
+            btn.classList.remove('boton-blau');
+            btn.classList.add('boton-verde');
+            btn.innerText = "El joc ha començat, ves al mapa";
+
+            document.getElementById('hudJuego').style.display = 'block';
+            map.panTo([CENTRO_JUEGO.lat, CENTRO_JUEGO.lng]);
+            iniciarCronometro();
+        }
+
+        // Cronometre
+        function iniciarCronometro() {
+            if (intervaloJuego)
+                clearInterval(intervaloJuego);
+
+            tiempoRestante = 90;
+            juegoActivo = true;
+            totalPuntosJuego = puntosJuegoActivos.length;
+            document.getElementById('tiempoJuego').innerText = tiempoRestante + "s";
+            actualizarProgresoJuego();
+            intervaloJuego = setInterval(() => {
+                tiempoRestante--;
+                document.getElementById('tiempoJuego').innerText = tiempoRestante + "s";
+                if (tiempoRestante <= 0)
+                    derrotaJuego();
+            }, 1000);
+        }
+
+        // Progreso
+        function actualizarProgresoJuego() {
+            let borrados = totalPuntosJuego - puntosJuegoActivos.length;
+            let porcentaje =
+                totalPuntosJuego > 0
+                ? Math.round((borrados / totalPuntosJuego) * 100)
+                : 0;
+            let barra = document.getElementById('barraProgresoJuego');
+            barra.style.width = porcentaje + "%";
+            barra.innerText = porcentaje + "%";
+            document.getElementById('progresoJuegoTexto').innerText = porcentaje + "%";
+            if (porcentaje >= 100 && juegoActivo)
+                victoriaJuego();
+        }
+
+
+        // Función para mostrar el resultado de forma bonita
+        function mostrarResultadoJuego(titulo, mensaje, colorBorde) {
+            const modal = document.getElementById('modalResultado');
+            const card = modal.querySelector('.card');
+
+            document.getElementById('tituloResultado').innerText = titulo;
+            document.getElementById('mensajeResultado').innerText = mensaje;
+            card.style.borderColor = colorBorde;
+
+            modal.style.display = 'flex';
+        }
+
+        function cerrarResultado() {
+            document.getElementById('modalResultado').style.display = 'none';
+        }
+
+        // Victoria
+        function victoriaJuego() {
+            juegoActivo = false;
+            clearInterval(intervaloJuego);
+            mostrarResultadoJuego("HAS GUANYAT!", "Has esborrat tots els punts a temps!", "#4CAF50");
+            limpiarInterfazJuego();
+        }
+
+        // Derrota
+        function derrotaJuego() {
+            juegoActivo = false;
+            clearInterval(intervaloJuego);
+            mostrarResultadoJuego("TEMPS EXHAURIT", "No has pogut completar el repte.", "#f44336");
+            limpiarInterfazJuego();
+        }
+
+        // Reiniciar mapa
+        function limpiarInterfazJuego() {
+            document.getElementById('hudJuego').style.display = 'none';
+            capaPuntosJuego.clearLayers();
+
+            const btn = document.getElementById('btnNuevoJuego');
+            if (btn) {
+                btn.classList.remove('boton-verde');
+                btn.classList.add('boton-blau');
+                btn.innerText = "Iniciar Repte";
+            }
+
+            let barra = document.getElementById('barraProgresoJuego');
+            barra.style.width = "0%";
+            barra.innerText = "0%";
+            client.publish('Grup25/autopilotServiceDemo/mobileFlask/gameEnd', 'stop');
+        }
+
+
+
+
+
+
         // mapa i funcions de mapa
         function abrirTab(evt, nombreTab) {
             const contenidos = document.getElementsByClassName("tab-content");
@@ -1208,6 +1521,18 @@
             }
             else if (command.includes("atrás") ) {
                 moverDron('Back');
+            }
+            else if (command.includes("triángulo") ) {
+                hacerTriangulo();
+            }
+            else if (command.includes("cuadrado") ) {
+                hacerCuadrado();
+            }
+            else if (command.includes("redonda") ) {
+                hacerRedonda();
+            }
+            else if (command.includes("corazón") ) {
+                hacerCorazon();
             }
         };
 
@@ -1830,6 +2155,8 @@
 
         function activarDibujo() {
             polygonDrawer.enable();
+            const btn = document.getElementById('btnDibujar');
+            btn.classList.replace('boton-blau', 'boton-verde');
         }
 
         function limpiarZona() {
@@ -1842,14 +2169,18 @@
                 map.removeLayer(polylineLawnmower);
             }
 
-            let btnRellenar = document.getElementById('btnRellenar');
+            // RESET BOTÓN DIBUJAR
+            const btnDibujar = document.getElementById('btnDibujar');
+            btnDibujar.disabled = false;
+            btnDibujar.classList.remove('boton-verde');
+            btnDibujar.classList.add('boton-blau');
 
+            // RESET BOTÓN RELLENAR
+            const btnRellenar = document.getElementById('btnRellenar');
             btnRellenar.disabled = true;
             btnRellenar.innerText = "Emplenar";
-            btnRellenar.classList.remove('boton-amarillo', 'boton-verde');
+            btnRellenar.classList.remove('boton-verde', 'boton-amarillo');
             btnRellenar.classList.add('boton-blau');
-
-            document.getElementById('btnDibujar').disabled = false;
         }
 
         function rellenarZona() {
@@ -1988,6 +2319,9 @@
             // Le inyectamos la clase CSS al contenedor del mapa para cambiar el cursor
             document.getElementById('map').classList.add('cursor-pintura');
 
+            const btn = document.getElementById('btnRellenar');
+            btn.innerText = "Fes clic a la zona...";
+            btn.classList.replace('boton-blau', 'boton-amarillo');
             console.log("Modo pintura activado. Haz clic dentro del polígono.");
         }
 

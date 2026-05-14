@@ -102,6 +102,11 @@
         let estiloRutaActual = { color: 'red', weight: 3, formato: 'solid' };
         const coloresArcoiris = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
 
+        let capaPuntosJuego = L.layerGroup();
+        let puntosJuegoActivos = [];
+        const CENTRO_JUEGO = { lat: 41.276389, lng: 1.988694 };
+        let juegoActivo = false;
+
         function inicializarMapa() {
             const latInicial = 41.276478;
             const lonInicial = 1.988571;
@@ -113,6 +118,7 @@
                 iconSize: [30,30], iconAnchor: [15,15]
             });
             droneMarker = L.marker([latInicial, lonInicial], { icon: droneIcon }).addTo(map);
+            capaPuntosJuego.addTo(map);
         }
 
         window.onload = inicializarMapa;
@@ -128,6 +134,9 @@
             client.subscribe('Grup25/autopilotServiceDemo/+/telemetryInfo');
             client.subscribe('Grup25/autopilotServiceDemo/+/syncVisuals');
             client.subscribe('Grup25/autopilotServiceDemo/+/clearMap');
+            client.subscribe('Grup25/autopilotServiceDemo/+/gameStart');
+            client.subscribe('Grup25/autopilotServiceDemo/+/gameEnd');
+            client.subscribe('Grup25/autopilotServiceDemo/+/pointDeleted');
         });
 
         client.on('message', function (topic, message) {
@@ -164,9 +173,41 @@
                 if (!modoBorrar) ultimoPuntoBorrador = null;
             }
 
-            if (topic.endsWith('/telemetryInfo')) {
+            if (topic.endsWith('/pointDeleted')) {
+                const datosPunto = JSON.parse(message.toString());
+
+                puntosJuegoActivos = puntosJuegoActivos.filter(punto => {
+                    const diffLat = Math.abs(punto.lat - datosPunto.lat);
+                    const diffLng = Math.abs(punto.lng - datosPunto.lng);
+
+                    if (diffLat < 0.00001 && diffLng < 0.00001) {
+                        if (capaPuntosJuego.hasLayer(punto.marker)) {
+                            capaPuntosJuego.removeLayer(punto.marker);
+                        }
+                        return false;
+                    }
+                    return true;
+                });
+            }
+
+            if (topic.endsWith('/gameStart')) {
+                const figura = message.toString();
+                generarFiguraJuego(figura);
+                juegoActivo = true;
+
                 document.getElementById('estadoConexion').className = "badge bg-success p-2";
-                document.getElementById('estadoConexion').innerText = "Veient l’emissió en directe";
+                document.getElementById('estadoConexion').innerText = "S'esta jugant (" + figura.toUpperCase() + ")";
+            }
+
+            if (topic.endsWith('/gameEnd')) {
+                limpiarJuegoEspectador();
+            }
+
+            if (topic.endsWith('/telemetryInfo')) {
+                if (!juegoActivo) {
+                    document.getElementById('estadoConexion').className = "badge bg-success p-2";
+                    document.getElementById('estadoConexion').innerText = "Veient l’emissió en directe";
+                }
 
                 const data = JSON.parse(message.toString());
                 let alt = parseFloat(data.alt !== undefined ? data.alt : data.altitude);
@@ -181,6 +222,22 @@
                     droneMarker.setLatLng(nuevaPos);
                     droneMarker.setRotationAngle(data.heading || 0);
                     map.panTo(nuevaPos);
+
+                    if (juegoActivo) {
+                        let dronLatLng = L.latLng(parseFloat(lat), parseFloat(lon));
+                        puntosJuegoActivos = puntosJuegoActivos.filter(punto => {
+                            let puntoLatLng = L.latLng(parseFloat(punto.lat), parseFloat(punto.lng));
+                            if (dronLatLng.distanceTo(puntoLatLng) < 3.0) {
+                                if (capaPuntosJuego.hasLayer(punto.marker)) {
+                                    capaPuntosJuego.removeLayer(punto.marker);
+                                }
+                                return false;
+                            }
+                            return true;
+                        });
+                    }
+
+
 
                     if (modoBorrar) {
                         if (ultimoPuntoBorrador) borrarConLineaTransparente(ultimoPuntoBorrador, nuevaPos);
@@ -215,6 +272,71 @@
             }
         });
 
+        function crearPuntoJuego(lat, lng) {
+            let marker = L.circleMarker([lat, lng], {
+                radius: 5,
+                color: 'red',
+                fillColor: '#ff4444',
+                fillOpacity: 1
+            }).addTo(capaPuntosJuego);
+
+            puntosJuegoActivos.push({ lat: lat, lng: lng, marker: marker });
+        }
+
+        function generarFiguraJuego(tipo) {
+            capaPuntosJuego.clearLayers();
+            puntosJuegoActivos = [];
+            let centro = CENTRO_JUEGO;
+            const mLat = 1 / 111320;
+            const mLng = 1 / (111320 * Math.cos(centro.lat * Math.PI / 180));
+            let radio = 12.5;
+
+            if (tipo === 'Cercle') {
+                for (let i = 0; i < 24; i++) {
+                    let angulo = (i * 360 / 24) * (Math.PI / 180);
+                    crearPuntoJuego(
+                        centro.lat + (radio * Math.cos(angulo) * mLat),
+                        centro.lng + (radio * Math.sin(angulo) * mLng)
+                    );
+                }
+            }
+            else if (tipo === 'Quadrat') {
+                let lado = radio;
+                for(let i=0; i<6; i++) crearPuntoJuego(centro.lat + lado*mLat, centro.lng + (lado - i*(lado*2/6))*mLng);
+                for(let i=0; i<6; i++) crearPuntoJuego(centro.lat + (lado - i*(lado*2/6))*mLat, centro.lng - lado*mLng);
+                for(let i=0; i<6; i++) crearPuntoJuego(centro.lat - lado*mLat, centro.lng - (lado - i*(lado*2/6))*mLng);
+                for(let i=0; i<6; i++) crearPuntoJuego(centro.lat - (lado - i*(lado*2/6))*mLat, centro.lng + lado*mLng);
+            }
+            else if (tipo === 'Estrella') {
+                let vertices = [];
+                for (let i = 0; i < 10; i++) {
+                    let r = (i % 2 === 0) ? 17.5 : 6.25;
+                    let angulo = (i * 360 / 10) * (Math.PI / 180);
+                    vertices.push({
+                        lat: centro.lat + (r * Math.cos(angulo) * mLat),
+                        lng: centro.lng + (r * Math.sin(angulo) * mLng)
+                    });
+                }
+                for (let i = 0; i < vertices.length; i++) {
+                    let v1 = vertices[i];
+                    let v2 = vertices[(i + 1) % vertices.length];
+                    crearPuntoJuego(v1.lat, v1.lng);
+                    crearPuntoJuego(v1.lat + (v2.lat - v1.lat)*0.33, v1.lng + (v2.lng - v1.lng)*0.33);
+                    crearPuntoJuego(v1.lat + (v2.lat - v1.lat)*0.66, v1.lng + (v2.lng - v1.lng)*0.66);
+                }
+            }
+        }
+
+        function limpiarJuegoEspectador() {
+            juegoActivo = false;
+            capaPuntosJuego.clearLayers();
+            puntosJuegoActivos = [];
+            document.getElementById('estadoConexion').className = "badge bg-success p-2";
+            document.getElementById('estadoConexion').innerText = "Veient l’emissió en directe";
+        }
+
+
+
         function guardarElementoDibujo(elemento) {
             elementosDibujo.push(elemento);
             if (modoTemporal) {
@@ -237,7 +359,7 @@
             };
 
             if (estiloRutaActual.formato === 'dash-short') {
-                // Aumentamos a 12, 15 para que el hueco sea claro
+                // Aumentamos a 6, 6 para que el hueco sea claro
                 opciones.dashArray = '6, 6';
             }
             return opciones;
@@ -427,13 +549,6 @@
                 });
             }
         }
-
-
-
-
-
-
-
 
 
         function borrarConLineaTransparente(posAnterior, posActual) {
