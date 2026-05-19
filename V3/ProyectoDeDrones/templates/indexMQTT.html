@@ -595,6 +595,15 @@
 
                 // Extraemos y guardamos los vértices del polígono
                 zonaPoligono = layer.getLatLngs()[0];
+                modoPintura = false;
+                lawnmowerPath = [];
+
+                if (polylineLawnmower && map.hasLayer(polylineLawnmower)) {
+                    map.removeLayer(polylineLawnmower);
+                }
+
+                polylineLawnmower = null;
+                document.getElementById('map').classList.remove('cursor-pintura');
 
 
 
@@ -605,50 +614,7 @@
 
 
 
-                layer.on('click', function(ev) {
-                    // Solo actuamos si el usuario ha pulsado primero "Rellenar"
-                    if (modoPintura) {
 
-                        console.log("¡Clic dentro del polígono detectado!");
-                        const btn = document.getElementById('btnRellenar');
-                        btn.innerText = "Enplenant...";
-                        btn.classList.replace('boton-amarillo', 'boton-verde');
-                        btn.disabled = true; // Evitamos doble clic
-
-                        modoPintura = false;
-                        document.getElementById('map').classList.remove('cursor-pintura');
-
-                        let separacionDeseada = parseFloat(document.getElementById('inputSeparacionMision').value) || 2.0;
-                        lawnmowerPath = calcularLawnmower(zonaPoligono, separacionDeseada);
-
-                        // Borramos ruta anterior si la hubiera
-                        if (polylineLawnmower) {
-                            map.removeLayer(polylineLawnmower);
-                        }
-
-                        // Dibujamos la previsualización en amarillo
-                        let latlngsToDraw = lawnmowerPath.map(wp => [wp.lat, wp.lng]);
-                        polylineLawnmower = L.polyline(latlngsToDraw, {
-                            color: '#FFD700',
-                            weight: 3,
-                            dashArray: '5, 5',
-                            renderer: L.canvas()
-                        }).addTo(map);
-
-                        let alturaDeseada = parseFloat(document.getElementById('inputAltitudMision').value) || 5.0;
-                        let flightPlan = lawnmowerPath.map(wp => ({
-                            lat: wp.lat,
-                            lon: wp.lng,
-                            alt: alturaDeseada
-                        }));
-
-                        let payload = JSON.stringify(flightPlan);
-                        client.publish('mobileFlask/autopilotServiceDemo/executeLawnmower', payload);
-
-                        console.log("Ruta generada y enviada al dron:", flightPlan);
-
-                    }
-                });
 
                 // Habilitamos rellenar y bloqueamos dibujar para evitar múltiples zonas
                 const btnRellenar = document.getElementById('btnRellenar');
@@ -705,7 +671,7 @@
             contadorArcoiris = 0;
             contadorPurpurina = 0;
 
-            client.publish('Grup212/autopilotServiceDemo/mobileFlask/clearMap', 'clear');
+            client.publish('Grup25/autopilotServiceDemo/mobileFlask/clearMap', 'clear');
 
             console.log("Mapa limpiado correctamente");
         }
@@ -878,6 +844,9 @@
                 const btnRellenar = document.getElementById('btnRellenar');
                 const btnDibujar = document.getElementById('btnDibujar');
 
+                modoPintura = false;
+                document.getElementById('map').classList.remove('cursor-pintura');
+
                 if (btnRellenar) {
                     btnRellenar.innerText = "Emplenar";
                     btnRellenar.disabled = false;
@@ -887,6 +856,8 @@
                 }
                 if (btnDibujar) {
                     btnDibujar.disabled = false;
+                    btnDibujar.classList.remove('boton-verde');
+                    btnDibujar.classList.add('boton-blau');
                 }
                 console.log("Rellenado finalizado.");
             }
@@ -2165,9 +2136,13 @@
 
             drawnItems.clearLayers();
             zonaPoligono = null;
-            if (polylineLawnmower) {
+            if (polylineLawnmower && map.hasLayer(polylineLawnmower)) {
                 map.removeLayer(polylineLawnmower);
             }
+
+            polylineLawnmower = null;
+            lawnmowerPath = [];
+            modoPintura = false;
 
             // RESET BOTÓN DIBUJAR
             const btnDibujar = document.getElementById('btnDibujar');
@@ -2309,20 +2284,66 @@
 
         function prepararRelleno() {
             if (!zonaPoligono || zonaPoligono.length < 3) {
-                alert("Dibuja un polígono válido primero.");
+                alert("Dibuixa una plantilla primer.");
                 return;
             }
 
-            // Activamos el estado lógico
-            modoPintura = true;
-
-            // Le inyectamos la clase CSS al contenedor del mapa para cambiar el cursor
-            document.getElementById('map').classList.add('cursor-pintura');
-
             const btn = document.getElementById('btnRellenar');
-            btn.innerText = "Fes clic a la zona...";
-            btn.classList.replace('boton-blau', 'boton-amarillo');
-            console.log("Modo pintura activado. Haz clic dentro del polígono.");
+
+            btn.innerText = "Emplenant...";
+            btn.disabled = true;
+            btn.classList.remove('boton-blau', 'boton-verde', 'boton-rojo');
+            btn.classList.add('boton-amarillo');
+
+            modoPintura = false;
+            document.getElementById('map').classList.remove('cursor-pintura');
+
+            let separacionDeseada = parseFloat(document.getElementById('inputSeparacionMision').value) || 2.0;
+
+            lawnmowerPath = calcularLawnmower(zonaPoligono, separacionDeseada);
+
+            if (!lawnmowerPath || lawnmowerPath.length < 2) {
+                console.log("No s'ha pogut generar la ruta lawnmower.");
+
+                btn.innerText = "Error - Reintenta";
+                btn.disabled = false;
+                btn.classList.remove('boton-amarillo', 'boton-blau', 'boton-verde');
+                btn.classList.add('boton-rojo');
+
+                setTimeout(() => {
+                    btn.innerText = "Emplenar";
+                    btn.classList.remove('boton-rojo');
+                    btn.classList.add('boton-blau');
+                }, 3000);
+
+                return;
+            }
+
+            if (polylineLawnmower && map.hasLayer(polylineLawnmower)) {
+                map.removeLayer(polylineLawnmower);
+            }
+
+            let latlngsToDraw = lawnmowerPath.map(wp => [wp.lat, wp.lng]);
+
+            polylineLawnmower = L.polyline(latlngsToDraw, {
+                color: '#FFD700',
+                weight: 3,
+                dashArray: '5, 5',
+                renderer: L.canvas()
+            }).addTo(map);
+
+            let alturaDeseada = parseFloat(document.getElementById('inputAltitudMision').value) || 5.0;
+
+            let flightPlan = lawnmowerPath.map(wp => ({
+                lat: wp.lat,
+                lon: wp.lng,
+                alt: alturaDeseada
+            }));
+
+            let payload = JSON.stringify(flightPlan);
+            client.publish('mobileFlask/autopilotServiceDemo/executeLawnmower', payload);
+
+            console.log("Ruta generada i enviada al dron:", flightPlan);
         }
 
 

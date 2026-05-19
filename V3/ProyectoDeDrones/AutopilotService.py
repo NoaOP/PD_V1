@@ -594,37 +594,37 @@ def on_message(cli, userdata, message):
 
     active_origins.add(origin)
 
-    if command == "connect":
-        if dron.state != "disconnected":
-            publish_event(origin, "connected")
-        else:
-            print("Connectant directament via COM3...")
-            dron.connect(
-                "COM3",  # Forcem el port COM3
-                57600,  # Velocitat típica de ràdio (canvia a 115200 si uses cable USB)
-                freq=4,
-                blocking=False,
-                # Afegim l'activació de telemetria al callback perquè funcioni el mapa al moment
-                callback=lambda: (
-                    publish_event(origin, "connected"),
-                    dron.send_telemetry_info(publish_telemetry_info)
-                )
-            )
-
     # if command == "connect":
     #     if dron.state != "disconnected":
-    #         # Ja connectat: resposta immediata
-    #         publish_event(origin,"connected")
+    #         publish_event(origin, "connected")
     #     else:
-    #         # Connexio no bloquejant perque vagi fluid el MQTT
-    #         print("Conectando via MAVProxy...")
+    #         print("Connectant directament via COM3...")
     #         dron.connect(
-    #             MAVPROXY_AUTOPILOT_ENDPOINT,
-    #             MAVPROXY_AUTOPILOT_BAUD,
+    #             "COM3",  # Forcem el port COM3
+    #             57600,  # Velocitat típica de ràdio (canvia a 115200 si uses cable USB)
     #             freq=4,
     #             blocking=False,
-    #             callback = lambda: publish_event(origin, "connected")
+    #             # Afegim l'activació de telemetria al callback perquè funcioni el mapa al moment
+    #             callback=lambda: (
+    #                 publish_event(origin, "connected"),
+    #                 dron.send_telemetry_info(publish_telemetry_info)
+    #             )
     #         )
+
+    if command == "connect":
+        if dron.state != "disconnected":
+            # Ja connectat: resposta immediata
+            publish_event(origin,"connected")
+        else:
+            # Connexio no bloquejant perque vagi fluid el MQTT
+            print("Conectando via MAVProxy...")
+            dron.connect(
+                MAVPROXY_AUTOPILOT_ENDPOINT,
+                MAVPROXY_AUTOPILOT_BAUD,
+                freq=4,
+                blocking=False,
+                callback = lambda: publish_event(origin, "connected")
+            )
 
      # afegit per la simulacio de la web app
     elif command == 'Simulacion':
