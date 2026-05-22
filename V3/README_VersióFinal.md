@@ -31,7 +31,24 @@ A la part superior de la pestanya es troben les eines principals de dibuix:
 
 **· Netejar:** elimina el dibuix o la trajectòria mostrada, permetent començar de nou.
 
-**· Imatge:**
+**· Imatge:** es realitza una captura de pantalla del mapa que es descarrega al dispositiu directament amb el nom "DronLab Paint EETAC", la data i l'hora.
 
 El mapa permet veure la posició GPS del dron en temps real i seguir el seu desplaçament mentre es mou. D’aquesta manera, l’usuari pot comprovar visualment si el dron està seguint correctament la trajectòria desitjada i si el dibuix generat coincideix amb el resultat esperat.
 A més, aquesta pestanya incorpora controls manuals addicionals, com un joystick de moviment i botons per modificar l’altitud del dron. Això permet fer petits ajustos directament des del mapa sense haver de tornar a la pestanya de control. També es mostra un missatge d’estat que indica si el dron està preparat per volar o si encara s’ha d’iniciar el vol.
+
+
+## PESTANYA DE LA ZONA DE JOCS
+La pestanya de jocs permet a l’usuari iniciar un repte interactiu. L’objectiu principal del joc és controlar el dron manualment i aconseguir passar per sobre de tots els punts que formen la figura seleccionada abans que s’acabi el temps del cronòmetre.
+
+Abans d’iniciar el repte, l’usuari pot seleccionar una de les figures disponibles. Aquestes figures estan organitzades segons el nivell de dificultat:
+
+**· Quadrat:** figura més senzilla.
+
+**· Cercle:** figura de dificultat intermèdia.
+
+**· Estrella:** figura més complexa.
+
+Un cop seleccionada la figura, l’usuari pot prémer el botó Iniciar Repte. A partir d’aquest moment, comença el compte enrere i apareixen els punts que formen la figura. 
+Si s'acaba el temps i no s'ha pogut completar el repte apareix a la pantalla el següent missatge:
+
+
