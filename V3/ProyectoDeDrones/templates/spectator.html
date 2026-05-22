@@ -131,12 +131,12 @@
 
         client.on('connect', function () {
             console.log('Espectador conectado al broker');
-            client.subscribe('Grup25/autopilotServiceDemo/+/telemetryInfo');
-            client.subscribe('Grup25/autopilotServiceDemo/+/syncVisuals');
-            client.subscribe('Grup25/autopilotServiceDemo/+/clearMap');
-            client.subscribe('Grup25/autopilotServiceDemo/+/gameStart');
-            client.subscribe('Grup25/autopilotServiceDemo/+/gameEnd');
-            client.subscribe('Grup25/autopilotServiceDemo/+/pointDeleted');
+            client.subscribe('Grup99/autopilotServiceDemo/+/telemetryInfo');
+            client.subscribe('Grup99/autopilotServiceDemo/+/syncVisuals');
+            client.subscribe('Grup99/autopilotServiceDemo/+/clearMap');
+            client.subscribe('Grup99/autopilotServiceDemo/+/gameStart');
+            client.subscribe('Grup99/autopilotServiceDemo/+/gameEnd');
+            client.subscribe('Grup99/autopilotServiceDemo/+/pointDeleted');
         });
 
         client.on('message', function (topic, message) {

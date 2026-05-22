@@ -297,7 +297,7 @@
 
         <div class="d-flex justify-content-around align-items-center mt-4" style="background: #333; border-radius: 15px; padding: 20px;">
             <div id="joystick-container" style="width: 150px; height: 150px; position: relative; background: #444; border-radius: 50%;">
-                <p style="color: white; position: absolute; bottom: -30px; width: 100%; text-align: center;">Movimient</p>
+                <p style="color: white; position: absolute; bottom: -30px; width: 100%; text-align: center;">Moviment</p>
             </div>
 
             <div class="d-flex flex-column gap-2" style="width: 100px;">
@@ -671,7 +671,7 @@
             contadorArcoiris = 0;
             contadorPurpurina = 0;
 
-            client.publish('Grup25/autopilotServiceDemo/mobileFlask/clearMap', 'clear');
+            client.publish('Grup99/autopilotServiceDemo/mobileFlask/clearMap', 'clear');
 
             console.log("Mapa limpiado correctamente");
         }
@@ -769,7 +769,7 @@
 
         client.on('connect', function () {
             console.log('Conectado al broker MQTT');
-            client.subscribe('Grup25/autopilotServiceDemo/mobileFlask/#');
+            client.subscribe('Grup99/autopilotServiceDemo/mobileFlask/#');
             publicarEstadoVisual();
         });
 
@@ -777,7 +777,7 @@
             console.log("Mensaje recibido en:", topic, "Contenido:", message.toString());
 
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/paintOn") {
+            if (topic === "Grup99/autopilotServiceDemo/mobileFlask/paintOn") {
                 pol = true;
 
                 const btn = document.getElementById("botonPintar");
@@ -791,7 +791,7 @@
                 console.log("Pintura activada automáticamente por el AutopilotService");
             }
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/paintOff") {
+            if (topic === "Grup99/autopilotServiceDemo/mobileFlask/paintOff") {
                 pol = false;
 
                 const btn = document.getElementById("botonPintar");
@@ -805,7 +805,7 @@
                 console.log("Pintura desactivada automáticamente por el AutopilotService");
             }
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/textDone") {
+            if (topic === "Grup99/autopilotServiceDemo/mobileFlask/textDone") {
                 const btn = document.getElementById('botonEscribirTexto');
 
                 if (btn) {
@@ -822,7 +822,7 @@
                 console.log("El dron ha acabat d'escriure el text.");
             }
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/textError") {
+            if (topic === "Grup99/autopilotServiceDemo/mobileFlask/textError") {
                 const btn = document.getElementById('botonEscribirTexto');
 
                 if (btn) {
@@ -840,7 +840,7 @@
                 alert("No s'ha pogut escriure el text. Comprova que el dron estigui volant.");
             }
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/missionCompleted") {
+            if (topic === "Grup99/autopilotServiceDemo/mobileFlask/missionCompleted") {
                 const btnRellenar = document.getElementById('btnRellenar');
                 const btnDibujar = document.getElementById('btnDibujar');
 
@@ -862,7 +862,7 @@
                 console.log("Rellenado finalizado.");
             }
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/missionError") {
+            if (topic === "Grup99/autopilotServiceDemo/mobileFlask/missionError") {
 <!--                const btnRellenar = document.getElementById('btnRellenar');-->
 <!--                const btnDibujar = document.getElementById('btnDibujar');-->
 
@@ -894,7 +894,7 @@
 
             }
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/connected") {
+            if (topic === "Grup99/autopilotServiceDemo/mobileFlask/connected") {
                 console.log("El dron confirma conexión. Pidiendo telemetría...");
 
                 const botonDespegar = document.getElementById('botonDespegar');
@@ -915,7 +915,7 @@
 
 
             // Escuchar los datos de telemetría
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/telemetryInfo") {
+            if (topic === "Grup99/autopilotServiceDemo/mobileFlask/telemetryInfo") {
 
 
                 // Si me llega telemetría, significa que estamos conectados
@@ -977,7 +977,7 @@
                                 if (capaPuntosJuego.hasLayer(punto.marker)) {
                                     capaPuntosJuego.removeLayer(punto.marker);
                                 }
-                                client.publish('Grup25/autopilotServiceDemo/mobileFlask/pointDeleted', JSON.stringify({lat: punto.lat, lng: punto.lng}));
+                                client.publish('Grup99/autopilotServiceDemo/mobileFlask/pointDeleted', JSON.stringify({lat: punto.lat, lng: punto.lng}));
                                 puntosBorrados = true;
                                 return false;
                             }
@@ -1101,13 +1101,13 @@
                 }
             }
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/videoOffer") {
+            if (topic === "Grup99/autopilotServiceDemo/mobileFlask/videoOffer") {
                 const data = JSON.parse(message.toString());
                 console.log("Oferta de video recibida del dron");
                 recibirVideo(data.offer);
             }
 
-            if (topic === "Grup25/autopilotServiceDemo/mobileFlask/iceCandidate") {
+            if (topic === "Grup99/autopilotServiceDemo/mobileFlask/iceCandidate") {
                 const data = JSON.parse(message.toString());
                 if (pc && data.candidate) {
                     pc.addIceCandidate(new RTCIceCandidate(data.candidate));
@@ -1289,7 +1289,7 @@
         // iniciar juego
         function iniciarJuegoEraser() {
             let figura =document.getElementById('selectorFiguraJuego').value;
-            client.publish('Grup25/autopilotServiceDemo/mobileFlask/gameStart', figura);
+            client.publish('Grup99/autopilotServiceDemo/mobileFlask/gameStart', figura);
             generarFiguraJuego(figura);
 
             const btn = document.getElementById('btnNuevoJuego');
@@ -1383,7 +1383,7 @@
             let barra = document.getElementById('barraProgresoJuego');
             barra.style.width = "0%";
             barra.innerText = "0%";
-            client.publish('Grup25/autopilotServiceDemo/mobileFlask/gameEnd', 'stop');
+            client.publish('Grup99/autopilotServiceDemo/mobileFlask/gameEnd', 'stop');
         }
 
 
@@ -2357,7 +2357,7 @@
                 borrar: modoBorrar,
                 temporal: modoTemporal
             };
-            client.publish('Grup25/autopilotServiceDemo/mobileFlask/syncVisuals', JSON.stringify(estadoVisual));
+            client.publish('Grup99/autopilotServiceDemo/mobileFlask/syncVisuals', JSON.stringify(estadoVisual));
         }
 
     </script>

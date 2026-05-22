@@ -19,7 +19,7 @@ last_telemetry_info = None
 writing_lock = threading.Lock()
 
 # MAVProxy endpoint per a l'AutopilotService (port diferent del dashboard local)
-MAVPROXY_AUTOPILOT_ENDPOINT = os.getenv("MAVPROXY_AUTOPILOT_ENDPOINT", "udp:127.0.0.1:14551")
+MAVPROXY_AUTOPILOT_ENDPOINT = os.getenv("MAVPROXY_AUTOPILOT_ENDPOINT", "udp:127.0.0.1:14552")
 MAVPROXY_AUTOPILOT_BAUD     = int(os.getenv("MAVPROXY_AUTOPILOT_BAUD", "115200"))
 
 MQTT_BROKER_HOST = os.getenv("MQTT_BROKER_HOST", "dronseetac.upc.edu")
@@ -37,7 +37,7 @@ def publish_event(origin, event):
     global client
 
 
-    topic = "Grup25/autopilotServiceDemo/" + origin + "/" + event
+    topic = "Grup99/autopilotServiceDemo/" + origin + "/" + event
 
     client.publish(topic)
 
@@ -56,7 +56,7 @@ def publish_telemetry_info(telemetry_info):
 
     for origin in active_origins:
 
-        topic = "Grup25/autopilotServiceDemo/" + origin + "/telemetryInfo"
+        topic = "Grup99/autopilotServiceDemo/" + origin + "/telemetryInfo"
         client.publish(topic, json.dumps(telemetry_info))
 
 
