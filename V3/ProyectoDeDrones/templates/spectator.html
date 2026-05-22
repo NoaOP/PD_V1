@@ -137,6 +137,8 @@
             client.subscribe('Grup99/autopilotServiceDemo/+/gameStart');
             client.subscribe('Grup99/autopilotServiceDemo/+/gameEnd');
             client.subscribe('Grup99/autopilotServiceDemo/+/pointDeleted');
+            client.subscribe('Grup99/autopilotServiceDemo/+/paintOn');
+            client.subscribe('Grup99/autopilotServiceDemo/+/paintOff');
         });
 
         client.on('message', function (topic, message) {
@@ -156,7 +158,7 @@
             contadorArcoiris = 0;
             contadorPurpurina = 0;
             return;
-        }
+            }
 
             if (topic.endsWith('/syncVisuals')) {
                 const config = JSON.parse(message.toString());
@@ -269,6 +271,17 @@
                         ultimoPuntoRuta = nuevaPos;
                     }
                 }
+            }
+            if (topic.endsWith('/paintOn')) {
+                pol = true;
+                ultimoPuntoRuta = null;
+                lineaTrazoActual = null;
+            }
+
+            if (topic.endsWith('/paintOff')) {
+                pol = false;
+                ultimoPuntoRuta = null;
+                lineaTrazoActual = null;
             }
         });
 

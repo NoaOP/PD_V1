@@ -789,6 +789,7 @@
                 lineaTrazoActual = null;
 
                 console.log("Pintura activada automáticamente por el AutopilotService");
+                publicarEstadoVisual();
             }
 
             if (topic === "Grup99/autopilotServiceDemo/mobileFlask/paintOff") {
@@ -803,6 +804,7 @@
                 lineaTrazoActual = null;
 
                 console.log("Pintura desactivada automáticamente por el AutopilotService");
+                publicarEstadoVisual();
             }
 
             if (topic === "Grup99/autopilotServiceDemo/mobileFlask/textDone") {
