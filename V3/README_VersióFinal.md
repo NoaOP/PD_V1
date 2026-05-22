@@ -23,6 +23,11 @@ Des d’aquesta pestanya es poden realitzar les funcions següents:
 
 Els controls de moviment estan organitzats en diferents blocs. El primer bloc permet moure el dron segons les direccions cardinals, com nord, sud, est i oest. El segon bloc permet controlar el moviment respecte a l’orientació pròpia del dron, amb ordres com endavant, enrere, esquerra i dreta. Finalment, el tercer bloc permet modificar l’altitud mitjançant els comandaments d’amunt i avall. També proporciona funcions de seguretat importants, com aturar el moviment, aterrar el dron o fer-lo tornar automàticament al punt inicial mitjançant el mode RTL.
 
+<p align="center">
+<img style="width:auto; height:200px" alt="WhatsApp Image 2026-05-20 at 12 31 44" src="https://github.com/user-attachments/assets/17b23ee7-a257-4973-99fc-2bad805e947f" />
+</p>
+
+
 ## PESTANYA DE VISUALITZACIÓ DEL MAPA
 La pestanya de mapa és l’apartat principal des d’on l’usuari pot visualitzar la posició del dron i utilitzar-lo com a eina de dibuix sobre una zona geogràfica. Aquesta secció mostra un mapa interactiu amb la ubicació del dron.
 A la part superior de la pestanya es troben les eines principals de dibuix:
@@ -31,7 +36,40 @@ A la part superior de la pestanya es troben les eines principals de dibuix:
 
 **· Netejar:** elimina el dibuix o la trajectòria mostrada, permetent començar de nou.
 
-**· Imatge:**
+**· Imatge:** es realitza una captura de pantalla del mapa que es descarrega al dispositiu directament amb el nom "DronLab Paint EETAC", la data i l'hora.
 
 El mapa permet veure la posició GPS del dron en temps real i seguir el seu desplaçament mentre es mou. D’aquesta manera, l’usuari pot comprovar visualment si el dron està seguint correctament la trajectòria desitjada i si el dibuix generat coincideix amb el resultat esperat.
 A més, aquesta pestanya incorpora controls manuals addicionals, com un joystick de moviment i botons per modificar l’altitud del dron. Això permet fer petits ajustos directament des del mapa sense haver de tornar a la pestanya de control. També es mostra un missatge d’estat que indica si el dron està preparat per volar o si encara s’ha d’iniciar el vol.
+
+<p align="center">
+<img style="width:auto; height:200px" alt="WhatsApp Image 2026-05-20 at 12 47 03" src="https://github.com/user-attachments/assets/19f32c19-d8b7-4c2e-8865-514875708120" />
+</p>
+
+
+
+## PESTANYA DE LA ZONA DE JOCS
+La pestanya de jocs permet a l’usuari iniciar un repte interactiu. L’objectiu principal del joc és controlar el dron manualment i aconseguir passar per sobre de tots els punts que formen la figura seleccionada abans que s’acabi el temps del cronòmetre.
+
+<p align="center">
+<img style="width:auto; height:200px" alt="Captura de pantalla 2026-05-22 202222" src="https://github.com/user-attachments/assets/04b21590-fb43-40f7-b673-d714ef37fe1c" />
+</p>
+
+Abans d’iniciar el repte, l’usuari pot seleccionar una de les figures disponibles. Aquestes figures estan organitzades segons el nivell de dificultat:
+
+**· Quadrat:** figura més senzilla.
+
+**· Cercle:** figura de dificultat intermèdia.
+
+**· Estrella:** figura més complexa.
+
+Un cop seleccionada la figura, l’usuari pot prémer el botó Iniciar Repte. A partir d’aquest moment, comença el compte enrere i apareixen els punts que formen la figura. 
+Si s'acaba el temps i no s'ha pogut completar el repte apareix a la pantalla el següent missatge:
+
+
+<p align="center">
+<img style="width:auto; height:200px" alt="Captura de pantalla 2026-05-22 201759" src="https://github.com/user-attachments/assets/b0c1752c-8c21-4b2c-af03-e6d4367cfa42" />
+</p>
+
+
+## PESTANYA CONFIGURACIÓ
+
