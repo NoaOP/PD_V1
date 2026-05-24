@@ -66,10 +66,5 @@ Un cop seleccionada la figura, l’usuari pot prémer el botó Iniciar Repte. A 
 Si s'acaba el temps i no s'ha pogut completar el repte apareix a la pantalla el següent missatge:
 
 
-<p align="center">
-<img style="width:auto; height:200px" alt="Captura de pantalla 2026-05-22 201759" src="https://github.com/user-attachments/assets/b0c1752c-8c21-4b2c-af03-e6d4367cfa42" />
-</p>
-
-
 ## PESTANYA CONFIGURACIÓ
 
