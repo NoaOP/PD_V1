@@ -1702,6 +1702,24 @@
             let opciones = obtenerOpcionesLinea();
             opciones.color = obtenerColorDibujo();
 
+            // Si la línia temporal està activada, cada tram ha de ser independent.
+            // Així s'esborra només el tros que fa 10 segons que s'ha pintat,
+            // no tota la línia completa.
+            if (modoTemporal === true) {
+                const linea = L.polyline([pos1, pos2], {
+                    ...opciones,
+                    renderer: L.canvas()
+                }).addTo(map);
+
+                guardarElementoDibujo({
+                    tipo: 'linea',
+                    layer: linea,
+                    puntos: [pos1, pos2]
+                });
+
+                return;
+            }
+
             // Si està activat arcoíris i línia discontínua curta,
             // dibuixem un segment sí i un segment no
             if (modoArcoiris === true && estiloRutaActual.formato === 'dash-short') {
@@ -1728,7 +1746,6 @@
             // Si està activat arcoíris però NO és discontínua,
             // fem segments separats perquè cada tros tingui un color diferent
             if (modoArcoiris === true) {
-
                 const linea = L.polyline([pos1, pos2], {
                     ...opciones,
                     renderer: L.canvas()
@@ -1743,10 +1760,9 @@
                 return;
             }
 
-            // Línia normal o discontínua curta sense arcoíris
+            // Línia normal sense mode temporal
             if (lineaTrazoActual === null) {
-
-               lineaTrazoActual = L.polyline([pos1, pos2], {
+                lineaTrazoActual = L.polyline([pos1, pos2], {
                     ...opciones,
                     renderer: L.canvas()
                 }).addTo(map);
