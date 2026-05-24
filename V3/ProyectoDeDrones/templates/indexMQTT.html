@@ -1196,6 +1196,7 @@
             document.getElementById('headingValor').innerText = valor;
             // Enviamos el comando al dron
             client.publish('mobileFlask/autopilotServiceDemo/changeHeading', valor.toString());
+            publicarEstadoVisual();
         }
 
         function cambiarSpeed(valor) {
@@ -2366,6 +2367,7 @@
 
 
 
+        // Funcion para pasar informacion de modo piloto a modo espectador
         function publicarEstadoVisual() {
             const estadoVisual = {
                 pol: pol,
@@ -2373,7 +2375,8 @@
                 arcoiris: modoArcoiris,
                 purpurina: modoPurpurina,
                 borrar: modoBorrar,
-                temporal: modoTemporal
+                temporal: modoTemporal,
+                heading: document.getElementById('headingValor').innerText
             };
             client.publish('Grup99/autopilotServiceDemo/mobileFlask/syncVisuals', JSON.stringify(estadoVisual));
         }

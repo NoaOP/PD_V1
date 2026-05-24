@@ -168,6 +168,9 @@
                 modoPurpurina = config.purpurina;
                 modoBorrar = config.borrar;
                 modoTemporal = config.temporal;
+                if (config.heading !== undefined) {
+                    document.getElementById('headingValor').innerText = config.heading;
+                }
                 lineaTrazoActual = null;
                 ultimoPuntoRuta = null;
 
@@ -214,7 +217,7 @@
                 const data = JSON.parse(message.toString());
                 let alt = parseFloat(data.alt !== undefined ? data.alt : data.altitude);
                 document.getElementById('altitudValor').innerText = isNaN(alt) ? "0.00" : alt.toFixed(2);
-                document.getElementById('headingValor').innerText = data.heading || "0";
+
 
                 const lat = data.lat || data.latitude;
                 const lon = data.lng || data.lon || data.longitude;
@@ -358,6 +361,10 @@
                         map.removeLayer(elemento.layer);
                     }
                     elementosDibujo = elementosDibujo.filter(e => e !== elemento);
+                    if (lineaTrazoActual === elemento.layer) {
+                        lineaTrazoActual = null;
+                        ultimoPuntoRuta = null;
+                    }
                 }, 10000);
             }
         }
@@ -394,6 +401,22 @@
         function añadirSegmentoLinea(pos1, pos2) {
             let opciones = obtenerOpcionesLinea();
             opciones.color = obtenerColorDibujo();
+
+            // Para la linea de 10 s
+            if (modoTemporal === true) {
+                const linea = L.polyline([pos1, pos2], {
+                ...opciones,
+                renderer: L.canvas()
+            }).addTo(map);
+
+            guardarElementoDibujo({
+                tipo: 'linea',
+                layer: linea,
+                puntos: [pos1, pos2]
+            });
+
+            return;
+        }
 
             // Si està activat arcoíris i línia discontínua curta,
             // dibuixem un segment sí i un segment no
