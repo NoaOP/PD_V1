@@ -1,4 +1,5 @@
-# VERSIÓ FINAL
+
+## Drone Paint WebApp ✈️ 🖌️
 
 ## Introducció
 Aquest projecte té com a objectiu utilitzar el dron com si fos una eina de dibuix, semblant a una eina de Paint, permetent crear trajectòries, figures i formes directament des d’una WebApp. A través de la web, l’usuari pot controlar el moviment del dron, configurar l’estil del traç i visualitzar en temps real el recorregut que s’està generant.
@@ -14,8 +15,7 @@ D’altra banda, el mode espectador està destinat a aquells usuaris que només 
 
 
 
-
-## Pestanya de control
+## Pestanya de control 🛫 🛬 🏠
 La pestanya de control és l’apartat principal des d’on l’usuari pot manejar el dron de manera manual. Aquesta secció permet establir la connexió amb el dron, ja sigui mitjançant MAVProxy o a través del simulador, i executar les accions bàsiques necessàries abans d’iniciar qualsevol operació de dibuix.
 
 Des d’aquesta pestanya es poden realitzar les funcions següents:
@@ -40,15 +40,15 @@ Els controls de moviment estan organitzats en diferents blocs. El primer bloc pe
 </p>
 
 
-## PESTANYA DE VISUALITZACIÓ DEL MAPA
+## PESTANYA DE VISUALITZACIÓ DEL MAPA 🗺️
 La pestanya de mapa és l’apartat principal des d’on l’usuari pot visualitzar la posició del dron i utilitzar-lo com a eina de dibuix sobre una zona geogràfica. Aquesta secció mostra un mapa interactiu amb la ubicació del dron.
 A la part superior de la pestanya es troben les eines principals de dibuix:
 
-**· Pintar:** Activa el mode de dibuix perquè el moviment del dron quedi representat sobre el mapa.
+🎨 **· Pintar:** Activa el mode de dibuix perquè el moviment del dron quedi representat sobre el mapa.
 
-**· Netejar:** Elimina el dibuix o la trajectòria mostrada, permetent començar de nou.
+🧽 **· Netejar:** Elimina el dibuix o la trajectòria mostrada, permetent començar de nou.
 
-**· Imatge:** Es realitza una captura de pantalla del mapa que es descarrega al dispositiu directament amb el nom "DronLab Paint EETAC", la data i l'hora.
+🖼️ **· Imatge:** Es realitza una captura de pantalla del mapa que es descarrega al dispositiu directament amb el nom "DronLab Paint EETAC", la data i l'hora.
 
 El mapa permet veure la posició GPS del dron en temps real i seguir el seu desplaçament mentre es mou. D’aquesta manera, l’usuari pot comprovar visualment si el dron està seguint correctament la trajectòria desitjada i si el dibuix generat coincideix amb el resultat esperat.
 A més, aquesta pestanya incorpora controls manuals addicionals, com un joystick de moviment i botons per modificar l’altitud del dron. Això permet fer petits ajustos directament des del mapa sense haver de tornar a la pestanya de control. També es mostra un missatge d’estat que indica si el dron està preparat per volar o si encara s’ha d’iniciar el vol.
@@ -59,7 +59,7 @@ A més, aquesta pestanya incorpora controls manuals addicionals, com un joystick
 
 
 
-## PESTANYA DE LA ZONA DE JOCS
+## PESTANYA DE LA ZONA DE JOCS 🎮
 La pestanya de jocs permet a l’usuari iniciar un repte interactiu. L’objectiu principal del joc és controlar el dron manualment i aconseguir passar per sobre de tots els punts que formen la figura seleccionada abans que s’acabi el temps del cronòmetre.
 
 <p align="center">
@@ -68,17 +68,17 @@ La pestanya de jocs permet a l’usuari iniciar un repte interactiu. L’objecti
 
 Abans d’iniciar el repte, l’usuari pot seleccionar una de les figures disponibles. Aquestes figures estan organitzades segons el nivell de dificultat:
 
-**· Quadrat:** Figura més senzilla.
+⬛ **· Quadrat:** Figura més senzilla.
 
-**· Cercle:** Figura de dificultat intermèdia.
+⭕ **· Cercle:** Figura de dificultat intermèdia.
 
-**· Estrella:** Figura més complexa.
+⭐ **· Estrella:** Figura més complexa.
 
 Un cop seleccionada la figura, l’usuari pot prémer el botó Iniciar Repte. A partir d’aquest moment, comença el compte enrere i apareixen els punts que formen la figura. 
 Si s'acaba el temps i no s'ha pogut completar el repte apareix a la pantalla el següent missatge:
 
 
-## PESTANYA CONFIGURACIÓ
+## PESTANYA CONFIGURACIÓ ⚙️
 
 La pestanya de configuració permet personalitzar l’aspecte del dibuix que es genera sobre el mapa. Aquesta secció està pensada perquè l’usuari pugui modificar diferents paràmetres visuals de la trajectòria abans o durant l’ús del dron com a eina de dibuix.
 
@@ -120,7 +120,7 @@ Aquesta pestanya també incorpora una eina per escriure text amb el dron. L’us
 </p>
 
 
-## PESTANYA DE VÍDEO
+## PESTANYA DE VÍDEO 📹
 
 La pestanya de vídeo està preparada per permetre la transmissió d’imatge en temps real des del dron. Aquesta secció inclou els botons per iniciar i detenir el vídeo, així com una zona central on es mostraria la imatge capturada per la càmera. La seva finalitat és que, si en un futur s’instal·la una càmera al dron, l’usuari pugui visualitzar directament des de la WebApp el que el dron està captant durant el vol.
 Aquesta pestanya podria ser especialment útil durant les operacions de dibuix, ja que permetria supervisar l’entorn del dron en temps real i comprovar visualment que el moviment s’està executant correctament.
@@ -131,5 +131,3 @@ Aquesta pestanya podria ser especialment útil durant les operacions de dibuix, 
 <img style="width:auto; height:250px" alt="image" src="https://github.com/user-attachments/assets/7b933dfa-6e22-4635-bbe0-cb901de95435" />
 </p>
 
-
-![Uploading image.png…]()
