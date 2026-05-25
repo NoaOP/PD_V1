@@ -1,7 +1,19 @@
 # VERSIÓ FINAL
 
 ## Introducció
-comentar que hi ha modo pilot y modo espectador
+Aquest projecte té com a objectiu utilitzar el dron com si fos una eina de dibuix, semblant a una eina de Paint, permetent crear trajectòries, figures i formes directament des d’una WebApp. A través de la web, l’usuari pot controlar el moviment del dron, configurar l’estil del traç i visualitzar en temps real el recorregut que s’està generant.
+
+La WebApp està dividida en dos modes principals: el mode pilot i el mode espectador. El mode pilot està pensat per a la persona encarregada de controlar el dron i realitzar els dibuixos. Des d’aquest mode es poden executar les accions principals, com connectar el dron, enlairar-lo, moure’l, modificar la trajectòria, canviar els paràmetres del dibuix i utilitzar les diferents eines disponibles.
+
+D’altra banda, el mode espectador està destinat a aquells usuaris que només volen observar el que s’està dibuixant, sense intervenir en el control del dron. Aquest mode mostra informació bàsica del vol, com l’altitud i el heading, així com la posició del dron en temps real sobre el mapa. D’aquesta manera, qualsevol espectador pot seguir l’evolució del dibuix mentre el pilot executa els moviments.
+
+<p align="center">
+<img style="width:auto; height:250px" alt="image" src="https://github.com/user-attachments/assets/cf1fada8-595a-4dd9-b3ab-d95e9df37d2a" />
+</p>
+
+
+
+
 
 ## Pestanya de control
 La pestanya de control és l’apartat principal des d’on l’usuari pot manejar el dron de manera manual. Aquesta secció permet establir la connexió amb el dron, ja sigui mitjançant MAVProxy o a través del simulador, i executar les accions bàsiques necessàries abans d’iniciar qualsevol operació de dibuix.
@@ -24,7 +36,7 @@ Des d’aquesta pestanya es poden realitzar les funcions següents:
 Els controls de moviment estan organitzats en diferents blocs. El primer bloc permet moure el dron segons les direccions cardinals, com nord, sud, est i oest. El segon bloc permet controlar el moviment respecte a l’orientació pròpia del dron, amb ordres com endavant, enrere, esquerra i dreta. Finalment, el tercer bloc permet modificar l’altitud mitjançant els comandaments d’amunt i avall. També proporciona funcions de seguretat importants, com aturar el moviment, aterrar el dron o fer-lo tornar automàticament al punt inicial mitjançant el mode RTL.
 
 <p align="center">
-<img style="width:auto; height:200px" alt="WhatsApp Image 2026-05-20 at 12 31 44" src="https://github.com/user-attachments/assets/17b23ee7-a257-4973-99fc-2bad805e947f" />
+<img style="width:auto; height:250px" alt="WhatsApp Image 2026-05-20 at 12 31 44" src="https://github.com/user-attachments/assets/17b23ee7-a257-4973-99fc-2bad805e947f" />
 </p>
 
 
@@ -42,7 +54,7 @@ El mapa permet veure la posició GPS del dron en temps real i seguir el seu desp
 A més, aquesta pestanya incorpora controls manuals addicionals, com un joystick de moviment i botons per modificar l’altitud del dron. Això permet fer petits ajustos directament des del mapa sense haver de tornar a la pestanya de control. També es mostra un missatge d’estat que indica si el dron està preparat per volar o si encara s’ha d’iniciar el vol.
 
 <p align="center">
-<img style="width:auto; height:200px" alt="WhatsApp Image 2026-05-20 at 12 47 03" src="https://github.com/user-attachments/assets/19f32c19-d8b7-4c2e-8865-514875708120" />
+<img style="width:auto; height:250px" alt="WhatsApp Image 2026-05-20 at 12 47 03" src="https://github.com/user-attachments/assets/19f32c19-d8b7-4c2e-8865-514875708120" />
 </p>
 
 
@@ -104,5 +116,20 @@ Aquesta pestanya també incorpora una eina per escriure text amb el dron. L’us
 
 
 <p align="center">
-<img style="width:auto; height:200px" alt="image" src="https://github.com/user-attachments/assets/6f23e6c1-aa9d-4ef9-b30a-759ec0a170b2" />
+<img style="width:auto; height:250px" alt="image" src="https://github.com/user-attachments/assets/6f23e6c1-aa9d-4ef9-b30a-759ec0a170b2" />
 </p>
+
+
+## PESTANYA DE VÍDEO
+
+La pestanya de vídeo està preparada per permetre la transmissió d’imatge en temps real des del dron. Aquesta secció inclou els botons per iniciar i detenir el vídeo, així com una zona central on es mostraria la imatge capturada per la càmera. La seva finalitat és que, si en un futur s’instal·la una càmera al dron, l’usuari pugui visualitzar directament des de la WebApp el que el dron està captant durant el vol.
+Aquesta pestanya podria ser especialment útil durant les operacions de dibuix, ja que permetria supervisar l’entorn del dron en temps real i comprovar visualment que el moviment s’està executant correctament.
+
+
+
+<p align="center">
+<img style="width:auto; height:250px" alt="image" src="https://github.com/user-attachments/assets/7b933dfa-6e22-4635-bbe0-cb901de95435" />
+</p>
+
+
+![Uploading image.png…]()
