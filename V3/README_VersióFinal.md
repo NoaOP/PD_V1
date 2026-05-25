@@ -78,6 +78,10 @@ Un cop seleccionada la figura, l’usuari pot prémer el botó Iniciar Repte. A 
 Si s'acaba el temps i no s'ha pogut completar el repte apareix a la pantalla el següent missatge:
 
 
+<p align="center">
+<img style="width:auto; height:200px" alt="Captura de pantalla 2026-05-22 200200" src="https://github.com/user-attachments/assets/05bbf568-8f97-4a3c-a6d2-3b514d65b397" />
+</p>
+
 ## PESTANYA CONFIGURACIÓ ⚙️
 
 La pestanya de configuració permet personalitzar l’aspecte del dibuix que es genera sobre el mapa. Aquesta secció està pensada perquè l’usuari pugui modificar diferents paràmetres visuals de la trajectòria abans o durant l’ús del dron com a eina de dibuix.
@@ -126,8 +130,24 @@ La pestanya de vídeo està preparada per permetre la transmissió d’imatge en
 Aquesta pestanya podria ser especialment útil durant les operacions de dibuix, ja que permetria supervisar l’entorn del dron en temps real i comprovar visualment que el moviment s’està executant correctament.
 
 
-
 <p align="center">
 <img style="width:auto; height:250px" alt="image" src="https://github.com/user-attachments/assets/7b933dfa-6e22-4635-bbe0-cb901de95435" />
 </p>
+
+
+## DEMOSTRACIÓ DE LA WEBAPP 🎬
+
+<p align="center">
+  <a href="https://drive.google.com/file/d/1Wr10YXfl4sSoYk8w0_654i7Tzaq7Ito0/view?usp=drive_link" target="_blank">
+    <img src="https://github.com/user-attachments/assets/fb97b1d6-3cc1-46e3-9f06-914acfb265c1"
+         alt="Vídeo de demostració"
+         height="250">
+  </a>
+</p>
+
+<p align="center">
+  <em>Fes clic a la imatge per veure la demostració final de la WebApp.</em>
+</p>
+
+
 
