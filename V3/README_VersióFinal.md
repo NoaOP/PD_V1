@@ -57,6 +57,7 @@ A més, aquesta pestanya incorpora controls manuals addicionals, com un joystick
 <img style="width:auto; height:250px" alt="WhatsApp Image 2026-05-20 at 12 47 03" src="https://github.com/user-attachments/assets/19f32c19-d8b7-4c2e-8865-514875708120" />
 </p>
 
+Al vídeo es mostra el funcionament de la pestanya del mapa: https://drive.google.com/file/d/1dLVnobGKilXHOhRfDpDGO3DoDueqvain/view?usp=drive_link
 
 
 ## PESTANYA DE LA ZONA DE JOCS 🎮
@@ -123,7 +124,11 @@ Aquesta pestanya també incorpora una eina per escriure text amb el dron. L’us
 <img style="width:auto; height:250px" alt="image" src="https://github.com/user-attachments/assets/6f23e6c1-aa9d-4ef9-b30a-759ec0a170b2" />
 </p>
 
+Als vídeos es poden veure les diferents eines disponibles a l'apartat de la configuració:
 
+Vídeo 1: https://drive.google.com/file/d/1OzQmmWnxNWDJlxVlszBcS8xodk6dLjkw/view?usp=drive_link
+
+Vídeo 2: https://drive.google.com/file/d/1uBbtL5OwYlqatU9EomBpfwJXjgGXycPP/view?usp=drive_link
 ## PESTANYA DE VÍDEO 📹
 
 La pestanya de vídeo està preparada per permetre la transmissió d’imatge en temps real des del dron. Aquesta secció inclou els botons per iniciar i detenir el vídeo, així com una zona central on es mostraria la imatge capturada per la càmera. La seva finalitat és que, si en un futur s’instal·la una càmera al dron, l’usuari pugui visualitzar directament des de la WebApp el que el dron està captant durant el vol.
