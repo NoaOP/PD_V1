@@ -19,18 +19,31 @@ D’altra banda, el mode espectador està destinat a aquells usuaris que només 
 La pestanya de control és l’apartat principal des d’on l’usuari pot manejar el dron de manera manual. Aquesta secció permet establir la connexió amb el dron, ja sigui mitjançant MAVProxy o a través del simulador, i executar les accions bàsiques necessàries abans d’iniciar qualsevol operació de dibuix.
 
 Des d’aquesta pestanya es poden realitzar les funcions següents:
+
 · Connectar el dron mitjançant MAVProxy
+
 · Connectar el dron en mode simulador
+
 · Enlairar el dron introduint l’altura desitjada en metres
+
 · Aterrar el dron de manera segura
+
 · Activar el mode RTL perquè el dron torni al punt d’origen
+
 · Utilitzar el control per veu per executar ordres bàsiques
+
 · Modificar el heading del dron mitjançant un control lliscant
+
 · Ajustar la velocitat de navegació del dron
+
 · Desplaçar el dron manualment en diferents direccions
+
 · Moure el dron respecte al seu propi sistema de referència
+
 · Controlar el moviment vertical del dron, tant cap amunt com cap avall
+
 · Aturar el moviment del dron en qualsevol moment
+
 · Visualitzar l’altitud actual del dron
 
 Els controls de moviment estan organitzats en diferents blocs. El primer bloc permet moure el dron segons les direccions cardinals, com nord, sud, est i oest. El segon bloc permet controlar el moviment respecte a l’orientació pròpia del dron, amb ordres com endavant, enrere, esquerra i dreta. Finalment, el tercer bloc permet modificar l’altitud mitjançant els comandaments d’amunt i avall. També proporciona funcions de seguretat importants, com aturar el moviment, aterrar el dron o fer-lo tornar automàticament al punt inicial mitjançant el mode RTL.
@@ -38,6 +51,8 @@ Els controls de moviment estan organitzats en diferents blocs. El primer bloc pe
 <p align="center">
 <img style="width:auto; height:250px" alt="WhatsApp Image 2026-05-20 at 12 31 44" src="https://github.com/user-attachments/assets/17b23ee7-a257-4973-99fc-2bad805e947f" />
 </p>
+
+El funcionament de tots els botons d’aquesta pestanya es mostra en el següent vídeo: https://drive.google.com/file/d/1jQzbDifgyQAil2ZV8xtg16v4lMq-rJpo/view?usp=sharing
 
 
 ## PESTANYA DE VISUALITZACIÓ DEL MAPA 🗺️
@@ -83,6 +98,8 @@ Si s'acaba el temps i no s'ha pogut completar el repte apareix a la pantalla el 
 <img style="width:auto; height:200px" alt="Captura de pantalla 2026-05-22 200200" src="https://github.com/user-attachments/assets/05bbf568-8f97-4a3c-a6d2-3b514d65b397" />
 </p>
 
+Al vídeo es mostra el funcionament de la pestanya del joc: https://drive.google.com/file/d/13PNzchkuPIf_yUq4CWBE7A46mC6Pyrc3/view?usp=drive_link
+
 ## PESTANYA CONFIGURACIÓ ⚙️
 
 La pestanya de configuració permet personalitzar l’aspecte del dibuix que es genera sobre el mapa. Aquesta secció està pensada perquè l’usuari pugui modificar diferents paràmetres visuals de la trajectòria abans o durant l’ús del dron com a eina de dibuix.
@@ -126,9 +143,20 @@ Aquesta pestanya també incorpora una eina per escriure text amb el dron. L’us
 
 Als vídeos es poden veure les diferents eines disponibles a l'apartat de la configuració:
 
-Vídeo 1: https://drive.google.com/file/d/1OzQmmWnxNWDJlxVlszBcS8xodk6dLjkw/view?usp=drive_link
+Vídeo de colors i gruix de línia: https://drive.google.com/file/d/1OzQmmWnxNWDJlxVlszBcS8xodk6dLjkw/view?usp=drive_link
 
-Vídeo 2: https://drive.google.com/file/d/1uBbtL5OwYlqatU9EomBpfwJXjgGXycPP/view?usp=drive_link
+Vídeo dels diferents tipus de línia: https://drive.google.com/file/d/1uBbtL5OwYlqatU9EomBpfwJXjgGXycPP/view?usp=drive_link
+
+Vídeo del botó arcoiris, purpurina, línia temporal i esborrar: https://drive.google.com/file/d/1u2n-m7qtvx1kvoVbk1jLdP4nZwr9yF6t/view?usp=drive_link
+
+Vídeo de la geometria: https://drive.google.com/file/d/1zM0WzfDYu4xbzFK7c07Xn1_GtyXHTjl_/view?usp=drive_link
+
+Vídeo del botó d’emplenar zona: https://drive.google.com/file/d/1CcGdElXrPAkbjJyaM6wHj_Jh67IWrBc_/view?usp=drive_link
+
+Vídeo del teclat: https://drive.google.com/file/d/1GgdGvlbP6SfUhsEflIQF9nQhHvlRvofl/view?usp=drive_link
+
+
+
 ## PESTANYA DE VÍDEO 📹
 
 La pestanya de vídeo està preparada per permetre la transmissió d’imatge en temps real des del dron. Aquesta secció inclou els botons per iniciar i detenir el vídeo, així com una zona central on es mostraria la imatge capturada per la càmera. La seva finalitat és que, si en un futur s’instal·la una càmera al dron, l’usuari pugui visualitzar directament des de la WebApp el que el dron està captant durant el vol.
