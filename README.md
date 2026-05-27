@@ -38,13 +38,12 @@ git clone https://github.com/NoaOP/PD_V1.git
 cd PD_V1/V3/ProyectoDeDrones
 ```
 2. Instal·lar les dependències
-```bash
-pip install flask
-pip install paho-mqtt==1.6.1
-pip install opencv-python
-pip install aiortc
-pip install av
-```
+
+    Cal instalar una serie de paquets, aquests estan dins del requirements.txt
+
+  ```bash
+  pip install -r requirements.txt
+  ```
 3. Llibreria del dron (DronLink)
 Assegura't que la carpeta `dronLink` amb la classe `Dron` és accessible des del directori del projecte. Aquesta llibreria forma part del material del curs de l'EETAC.
 ---
@@ -83,25 +82,21 @@ Els paràmetres de connexió es poden sobreescriure amb variables d'entorn:
 ## Execució
 
 Cal llançar els serveis en terminals separades:
+
 Terminal 1 — Servidor web
 ```bash
 python serverMQTT.py
 ```
 La WebApp estarà disponible a `http://localhost:5002`
+
 Terminal 2 — Servei del pilot automàtic
 ```bash
 python AutopilotService.py
 ```
-Terminal 3 — Servei de càmera (opcional, per al vídeo en directe)
+Terminal 3 — Servei de càmera (opcional)
 ```bash
 python CameraService.py
 ```
-> Per usar el **simulador** en lloc del dron real, selecciona "Connectar (Simulador)" des de la pestanya Control. Cal tenir SITL en execució a `tcp:127.0.0.1:5763`.
-Mode espectador — des de qualsevol dispositiu a la mateixa xarxa:
-```
-http://<IP-del-portàtil>:5002/spectator
-```
 
----
-Llicència
-Projecte acadèmic de l'EETAC (UPC). 
+> Per utilitzar el **simulador** en lloc del dron real, selecciona "Connectar (Simulador)" des de la pestanya Control. Cal tenir SITL en execució a `tcp:127.0.0.1:5763`, si utilitzes el Mission Planer no has de tocar res
+
