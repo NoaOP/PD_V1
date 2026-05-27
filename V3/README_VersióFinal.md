@@ -184,4 +184,12 @@ Aquesta pestanya podria ser especialment útil durant les operacions de dibuix, 
 </p>
 
 
+## VISIÓ A FUTUR DEL PROJECTE
 
+En cas de que es reprengués aquest projecte, algunes de les funcionalitats que ens agradaria implementar serien les següents:
+
+  · Minijocs: Es podrien afegir minijocs semblants als actuals però amb petites diferències. Alguns exemples serien un joc dedicat a en comptes d'eliminar els punts del dibuix, que el pilot pogués dibuixar la figura. Un altre joc que inclogui geometries més complexes que les actuals.
+
+  · Implementació de la càmara: Degut a que tenim una pestanya de video a la WebApp, afegint una càmara es podria grabar el recorregut que segueix el dron. Podríem connectar el vídeo en temps real de WebRTC amb un model de reconeixement visual (com YOLOv8). Si el dron detecta un objecte de la seva llibreria (per exemple, un gos), s'activaria automàticament la lògica d'escriptura GPS (LETTER_PATHS) per "pintar" la paraula directament sobre el mapa, sense que el pilot hagi d'intervenir.
+
+  · Optimització del Lawnmower per a geometries complexes: Millorar l'algorisme d'interseccions per segmentar les passades en polígons còncaus, evitant que la ruta planificada surti fora dels límits en perímetres irregulars.
