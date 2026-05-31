@@ -15,6 +15,8 @@ Aquest projecte és una WebApp completa de control de drons desenvolupada en HTM
 
 La comunicació amb el dron es fa a través de MQTT (ordres i telemetria) i WebRTC (vídeo en directe).
 
+En aquest repositori podeu trobar quatre carpetes, C1 i P1 fan referència a la versió 1 del projecte, P2 a la versió 2 i finalment, V3 és per l'última versió. En tot cas, la carpeta que s'ha d'utilitzar és la de V3, l'última versió.
+
 ---
 ## Requisits previs:
 
